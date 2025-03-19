@@ -1,98 +1,77 @@
-class World{
+class World {
     character = new Character();
     level = level1;
-    canvas;
-    ctx;
-    keyboard;
     camera_x = 0;
-    statusBar = new StatusBar();
-    statusBarCoins = new StatusBarCoins();
-    statusBarBottles = new StatusBarBottles();
     throwableObjects = [new ThrowableObject()];
-    
 
-    constructor(canvas, keyboard){
-        this.ctx = canvas.getContext('2d');
-        this.canvas = canvas;
-        this.keyboard = keyboard;
-        this.draw();
+    constructor(canvas, keyboard) {
+        Object.assign(this, { canvas, keyboard, ctx: canvas.getContext('2d'),
+            statusBar: new StatusBar(),
+            statusBarCoins: new StatusBarCoins(),
+            statusBarBottles: new StatusBarBottles()
+        });
         this.setWorld();
         this.run();
+        this.draw();
     }
 
-    setWorld(){
+    setWorld() {
         this.character.world = this;
     }
 
-    run(){
+    run() {
         setInterval(() => {
             this.checkCollisions();
             this.checkThrowObjects();
         }, 200);
     }
 
-    checkCollisions(){
-        this.level.enemies.forEach((enemy) =>{
-            if(this.character.isColliding(enemy)){
+    checkCollisions() {
+        this.level.enemies.forEach(enemy => {
+            if (this.character.isColliding(enemy)) {
                 this.character.hit();
                 this.statusBar.setPercentage(this.character.energy);
             }
-        })
+        });
     }
 
-    checkThrowObjects(){
-        if(this.keyboard.D){
-            let bottle = new ThrowableObject(this.character.x, this.character.y)
-            this.throwableObjects.push(bottle);
+    checkThrowObjects() {
+        if (this.keyboard.D) {
+            console.log('Throwing bottle');
+            this.throwableObjects.push(new ThrowableObject(this.character.x, this.character.y));
         }
     }
 
+    draw() {
+        const drawElements = (elements, translate = false) => {
+            if (translate) this.ctx.translate(this.camera_x, 0);
+            elements.forEach(obj => this.addToMap(obj));
+            if (translate) this.ctx.translate(-this.camera_x, 0);
+        };
 
-
-    draw(){
- 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.translate(this.camera_x, 0);
-        this.addObjectsToMap(this.level.backgroundObjects);
+        drawElements(this.level.backgroundObjects, true);
+        drawElements([this.statusBar, this.statusBarCoins, this.statusBarBottles]);
+        drawElements([this.character, ...this.throwableObjects, ...this.level.enemies, ...this.level.clouds], true);
 
-        this.ctx.translate(-this.camera_x, 0);
-        this.addToMap(this.statusBar);
-        this.addToMap(this.statusBarCoins);
-        this.addToMap(this.statusBarBottles);
-
-        this.ctx.translate(this.camera_x, 0);
-
-        this.addToMap(this.character);
-        this.addObjectsToMap(this.throwableObjects);
-        this.addObjectsToMap(this.level.enemies);
-        this.addObjectsToMap(this.level.clouds);
-        this.ctx.translate(-this.camera_x, 0);
-        let self = this;
-        requestAnimationFrame(function() {
-            self.draw();
-        });
+        requestAnimationFrame(() => this.draw());
     }
 
-    addObjectsToMap(objects){
-        objects.forEach(o => {
-            this.addToMap(o);
-        });
+    addObjectsToMap(objects) {
+        objects.forEach(obj => this.addToMap(obj));
     }
 
     addToMap(mo) {
         this.ctx.save();
-        if (mo.otherDirection) {
-            this.flipImage(mo);
-        }
+        if (mo.otherDirection) this.flipImage(mo);
         mo.draw(this.ctx);
         mo.drawFrame(this.ctx);
         this.ctx.restore();
     }
-    
+
     flipImage(mo) {
         this.ctx.translate(mo.x + mo.width / 2, mo.y);
         this.ctx.scale(-1, 1);
         this.ctx.translate(-mo.x - mo.width / 2, -mo.y);
     }
-
 }
