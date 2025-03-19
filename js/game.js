@@ -2,50 +2,28 @@ let canvas;
 let world;
 let keyboard = new Keyboard();
 
-
-function init(){
-    canvas = document.getElementById('canvas')
+function init() {
+    canvas = document.getElementById('canvas');
     world = new World(canvas, keyboard);
 }
 
-window.addEventListener("keydown", (e) => {
-    if(e.keyCode == 39) {
-        keyboard.RIGHT = true;
-    }
-    if(e.keyCode == 37) {
-        keyboard.LEFT = true;
-    }
-    if(e.keyCode == 38) {
-        keyboard.UP = true;
-    }
-    if(e.keyCode == 40) {
-        keyboard.DOWN = true;
-    }
-    if(e.keyCode == 32) {
-        keyboard.SPACE = true;
-    }
-    if(e.keyCode == 68) {
-        keyboard.D = true;
-    }
-});
+const keyMap = {
+    'ArrowRight': 'RIGHT',
+    'ArrowLeft': 'LEFT',
+    'ArrowUp': 'UP',
+    'ArrowDown': 'DOWN',
+    ' ': 'SPACE',
+    'd': 'D',
+    'D': 'D'
+};
 
-window.addEventListener("keyup", (e) => {
-    if(e.keyCode == 39) {
-        keyboard.RIGHT = false;
+function setKeyboardState(e, state) {
+    if (keyMap[e.key] !== undefined) {
+        keyboard[keyMap[e.key]] = state;
     }
-    if(e.keyCode == 37) {
-        keyboard.LEFT = false;
-    }
-    if(e.keyCode == 38) {
-        keyboard.UP = false;
-    }
-    if(e.keyCode == 40) {
-        keyboard.DOWN = false;
-    }
-    if(e.keyCode == 32) {
-        keyboard.SPACE = false;
-    }
-    if(e.keyCode == 68) {
-        keyboard.D = false;
-    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('keydown', (e) => setKeyboardState(e, true));
+    window.addEventListener('keyup', (e) => setKeyboardState(e, false));
 });
