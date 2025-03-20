@@ -1,4 +1,4 @@
-class CollectableItems extends MovableObject {
+class CollectableCoins extends MovableObject {
     constructor(x, y) {
         super().loadImage('./img/8_coin/coin_1.png');
         Object.assign(this, { x, y, width: 100, height: 100, initialY: y });

@@ -9,7 +9,7 @@ class World {
     statusBarCoins = new StatusBarCoins();
     statusBarBottles = new StatusBarBottles();
     throwableObjects = [];
-    collectableItems = [];
+    collectableCoins = [];
 
     COIN_Y = 350;
     COIN_MIN_X = 350;
@@ -39,7 +39,7 @@ class World {
 
     checkCollisions() {
         this.level.enemies.forEach(e => { if (this.character.isColliding(e)) { this.character.hit(); this.statusBar.setPercentage(this.character.energy); } });
-        this.collectableItems.forEach((c, i) => { if (this.character.isColliding(c)) { this.collectableItems.splice(i, 1); this.statusBarCoins.increaseCoins(); } });
+        this.collectableCoins.forEach((c, i) => { if (this.character.isColliding(c)) { this.collectableCoins.splice(i, 1); this.statusBarCoins.increaseCoins(); } });
     }
 
     checkThrowObjects() {
@@ -50,7 +50,7 @@ class World {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.applyCamera(() => this.addObjects([this.level.backgroundObjects]));
         this.drawStatus();
-        this.applyCamera(() => this.addObjects([this.collectableItems, [this.character], this.throwableObjects, this.level.enemies, this.level.clouds]));
+        this.applyCamera(() => this.addObjects([this.collectableCoins, [this.character], this.throwableObjects, this.level.enemies, this.level.clouds]));
         requestAnimationFrame(() => this.draw());
     }
 
@@ -87,11 +87,11 @@ class World {
         for (let i = 0; i < this.COIN_COUNT; i++) {
             let x;
             do { x = this.COIN_MIN_X + Math.random() * (this.COIN_MAX_X - this.COIN_MIN_X); } while (this.checkOverlap(x));
-            this.collectableItems.push(new CollectableItems(x, this.COIN_Y));
+            this.collectableCoins.push(new CollectableCoins(x, this.COIN_Y));
         }
     }
 
     checkOverlap(x) {
-        return this.collectableItems.some(c => Math.abs(x - c.x) < this.COIN_SPACING);
+        return this.collectableCoins.some(c => Math.abs(x - c.x) < this.COIN_SPACING);
     }
 }

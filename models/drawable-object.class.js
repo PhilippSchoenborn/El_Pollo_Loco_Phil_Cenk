@@ -29,7 +29,7 @@ class DrawableObject {
     }
 
     drawFrame(ctx) {
-        const frameTypes = [Character, Chicken, Endboss, CollectableItems];
+        const frameTypes = [Character, Chicken, Endboss, CollectableCoins];
         
         if (frameTypes.some(type => this instanceof type)) {
             ctx.beginPath();
