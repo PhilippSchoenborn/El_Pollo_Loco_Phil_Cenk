@@ -1,4 +1,4 @@
-class StatusBarBottles extends DrawableObject{
+class StatusBarBottles extends DrawableObject {
     IMAGES_BOTTLES = [
         './img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/0.png',
         './img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/20.png',
@@ -7,38 +7,24 @@ class StatusBarBottles extends DrawableObject{
         './img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/80.png',
         './img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/100.png',
     ];
-    percentage = 100;
-    
-    constructor(){
+
+    percentage = 0;
+
+    constructor() {
         super();
+        Object.assign(this, { x: 25, y: 80, width: 180, height: 50 });
         this.loadImages(this.IMAGES_BOTTLES);
-        this.x = 25;
-        this.y = 80;
-        this.width = 180;
-        this.height = 50;
-        this.setPercentage(100);
+        this.setPercentage(0);
     }
-    
-    setPercentage(percentage){
-        this.percentage = percentage;
-        let path = this.IMAGES_BOTTLES[this.resolveImageIndex()];
-        this.img = this.imageCache[path];
+
+    setPercentage(percentage) {
+        this.img = this.imageCache[this.IMAGES_BOTTLES[this.resolveImageIndex(this.percentage = percentage)]];
     }
-    
-    resolveImageIndex(){
-        if(this.percentage == 100){
-            return 5;
-        } else if(this.percentage > 80){
-            return 4;
-        } else if(this.percentage > 60){
-            return 3;
-        } else if(this.percentage > 40){
-            return 2;
-        } else if(this.percentage > 20){
-            return 1;
-        } else {
-            return 0;
-        }
+
+    increaseBottles() { this.setPercentage(Math.min(this.percentage + 10, 100)); }
+    decreaseBottles() { this.setPercentage(Math.max(this.percentage - 10, 0)); }
+
+    resolveImageIndex() {
+        return Math.min(Math.floor(this.percentage / 20), 5);
     }
-    
-    }
+}
