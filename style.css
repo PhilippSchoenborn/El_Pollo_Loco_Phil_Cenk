@@ -1,9 +1,46 @@
 body {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    /* centers horizontally */
     align-items: center;
+    /* centers vertically */
+    height: 100vh;
+    /* makes the body take full viewport height */
+    margin: 0;
+    /* removes default margin */
 }
 
 canvas {
     background-color: black;
+}
+
+#game-container {
+    position: relative;
+    width: 720px;
+    height: 480px;
+}
+
+#start-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('./img/9_intro_outro_screens/start/startscreen_2.png') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+#start-button {
+    padding: 1em 2em;
+    font-size: 1.5em;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }

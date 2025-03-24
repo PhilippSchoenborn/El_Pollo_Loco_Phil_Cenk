@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
 
-    <link rel="stylesheet" href="style.css">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>El Pollo Loco</title>
+    <link rel="stylesheet" href="style.css" />
     <script src="./models/drawable-object.class.js"></script>
     <script src="./models/movable-object.class.js"></script>
     <script src="./models/status-bar.class.js"></script>
@@ -24,15 +24,22 @@
     <script src="./models/trowable-object.class.js"></script>
     <script src="./levels/level1.js"></script>
     <script src="./js/game.js"></script>
-
 </head>
-<body onload="init()">
 
-    <h1>El Pollo Loco</h1>
+<body>
+    <div id="game-container">
+        <canvas id="canvas" width="720" height="480"></canvas>
+        <div id="start-screen">
+            <button id="start-button">Start Game</button>
+        </div>
+    </div>
 
-    <canvas id="canvas" width="720" height="480">
-         
-    </canvas>
-
+    <script>
+        document.getElementById('start-button').addEventListener('click', function () {
+            document.getElementById('start-screen').style.display = 'none';
+            init();
+        });
+    </script>
 </body>
+
 </html>

@@ -11,6 +11,9 @@ class World {
     throwableObjects = [];
     collectableCoins = [];
     collectableBottles = [];
+    soundtrack_sound = new Audio('audio/soundtrack.mp3');
+    coin_sound = new Audio('audio/coin.mp3');
+    pickup_bottle_sound = new Audio('audio/pickup_bottle.mp3');
 
     COIN_Y = 350;
     COIN_MIN_X = 350;
@@ -24,10 +27,16 @@ class World {
     constructor(canvas, keyboard) {
         Object.assign(this, { ctx: canvas.getContext('2d'), canvas, keyboard });
         this.character.world = this;
+        this.soundtrack_sound.play();
         this.run();
         this.spawnCoins();
         this.draw();
         this.spawnBottles();
+        this.soundtrack_sound.volume = 0.05;
+        this.coin_sound.volume = 0.5;
+        this.pickup_bottle_sound.volume = 0.5;
+        this.soundtrack_sound.loop = true;
+        this.soundtrack_sound.play();
     }
 
     run() {
@@ -42,6 +51,7 @@ class World {
         this.collectableCoins = this.collectableCoins.filter(c => {
             if (this.character.isColliding(c)) {
                 this.statusBarCoins.increaseCoins();
+                this.coin_sound.play();
                 return false;
             }
             return true;
@@ -49,6 +59,7 @@ class World {
         this.collectableBottles = this.collectableBottles.filter(bottle => {
             if (this.character.isColliding(bottle)) {
                 this.statusBarBottles.increaseBottles();
+                this.pickup_bottle_sound.play();
                 return false;
             }
             return true;
