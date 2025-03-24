@@ -1,13 +1,13 @@
 body {
     display: flex;
     justify-content: center;
-    /* centers horizontally */
     align-items: center;
-    /* centers vertically */
     height: 100vh;
-    /* makes the body take full viewport height */
     margin: 0;
-    /* removes default margin */
+    font-weight: 700;
+    font-size: 20px;
+    background: url('./img/5_background/background_body.jpg') no-repeat center center fixed;
+    background-size: cover;
 }
 
 canvas {
@@ -18,6 +18,9 @@ canvas {
     position: relative;
     width: 720px;
     height: 480px;
+    border: solid 12px rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+    
 }
 
 #start-screen {
