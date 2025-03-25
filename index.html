@@ -8,7 +8,6 @@
     <link rel="icon" type="image/x-icon" href="./img/10_interface_icons/favicon.png">
     <link rel="stylesheet" href="style.css">
 
-    <!-- game scripts -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>El Pollo Loco</title>
@@ -33,21 +32,14 @@
 </head>
 
 <body>
-    <!-- Game container with canvas and loading screen -->
     <div class="canvas-container" id="gameContainer">
         <canvas id="canvas" width="720" height="480"></canvas>
-
-        <!-- Loading Screen Image -->
         <img class="start-screen" id="loadingImage" src="./img/9_intro_outro_screens/start/startscreen_1.png"
             alt="Loading Screen Image">
-
-        <!-- Interface Icons -->
         <div class="interface-container">
             <img onclick="startGame()" class="start-screen-icon" src="./img/10_interface_icons/start_button.png"
                 alt="start button">
-
             <div class="interface-icons">
-
                 <img onclick="openModal()" class="img-icon" src="./img/10_interface_icons/info.PNG" alt="info button">
                 <img onclick="toggleMute()" class="img-icon" id="volume-button"
                     src="./img/10_interface_icons/volume.png" alt="volume button">
@@ -57,15 +49,11 @@
                     alt="reload button">
             </div>
         </div>
-
-        <!--game over screen-->
         <div id="gameOverScreen" class="game-over hidden"><img src="./img/9_intro_outro_screens/game_over/game over.png"
                 alt="Game Over"></div>
         <img id="tryAgainButton" onclick="reloadGame()" class="start-screen-icon hidden " src="./img/10_interface_icons/again_button.png"
             alt="start button">
     </div>
-
-    <!-- Info Modal for Game Controls -->
     <div id="infoModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
@@ -94,5 +82,4 @@
     </div>
     <script src="./js/game.js"></script>
 </body>
-
 </html>
