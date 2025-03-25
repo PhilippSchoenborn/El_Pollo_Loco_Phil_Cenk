@@ -135,6 +135,10 @@ function startGame() {
     startButton.onclick = null;
     gameContainer.style.display = 'block';
     init();
+    if (isMuted && world) {
+        world.setMute(true);
+    }
+    document.querySelector('.reload-button').classList.remove('hidden');
 }
 
 /**
