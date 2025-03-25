@@ -26,10 +26,16 @@ function setKeyboardState(e, state) {
 
 function toggleMute() {
     const volumeButton = document.getElementById('volume-button');
-    if (volumeButton.src.includes('volume.png')) {
+    isMuted = !isMuted;
+
+    if (isMuted) {
         volumeButton.src = './img/10_interface_icons/mute.png';
     } else {
         volumeButton.src = './img/10_interface_icons/volume.png';
+    }
+
+    if (world) {
+        world.setMute(isMuted);
     }
 }
 

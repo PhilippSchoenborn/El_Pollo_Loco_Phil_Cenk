@@ -59,6 +59,9 @@ class World {
         this.soundtrack_sound.muted = muted;
         this.coin_sound.muted = muted;
         this.pickup_bottle_sound.muted = muted;
+        if (this.character) {
+            this.character.setMute(muted);
+        }
     }
 
     run() {

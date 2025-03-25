@@ -165,4 +165,15 @@ class Character extends MovableObject {
             }
         }, 100);
     }
+
+    setMute(muted) {
+        this.walking_sound.muted = muted;
+        this.jump_sound.muted = muted;
+        this.character_jump_sound.muted = muted;
+        this.character_hurt_sound.muted = muted;
+        this.snoring_sound.muted = muted;
+    }
+    
+
+    // function gameOver();
 }
