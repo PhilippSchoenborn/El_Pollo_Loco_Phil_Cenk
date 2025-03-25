@@ -45,8 +45,8 @@
                     src="./img/10_interface_icons/volume.png" alt="volume button">
                 <img onclick="toggleFullscreen()" class="img-icon" src="./img/10_interface_icons/fullscreen.png"
                     alt="fullscreen button">
-                <img onclick="reloadGame()" class="img-icon" src="./img/10_interface_icons/reload.png"
-                    alt="reload button">
+                <img onclick="reloadGame()" class="img-icon reload-button hidden"
+                    src="./img/10_interface_icons/reload.png" alt="reload button">
             </div>
             <div class="legal-notice-section">
                 <div class="legal-notice">
@@ -56,8 +56,8 @@
         </div>
         <div id="gameOverScreen" class="game-over hidden"><img src="./img/9_intro_outro_screens/game_over/game over.png"
                 alt="Game Over"></div>
-        <img id="tryAgainButton" onclick="reloadGame()" class="start-screen-icon hidden " src="./img/10_interface_icons/again_button.png"
-            alt="start button">
+        <img id="tryAgainButton" onclick="reloadGame()" class="start-screen-icon hidden "
+            src="./img/10_interface_icons/again_button.png" alt="start button">
     </div>
     <div id="infoModal" class="modal">
         <div class="modal-content">
@@ -87,4 +87,5 @@
     </div>
     <script src="./js/game.js"></script>
 </body>
+
 </html>
