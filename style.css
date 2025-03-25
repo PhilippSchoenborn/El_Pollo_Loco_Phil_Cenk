@@ -1,4 +1,18 @@
+@font-face {
+    font-family: 'StardosStencil';
+    src: url('./fonts/StardosStencil-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'StardosStencil';
+    src: url('./fonts/StardosStencil-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
 body {
+    font-family: 'StardosStencil', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -89,10 +103,8 @@ canvas {
     color: white;
     padding: 30px;
     border-radius: 15px;
-    max-width: 500px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    font-size: 18px;
-    line-height: 1.5;
+    font-size: 24px;
 }
 
 .modal-content img {
@@ -100,7 +112,8 @@ canvas {
 }
 
 .modal-content li {
-    width: 180px;
+    width: 210px;
+    padding-bottom: 4px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -110,9 +123,15 @@ canvas {
     padding: 0;
 }
 
+.modal-content h3 {
+    border: solid 2px white;
+    border-radius: 8px;
+    padding: 8px;
+}
+
 .close {
     position: absolute;
-    top: 60px;
+    top: 42px;
     right: 255px;
     font-size: 24px;
     font-weight: bold;
