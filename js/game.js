@@ -1,6 +1,7 @@
 let canvas;
 let world;
 let keyboard = new Keyboard();
+let isMuted = false;
 
 function init() {
     canvas = document.getElementById('canvas');
@@ -34,8 +35,21 @@ function closeModal() {
 }
 
 function toggleMute() {
-    console.log('Mute toggled');
+    let muteIcon = document.getElementById('mute-icon');
+    // Flip the boolean
+    isMuted = !isMuted;
+    
+    if (isMuted) {
+        muteIcon.src = './img/10_interface_icons/mute.png';
+        document.querySelectorAll('audio').forEach(a => a.muted = true);
+
+    } else {
+        muteIcon.src = './img/10_interface_icons/volume.png';
+        backgroundSound.muted = false;
+        document.querySelectorAll('audio').forEach(a => a.muted = false);
+    }
 }
+
 
 function toggleFullscreen() {
     let gameContainer = document.getElementById('game-container');
