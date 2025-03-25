@@ -165,3 +165,19 @@ function disableUserInput() {
         document.removeEventListener('keyup', handleKeyUp);
     }
 }
+
+// Öffnen des Popups
+document.querySelector('.legal-notice-link').addEventListener('click', function (event) {
+    event.preventDefault();
+    document.getElementById('openLegalNotice').classList.remove('hidden');
+    document.body.classList.add('no-scroll'); // Scrollen deaktivieren
+});
+
+// Schließen des Popups, wenn man außerhalb der Box klickt
+document.getElementById('openLegalNotice').addEventListener('click', function (event) {
+    const legalNoticeContainer = document.querySelector('.legal-notice-container');
+    if (!legalNoticeContainer.contains(event.target)) {
+        document.getElementById('openLegalNotice').classList.add('hidden');
+        document.body.classList.remove('no-scroll'); // Scrollen wieder aktivieren
+    }
+});
