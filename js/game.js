@@ -125,7 +125,12 @@ function startGame() {
     startButton.style.display = 'none';
     startButton.onclick = null;
     gameContainer.style.display = 'block';
+
     init();
+
+    if (isMuted && world) {
+        world.setMute(true);
+    }
 }
 
 function gameOver() {
