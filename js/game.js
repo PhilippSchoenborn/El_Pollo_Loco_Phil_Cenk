@@ -130,10 +130,12 @@ function startGame() {
     const loadingImage = document.getElementById('loadingImage');
     const gameContainer = document.getElementById('gameContainer');
     const startButton = document.querySelector('.start-screen-icon');
+    const legalButton = document.querySelector('.legal-notice-section');
     loadingImage.classList.add('hidden');
     startButton.style.display = 'none';
     startButton.onclick = null;
     gameContainer.style.display = 'block';
+    legalButton.style.display = 'none';
     init();
     if (isMuted && world) {
         world.setMute(true);
