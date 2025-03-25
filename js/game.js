@@ -1,6 +1,8 @@
 let canvas;
 let world;
 let keyboard = new Keyboard();
+
+// Track global mute state
 let isMuted = false;
 
 function init() {
@@ -34,29 +36,35 @@ function closeModal() {
     modal.style.display = 'none';
 }
 
+// Toggle mute
 function toggleMute() {
-    let muteIcon = document.getElementById('mute-icon');
-    // Flip the boolean
+    // Flip the global mute state
     isMuted = !isMuted;
-    
-    if (isMuted) {
-        muteIcon.src = './img/10_interface_icons/mute.png';
-        document.querySelectorAll('audio').forEach(a => a.muted = true);
+    let muteIcon = document.getElementById('mute-icon');
 
+    if (isMuted) {
+        // Switch to the "mute" icon
+        muteIcon.src = './img/10_interface_icons/mute.png';
     } else {
+        // Switch to the "volume" icon (or whatever unmuted icon you use)
         muteIcon.src = './img/10_interface_icons/volume.png';
-        backgroundSound.muted = false;
-        document.querySelectorAll('audio').forEach(a => a.muted = false);
+    }
+
+    // Tell the world to mute/unmute all its sounds
+    // (Only works if 'world' is already created, i.e. after init())
+    if (world) {
+        world.setMute(isMuted);
     }
 }
 
-
 function toggleFullscreen() {
     let gameContainer = document.getElementById('game-container');
-    if (!document.fullscreenElement &&
+    if (
+        !document.fullscreenElement &&
         !document.webkitFullscreenElement &&
         !document.mozFullScreenElement &&
-        !document.msFullscreenElement) {
+        !document.msFullscreenElement
+    ) {
         if (gameContainer.requestFullscreen) {
             gameContainer.requestFullscreen();
         } else if (gameContainer.webkitRequestFullscreen) {
@@ -79,20 +87,23 @@ function toggleFullscreen() {
     }
 }
 
-
 function reloadGame() {
     location.reload();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    window.addEventListener('keydown', e => setKeyboardState(e, true));
-    window.addEventListener('keyup', e => setKeyboardState(e, false));
+    window.addEventListener('keydown', (e) => setKeyboardState(e, true));
+    window.addEventListener('keyup', (e) => setKeyboardState(e, false));
+
+    // Icon listeners
     document.getElementById('info-icon').addEventListener('click', openModal);
     document.getElementById('mute-icon').addEventListener('click', toggleMute);
     document.getElementById('fullscreen-icon').addEventListener('click', toggleFullscreen);
     document.getElementById('reload-icon').addEventListener('click', reloadGame);
     document.getElementById('close-modal').addEventListener('click', closeModal);
-    document.getElementById('info-modal').addEventListener('click', e => {
+
+    // Close modal when clicking outside the modal content
+    document.getElementById('info-modal').addEventListener('click', (e) => {
         if (e.target.id === 'info-modal') {
             closeModal();
         }
