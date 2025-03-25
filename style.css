@@ -53,9 +53,7 @@ canvas {
     right: 10px;
     display: flex;
     gap: 10px;
-    /* space between icons */
     z-index: 11;
-    /* place above the canvas */
 }
 
 #icon-container img {
@@ -71,7 +69,6 @@ canvas {
 
 .modal {
     display: none;
-    /* hidden initially */
     position: absolute;
     top: 0;
     left: 0;
@@ -85,11 +82,13 @@ canvas {
 
 
 .modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     background-color: #a85b53;
     color: white;
     padding: 30px;
     border-radius: 15px;
-    width: 80%;
     max-width: 500px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     font-size: 18px;
@@ -101,16 +100,20 @@ canvas {
 }
 
 .modal-content li {
-    width: 160px;
+    width: 180px;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
+.modal-content ul {
+    padding: 0;
+}
+
 .close {
     position: absolute;
-    top: 10px;
-    right: 15px;
+    top: 60px;
+    right: 255px;
     font-size: 24px;
     font-weight: bold;
     cursor: pointer;
