@@ -1,11 +1,9 @@
 class World {
-    character = new Character();
     level = level1;
     canvas;
     ctx;
     keyboard;
     camera_x = 0;
-    statusBar = new StatusBar();
     statusBarCoins = new StatusBarCoins();
     statusBarBottles = new StatusBarBottles();
     throwableObjects = [];
@@ -34,6 +32,8 @@ class World {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.keyboard = keyboard;
+        this.statusBar = new StatusBar();
+        this.character = new Character(this.statusBar);
         this.character.world = this;
         this.initSounds();
         this.soundtrack_sound.play();
@@ -78,9 +78,10 @@ class World {
 
     handleEnemyCollisions() {
         this.level.enemies.forEach(e => {
-            if (this.character.isColliding(e)) {
-                this.character.hit();
-                this.statusBar.setPercentage(this.character.energy);
+            // Prüfe zusätzlich, ob der Charakter nicht invulnerable ist
+            if (this.character.isColliding(e) && !this.character.isInvulnerable) {
+                this.character.hit(); // oder besser: this.character.takeDamage(20);
+                this.statusBar.setPercentage(this.character.health);
             }
         });
     }
