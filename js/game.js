@@ -8,13 +8,13 @@ function init() {
 }
 
 const keyMap = {
-    'ArrowRight': 'RIGHT',
-    'ArrowLeft': 'LEFT',
-    'ArrowUp': 'UP',
-    'ArrowDown': 'DOWN',
+    ArrowRight: 'RIGHT',
+    ArrowLeft: 'LEFT',
+    ArrowUp: 'UP',
+    ArrowDown: 'DOWN',
     ' ': 'SPACE',
-    'd': 'D',
-    'D': 'D'
+    d: 'D',
+    D: 'D'
 };
 
 function setKeyboardState(e, state) {
@@ -23,42 +23,64 @@ function setKeyboardState(e, state) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    window.addEventListener('keydown', (e) => setKeyboardState(e, true));
-    window.addEventListener('keyup', (e) => setKeyboardState(e, false));
-});
+function openModal() {
+    let modal = document.getElementById('info-modal');
+    modal.style.display = 'flex';
+}
 
-// Example in game.js:
+function closeModal() {
+    let modal = document.getElementById('info-modal');
+    modal.style.display = 'none';
+}
 
-function showInfo() {
-    alert('Game Info: Collect coins, throw bottles, defeat enemies, etc.');
-  }
-  
-  function toggleMute() {
-    // your audio handling logic
+function toggleMute() {
     console.log('Mute toggled');
-  }
-  
-  function toggleFullscreen() {
+}
+
+function toggleFullscreen() {
     let gameContainer = document.getElementById('game-container');
-    if (!document.fullscreenElement) {
-      gameContainer.requestFullscreen();
+    if (!document.fullscreenElement &&
+        !document.webkitFullscreenElement &&
+        !document.mozFullScreenElement &&
+        !document.msFullscreenElement) {
+        if (gameContainer.requestFullscreen) {
+            gameContainer.requestFullscreen();
+        } else if (gameContainer.webkitRequestFullscreen) {
+            gameContainer.webkitRequestFullscreen();
+        } else if (gameContainer.mozRequestFullScreen) {
+            gameContainer.mozRequestFullScreen();
+        } else if (gameContainer.msRequestFullscreen) {
+            gameContainer.msRequestFullscreen();
+        }
     } else {
-      document.exitFullscreen();
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
     }
-  }
-  
-  function reloadGame() {
-    // Either reload the entire page or reset the game logic
-    // location.reload(); // simplest approach
-    console.log('Game reloaded');
-  }
-  
-  // Attach event listeners after DOM is loaded
-  window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('info-icon').addEventListener('click', showInfo);
+}
+
+
+function reloadGame() {
+    location.reload();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('keydown', e => setKeyboardState(e, true));
+    window.addEventListener('keyup', e => setKeyboardState(e, false));
+    document.getElementById('info-icon').addEventListener('click', openModal);
     document.getElementById('mute-icon').addEventListener('click', toggleMute);
     document.getElementById('fullscreen-icon').addEventListener('click', toggleFullscreen);
     document.getElementById('reload-icon').addEventListener('click', reloadGame);
-  });
-  
+    document.getElementById('close-modal').addEventListener('click', closeModal);
+    document.getElementById('info-modal').addEventListener('click', e => {
+        if (e.target.id === 'info-modal') {
+            closeModal();
+        }
+    });
+});
