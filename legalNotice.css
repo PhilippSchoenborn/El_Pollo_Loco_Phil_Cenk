@@ -13,24 +13,23 @@
 }
 
 body {
-    font-family: 'Stardos Stencil', sans-serif;
     margin: 0;
     padding: 0;
+    height: 100vh;
+    font-family: 'Stardos Stencil', sans-serif;
     display: flex;
     align-items: center;
     flex-direction: column;
-    height: 100vh;
     background-image: url('./img/5_background/background_body.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-    overflow: scroll;
-    scrollbar-width: none;
+    overflow: auto; 
 }
 
-body::-webkit-scrollbar {
+.legal-notice-container::-webkit-scrollbar {
     display: none;
-  }
+}
 
 .legal-notice-container {
     max-width: 720px;
@@ -42,6 +41,7 @@ body::-webkit-scrollbar {
     color: white;
     font-size: 18px;
     overflow: auto;
+    scrollbar-width: none;
 
     text-shadow: 2px 2px 0px rgb(177, 103, 92, 0.9),
         -2px 2px 0px rgb(177, 103, 92, 0.9),
