@@ -12,7 +12,6 @@ class World {
     collectableCoins = [];
     collectableBottles = [];
 
-    // Your audio objects:
     soundtrack_sound = new Audio('audio/soundtrack.mp3');
     coin_sound = new Audio('audio/coin.mp3');
     pickup_bottle_sound = new Audio('audio/pickup_bottle.mp3');
@@ -26,34 +25,34 @@ class World {
     THROW_OFFSET_Y = 100;
     COLLISION_CHECK_INTERVAL = 200;
 
+    /**
+     * Initializes the game world
+     * @param {HTMLCanvasElement} canvas - The canvas element to render on
+     * @param {Keyboard} keyboard - Keyboard input controller
+     */
     constructor(canvas, keyboard) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.keyboard = keyboard;
-
         this.character.world = this;
-
-        // Set up your sounds
-        this.soundtrack_sound.loop = true;
-        this.soundtrack_sound.volume = 0.05;
-        this.coin_sound.volume = 0.5;
-        this.pickup_bottle_sound.volume = 0.5;
-
-        // Start background music (usually after a user click)
+        this.initSounds();
         this.soundtrack_sound.play();
-
-        // Main game loops
         this.run();
         this.draw();
-
-        // Spawn coins/bottles
         this.spawnCoins();
         this.spawnBottles();
     }
 
+    initSounds() {
+        this.soundtrack_sound.loop = true;
+        this.soundtrack_sound.volume = 0.05;
+        this.coin_sound.volume = 0.5;
+        this.pickup_bottle_sound.volume = 0.5;
+    }
+
     /**
-     * Mute or unmute all sounds in this world.
-     * @param {boolean} muted - true to mute, false to unmute
+     * Mutes or unmutes all audio in the game
+     * @param {boolean} muted - True to mute, false to unmute
      */
     setMute(muted) {
         this.soundtrack_sound.muted = muted;
@@ -72,27 +71,37 @@ class World {
     }
 
     checkCollisions() {
-        this.level.enemies.forEach((e) => {
+        this.handleEnemyCollisions();
+        this.handleCoinCollisions();
+        this.handleBottleCollisions();
+    }
+
+    handleEnemyCollisions() {
+        this.level.enemies.forEach(e => {
             if (this.character.isColliding(e)) {
                 this.character.hit();
                 this.statusBar.setPercentage(this.character.energy);
             }
         });
+    }
 
-        this.collectableCoins = this.collectableCoins.filter((c) => {
+    handleCoinCollisions() {
+        this.collectableCoins = this.collectableCoins.filter(c => {
             if (this.character.isColliding(c)) {
                 this.statusBarCoins.increaseCoins();
                 this.coin_sound.play();
-                return false; // remove the coin
+                return false;
             }
             return true;
         });
+    }
 
-        this.collectableBottles = this.collectableBottles.filter((bottle) => {
+    handleBottleCollisions() {
+        this.collectableBottles = this.collectableBottles.filter(bottle => {
             if (this.character.isColliding(bottle)) {
                 this.statusBarBottles.increaseBottles();
                 this.pickup_bottle_sound.play();
-                return false; // remove the bottle
+                return false;
             }
             return true;
         });
@@ -100,28 +109,21 @@ class World {
 
     checkThrowObjects() {
         if (this.keyboard.D && this.statusBarBottles.percentage > 0) {
-            this.throwableObjects.push(
-                new ThrowableObject(
-                    this.character.x + this.THROW_OFFSET_X,
-                    this.character.y + this.THROW_OFFSET_Y
-                )
-            );
+            this.throwObject();
             this.statusBarBottles.decreaseBottles();
         }
     }
 
+    throwObject() {
+        const x = this.character.x + this.THROW_OFFSET_X;
+        const y = this.character.y + this.THROW_OFFSET_Y;
+        this.throwableObjects.push(new ThrowableObject(x, y));
+    }
+
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // 1) Draw background objects using camera offset
-        this.applyCamera(() => {
-            this.addObjects([this.level.backgroundObjects]);
-        });
-
-        // 2) Draw fixed-position UI (status bars)
+        this.applyCamera(() => this.addObjects([this.level.backgroundObjects]));
         this.drawStatus();
-
-        // 3) Draw other objects with camera offset
         this.applyCamera(() => {
             this.addObjects([
                 this.collectableCoins,
@@ -129,11 +131,9 @@ class World {
                 [this.character],
                 this.throwableObjects,
                 this.level.enemies,
-                this.level.clouds,
+                this.level.clouds
             ]);
         });
-
-        // Keep redrawing
         requestAnimationFrame(() => this.draw());
     }
 
@@ -149,7 +149,7 @@ class World {
     }
 
     addObjects(objectGroups) {
-        objectGroups.flat().forEach((obj) => this.drawObject(obj));
+        objectGroups.flat().forEach(obj => this.drawObject(obj));
     }
 
     drawObject(mo) {
@@ -171,11 +171,7 @@ class World {
     spawnCoins() {
         this.collectableCoins = Array.from({ length: this.COIN_COUNT }, () => {
             let x;
-            while (
-                this.checkOverlap(
-                    (x = this.COIN_MIN_X + Math.random() * (this.COIN_MAX_X - this.COIN_MIN_X))
-                )
-            );
+            while (this.checkOverlap(x = this.randomX()));
             return new CollectableCoins(x, this.COIN_Y);
         });
     }
@@ -183,15 +179,17 @@ class World {
     spawnBottles() {
         const fixedY = 350;
         this.collectableBottles = Array.from({ length: 15 }, () => {
-            let randomX;
-            while (this.checkBottleOverlap((randomX = 250 + Math.random() * 2200)));
-            return new CollectableBottle(randomX, fixedY);
+            let x;
+            while (this.checkBottleOverlap(x = 250 + Math.random() * 2200));
+            return new CollectableBottle(x, fixedY);
         });
     }
 
-    checkOverlap = (x) =>
-        this.collectableCoins.some((c) => Math.abs(x - c.x) < this.COIN_SPACING);
+    randomX() {
+        return this.COIN_MIN_X + Math.random() * (this.COIN_MAX_X - this.COIN_MIN_X);
+    }
 
-    checkBottleOverlap = (newX) =>
-        this.collectableBottles.some((bottle) => Math.abs(newX - bottle.x) < 120);
+    checkOverlap = x => this.collectableCoins.some(c => Math.abs(x - c.x) < this.COIN_SPACING);
+
+    checkBottleOverlap = x => this.collectableBottles.some(b => Math.abs(x - b.x) < 120);
 }

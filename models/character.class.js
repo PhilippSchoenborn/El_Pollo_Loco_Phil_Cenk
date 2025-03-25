@@ -174,6 +174,5 @@ class Character extends MovableObject {
         this.snoring_sound.muted = muted;
     }
     
-
     // function gameOver();
 }
