@@ -37,9 +37,44 @@
             <img src="./img/10_interface_icons/mute.png" id="mute-icon" alt="Mute" />
             <img src="./img/10_interface_icons/fullscreen.png" id="fullscreen-icon" alt="Fullscreen" />
             <img src="./img/10_interface_icons/reload.png" id="reload-icon" alt="Reload" />
-          </div>          
+        </div>
+        <div id="info-modal" class="modal">
+            <div class="modal-content">
+                <span id="close-modal" class="close">&times;</span>
+                <h2>How to Play El Pollo Loco</h2>
+                <p>
+                    Welcome to El Pollo Loco, the crazy chicken game!<br />
+                    Your goal is to collect coins, throw bottles at enemies, and defeat the crazy chicken boss.
+                </p>
+                <h3>Movement & Controls</h3>
+                <ul>
+                    <li><strong>Move Left:</strong> <kbd>&larr;</kbd> or <kbd>A</kbd></li>
+                    <li><strong>Move Right:</strong> <kbd>&rarr;</kbd> or <kbd>D</kbd></li>
+                    <li><strong>Jump:</strong> <kbd>Space</kbd> or <kbd>W</kbd></li>
+                    <li><strong>Throw Bottle:</strong> <kbd>F</kbd></li>
+                </ul>
+                <h3>Interface Icons</h3>
+                <ul>
+                    <li>
+                        <img src="./img/10_interface_icons/info.png" alt="Info icon" />
+                        - Show this help panel
+                    </li>
+                    <li>
+                        <img src="./img/10_interface_icons/mute.png" alt="Mute icon" />
+                        - Mute / unmute game audio
+                    </li>
+                    <li>
+                        <img src="./img/10_interface_icons/fullscreen.png" alt="Fullscreen icon" />
+                        - Toggle fullscreen mode
+                    </li>
+                    <li>
+                        <img src="./img/10_interface_icons/reload.png" alt="Reload icon" />
+                        - Restart the game (show start screen again)
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
-
     <script>
         document.getElementById('start-button').addEventListener('click', function () {
             document.getElementById('start-screen').style.display = 'none';
