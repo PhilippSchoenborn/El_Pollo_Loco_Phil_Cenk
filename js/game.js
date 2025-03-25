@@ -1,8 +1,6 @@
 let canvas;
 let world;
 let keyboard = new Keyboard();
-
-// Track global mute state
 let isMuted = false;
 
 function init() {
@@ -26,63 +24,79 @@ function setKeyboardState(e, state) {
     }
 }
 
+function toggleMute() {
+    const volumeButton = document.getElementById('volume-button');
+    if (volumeButton.src.includes('volume.png')) {
+        volumeButton.src = './img/10_interface_icons/mute.png';
+    } else {
+        volumeButton.src = './img/10_interface_icons/volume.png';
+    }
+}
+
+let modal;
+
+function isFullscreen() {
+    return document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+}
+
 function openModal() {
-    let modal = document.getElementById('info-modal');
-    modal.style.display = 'flex';
+    modal.style.display = "block";
+    if (isFullscreen()) {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+            elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
+    }
 }
 
 function closeModal() {
-    let modal = document.getElementById('info-modal');
-    modal.style.display = 'none';
+    modal.style.display = "none";
+    if (isFullscreen()) {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    }
 }
 
-// Toggle mute
-function toggleMute() {
-    // Flip the global mute state
-    isMuted = !isMuted;
-    let muteIcon = document.getElementById('mute-icon');
-
-    if (isMuted) {
-        // Switch to the "mute" icon
-        muteIcon.src = './img/10_interface_icons/mute.png';
-    } else {
-        // Switch to the "volume" icon (or whatever unmuted icon you use)
-        muteIcon.src = './img/10_interface_icons/volume.png';
-    }
-
-    // Tell the world to mute/unmute all its sounds
-    // (Only works if 'world' is already created, i.e. after init())
-    if (world) {
-        world.setMute(isMuted);
+window.onclick = function (event) {
+    if (event.target === modal) {
+        closeModal();
     }
 }
 
 function toggleFullscreen() {
-    let gameContainer = document.getElementById('game-container');
-    if (
-        !document.fullscreenElement &&
-        !document.webkitFullscreenElement &&
-        !document.mozFullScreenElement &&
-        !document.msFullscreenElement
-    ) {
-        if (gameContainer.requestFullscreen) {
-            gameContainer.requestFullscreen();
-        } else if (gameContainer.webkitRequestFullscreen) {
-            gameContainer.webkitRequestFullscreen();
-        } else if (gameContainer.mozRequestFullScreen) {
-            gameContainer.mozRequestFullScreen();
-        } else if (gameContainer.msRequestFullscreen) {
-            gameContainer.msRequestFullscreen();
-        }
-    } else {
+    const canvasContainer = document.querySelector('.canvas-container');
+    if (isFullscreen()) {
         if (document.exitFullscreen) {
             document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
         } else if (document.mozCancelFullScreen) {
             document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
         } else if (document.msExitFullscreen) {
             document.msExitFullscreen();
+        }
+    } else {
+        if (canvasContainer.requestFullscreen) {
+            canvasContainer.requestFullscreen();
+        } else if (canvasContainer.mozRequestFullScreen) {
+            canvasContainer.mozRequestFullScreen();
+        } else if (canvasContainer.webkitRequestFullscreen) {
+            canvasContainer.webkitRequestFullscreen();
+        } else if (canvasContainer.msRequestFullscreen) {
+            canvasContainer.msRequestFullscreen();
         }
     }
 }
@@ -92,20 +106,35 @@ function reloadGame() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    modal = document.getElementById('infoModal');
     window.addEventListener('keydown', (e) => setKeyboardState(e, true));
     window.addEventListener('keyup', (e) => setKeyboardState(e, false));
-
-    // Icon listeners
-    document.getElementById('info-icon').addEventListener('click', openModal);
-    document.getElementById('mute-icon').addEventListener('click', toggleMute);
-    document.getElementById('fullscreen-icon').addEventListener('click', toggleFullscreen);
-    document.getElementById('reload-icon').addEventListener('click', reloadGame);
-    document.getElementById('close-modal').addEventListener('click', closeModal);
-
-    // Close modal when clicking outside the modal content
-    document.getElementById('info-modal').addEventListener('click', (e) => {
-        if (e.target.id === 'info-modal') {
-            closeModal();
-        }
-    });
 });
+
+function startGame() {
+    const loadingImage = document.getElementById('loadingImage');
+    const gameContainer = document.getElementById('gameContainer');
+    const startButton = document.querySelector('.start-screen-icon');
+    loadingImage.classList.add('hidden');
+    startButton.style.display = 'none';
+    startButton.onclick = null;
+    gameContainer.style.display = 'block';
+    init();
+}
+
+function gameOver() {
+    const gameOverScreen = document.getElementById('gameOverScreen');
+    const tryAgainButton = document.getElementById('tryAgainButton');
+    gameOverScreen.classList.remove('hidden');
+    tryAgainButton.classList.remove('hidden');
+    disableUserInput();
+}
+
+function disableUserInput() {
+    if (typeof handleKeyDown === 'function') {
+        document.removeEventListener('keydown', handleKeyDown);
+    }
+    if (typeof handleKeyUp === 'function') {
+        document.removeEventListener('keyup', handleKeyUp);
+    }
+}

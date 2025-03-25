@@ -2,6 +2,13 @@
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Pollo Loco</title>
+    <link rel="icon" type="image/x-icon" href="./img/10_interface_icons/favicon.png">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- game scripts -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>El Pollo Loco</title>
@@ -23,40 +30,69 @@
     <script src="./models/collectable-bottles.class.js"></script>
     <script src="./models/trowable-object.class.js"></script>
     <script src="./levels/level1.js"></script>
-    <script src="./js/game.js"></script>
 </head>
 
 <body>
-    <div id="game-container">
+    <!-- Game container with canvas and loading screen -->
+    <div class="canvas-container" id="gameContainer">
         <canvas id="canvas" width="720" height="480"></canvas>
-        <div id="start-screen">
-            <button id="start-button">Start Game</button>
+
+        <!-- Loading Screen Image -->
+        <img class="start-screen" id="loadingImage" src="./img/9_intro_outro_screens/start/startscreen_1.png"
+            alt="Loading Screen Image">
+
+        <!-- Interface Icons -->
+        <div class="interface-container">
+            <img onclick="startGame()" class="start-screen-icon" src="./img/10_interface_icons/start_button.png"
+                alt="start button">
+
+            <div class="interface-icons">
+
+                <img onclick="openModal()" class="img-icon" src="./img/10_interface_icons/info.PNG" alt="info button">
+                <img onclick="toggleMute()" class="img-icon" id="volume-button"
+                    src="./img/10_interface_icons/volume.png" alt="volume button">
+                <img onclick="toggleFullscreen()" class="img-icon" src="./img/10_interface_icons/fullscreen.png"
+                    alt="fullscreen button">
+                <img onclick="reloadGame()" class="img-icon" src="./img/10_interface_icons/reload.png"
+                    alt="reload button">
+            </div>
         </div>
-        <div id="icon-container">
-            <img src="./img/10_interface_icons/info.png" id="info-icon" alt="Info" />
-            <img src="./img/10_interface_icons/volume.png" id="mute-icon" alt="Mute" />
-            <img src="./img/10_interface_icons/fullscreen.png" id="fullscreen-icon" alt="Fullscreen" />
-            <img src="./img/10_interface_icons/reload.png" id="reload-icon" alt="Reload" />
-        </div>
-        <div id="info-modal" class="modal">
-            <div class="modal-content">
-                <span id="close-modal" class="close">&times;</span>
-                <h3>Controls</h3>
-                <ul>
-                    <li><strong>Move Left:</strong><img src="./img/10_interface_icons/arrow_left.png" alt=""></li>
-                    <li><strong>Move Right:</strong><img src="./img/10_interface_icons/arrow_right.png" alt=""></li>
-                    <li><strong>Jump:</strong><img src="./img/10_interface_icons/space.png" alt=""> / <img src="./img/10_interface_icons/arrow_up.png" alt=""></li>
-                    <li><strong>Throw Bottle:</strong><img src="./img/10_interface_icons/key_d.png" alt=""></li>
-                </ul>
+
+        <!--game over screen-->
+        <div id="gameOverScreen" class="game-over hidden"><img src="./img/9_intro_outro_screens/game_over/game over.png"
+                alt="Game Over"></div>
+        <img id="tryAgainButton" onclick="reloadGame()" class="start-screen-icon hidden " src="./img/10_interface_icons/again_button.png"
+            alt="start button">
+    </div>
+
+    <!-- Info Modal for Game Controls -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Game Controls</h2>
+            <div class="controls-images">
+                <div class="controls">
+                    <img src="./img/10_interface_icons/arrow_left.png" alt="Left Arrow">
+                    <h3>Left</h3>
+                </div>
+                <div class="controls">
+                    <img src="./img/10_interface_icons/arrow_right.png" alt="Right Arrow">
+                    <h3>Right</h3>
+                </div>
+                <div class="controls">
+                    <img src="./img/10_interface_icons/arrow_up.png" alt="Up Arrow">
+                    <h3>/</h3>
+                    <img src="./img/10_interface_icons/space.png" alt="Space Key">
+                    <h3>Jump</h3>
+                </div>
+                <div class="controls">
+                    <img src="./img/10_interface_icons/key_d.png" alt="D Key">
+                    <h3>Throw</h3>
+                </div>
             </div>
         </div>
     </div>
-    <script>
-        document.getElementById('start-button').addEventListener('click', function () {
-            document.getElementById('start-screen').style.display = 'none';
-            init();
-        });
-    </script>
+    <script src="./js/game.js"></script>
 </body>
 
 </html>
