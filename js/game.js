@@ -3,9 +3,15 @@ let world;
 let keyboard = new Keyboard();
 let isMuted = false;
 
+/**
+ * Initializes the canvas and game world
+ */
 function init() {
     canvas = document.getElementById('canvas');
     world = new World(canvas, keyboard);
+    if (isMuted && world) {
+        world.setMute(true);
+    }
 }
 
 const keyMap = {
@@ -18,22 +24,26 @@ const keyMap = {
     D: 'D'
 };
 
+/**
+ * Updates keyboard state on keydown or keyup
+ * @param {KeyboardEvent} e 
+ * @param {boolean} state 
+ */
 function setKeyboardState(e, state) {
     if (keyMap[e.key] !== undefined) {
         keyboard[keyMap[e.key]] = state;
     }
 }
 
+/**
+ * Toggles mute state and updates icon and game sound
+ */
 function toggleMute() {
     const volumeButton = document.getElementById('volume-button');
     isMuted = !isMuted;
-
-    if (isMuted) {
-        volumeButton.src = './img/10_interface_icons/mute.png';
-    } else {
-        volumeButton.src = './img/10_interface_icons/volume.png';
-    }
-
+    volumeButton.src = isMuted
+        ? './img/10_interface_icons/mute.png'
+        : './img/10_interface_icons/volume.png';
     if (world) {
         world.setMute(isMuted);
     }
@@ -41,82 +51,81 @@ function toggleMute() {
 
 let modal;
 
+/**
+ * Checks if the browser is currently in fullscreen mode
+ * @returns {boolean}
+ */
 function isFullscreen() {
     return document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
 }
 
+/**
+ * Opens the controls modal and requests fullscreen if needed
+ */
 function openModal() {
     modal.style.display = "block";
-    if (isFullscreen()) {
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.mozRequestFullScreen) {
-            elem.mozRequestFullScreen();
-        } else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
-        }
-    }
+    requestFullscreen(document.documentElement);
 }
 
+/**
+ * Closes the modal and exits fullscreen if active
+ */
 function closeModal() {
     modal.style.display = "none";
-    if (isFullscreen()) {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        }
-    }
+    exitFullscreen();
+}
+
+/**
+ * Request fullscreen for an element
+ * @param {HTMLElement} elem 
+ */
+function requestFullscreen(elem) {
+    if (elem.requestFullscreen) elem.requestFullscreen();
+    else if (elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+}
+
+/**
+ * Exit fullscreen if active
+ */
+function exitFullscreen() {
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    else if (document.msExitFullscreen) document.msExitFullscreen();
 }
 
 window.onclick = function (event) {
     if (event.target === modal) {
         closeModal();
     }
-}
+};
 
+/**
+ * Toggles fullscreen on the canvas container
+ */
 function toggleFullscreen() {
     const canvasContainer = document.querySelector('.canvas-container');
-    if (isFullscreen()) {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        }
-    } else {
-        if (canvasContainer.requestFullscreen) {
-            canvasContainer.requestFullscreen();
-        } else if (canvasContainer.mozRequestFullScreen) {
-            canvasContainer.mozRequestFullScreen();
-        } else if (canvasContainer.webkitRequestFullscreen) {
-            canvasContainer.webkitRequestFullscreen();
-        } else if (canvasContainer.msRequestFullscreen) {
-            canvasContainer.msRequestFullscreen();
-        }
-    }
+    isFullscreen() ? exitFullscreen() : requestFullscreen(canvasContainer);
 }
 
+/**
+ * Reloads the entire game
+ */
 function reloadGame() {
     location.reload();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     modal = document.getElementById('infoModal');
-    window.addEventListener('keydown', (e) => setKeyboardState(e, true));
-    window.addEventListener('keyup', (e) => setKeyboardState(e, false));
+    window.addEventListener('keydown', e => setKeyboardState(e, true));
+    window.addEventListener('keyup', e => setKeyboardState(e, false));
 });
 
+/**
+ * Starts the game by hiding the start screen and initializing game
+ */
 function startGame() {
     const loadingImage = document.getElementById('loadingImage');
     const gameContainer = document.getElementById('gameContainer');
@@ -125,14 +134,12 @@ function startGame() {
     startButton.style.display = 'none';
     startButton.onclick = null;
     gameContainer.style.display = 'block';
-
     init();
-
-    if (isMuted && world) {
-        world.setMute(true);
-    }
 }
 
+/**
+ * Shows the game over screen and disables input
+ */
 function gameOver() {
     const gameOverScreen = document.getElementById('gameOverScreen');
     const tryAgainButton = document.getElementById('tryAgainButton');
@@ -141,6 +148,9 @@ function gameOver() {
     disableUserInput();
 }
 
+/**
+ * Detaches any global key listeners
+ */
 function disableUserInput() {
     if (typeof handleKeyDown === 'function') {
         document.removeEventListener('keydown', handleKeyDown);
