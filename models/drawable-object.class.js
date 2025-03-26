@@ -12,7 +12,7 @@ class DrawableObject {
     }
 
     drawFrame(ctx) {
-        if ([Character, Chicken, Endboss, CollectableCoins, CollectableBottle].some(cls => this instanceof cls)) {
+        if ([Character, Chicken, Chick, Endboss, CollectableCoins, CollectableBottle].some(cls => this instanceof cls)) {
             ctx.strokeStyle = 'green';
             ctx.lineWidth = 2;
             ctx.strokeRect(this.x, this.y, this.width, this.height);

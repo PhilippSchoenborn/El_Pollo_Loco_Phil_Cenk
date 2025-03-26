@@ -71,6 +71,7 @@ class Character extends MovableObject {
         './img/2_character_pepe/4_hurt/H-42.png',
         './img/2_character_pepe/4_hurt/H-43.png',
     ];
+
     world;
     walking_sound = new Audio('audio/walking.mp3');
     jump_sound = new Audio('audio/jump.mp3');
@@ -89,13 +90,21 @@ class Character extends MovableObject {
         this.applyGravity();
         this.animate();
         this.statusBar = statusBar;
+
         this.walking_sound.volume = 0.15;
         this.jump_sound.volume = 0.3;
         this.character_jump_sound.volume = 0.2;
         this.character_hurt_sound.volume = 0.2;
         this.snoring_sound.volume = 0.5;
         this.snoring_sound.loop = true;
+
+        // Corrected hitbox
+        this.hitboxOffsetX = 20;
+        this.hitboxOffsetY = 50;
+        this.hitboxWidth = this.width - 40;
+        this.hitboxHeight = this.height - 80;
     }
+    
 
     playHurtAnimation() {
         let frameIndex = 0;
@@ -127,7 +136,6 @@ class Character extends MovableObject {
 
     animate() {
         setInterval(() => {
-            if (this.isInvulnerable) return;
             this.walking_sound.pause();
             let currentTime = Date.now();
             let isMoving = false;
@@ -153,6 +161,7 @@ class Character extends MovableObject {
                 this.lastMovementTime = currentTime;
                 isMoving = true;
             }
+
             if (!isMoving && !this.isAboveGround()) {
                 if (currentTime - this.lastMovementTime >= this.idleTimeThreshold) {
                     if (!this.snoringSoundPlaying) {
@@ -170,7 +179,9 @@ class Character extends MovableObject {
                     }
                 }
             }
+
             this.world.camera_x = -this.x + 100;
+
         }, 1000 / 60);
 
         setInterval(() => {
