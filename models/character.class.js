@@ -11,6 +11,7 @@ class Character extends MovableObject {
     longIdleAnimationSpeed = 10;
     snoringSoundPlaying = false;
     health = 100;
+    dead = false;
     statusBar = null;
     isInvulnerable = false;
 
@@ -120,9 +121,16 @@ class Character extends MovableObject {
     }
 
     takeDamage(damageAmount) {
-        if (this.isInvulnerable) return;
+        if (this.isInvulnerable || this.dead) return;
         this.health -= damageAmount;
-        if (this.health < 0) this.health = 0;
+        console.log("Aktuelle Lebenspunkte:", this.health);
+        if (this.health <= 0) {
+            this.health = 0;
+            if (!this.dead) {
+                this.dead = true;
+                this.gameOver();
+            }
+        }
         if (this.statusBar) {
             this.statusBar.setPercentage(this.health);
         }
@@ -136,10 +144,10 @@ class Character extends MovableObject {
 
     animate() {
         setInterval(() => {
+            if (this.dead) return;
             this.walking_sound.pause();
             let currentTime = Date.now();
             let isMoving = false;
-
             if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
                 this.moveRight();
                 this.walking_sound.play();
@@ -161,7 +169,6 @@ class Character extends MovableObject {
                 this.lastMovementTime = currentTime;
                 isMoving = true;
             }
-
             if (!isMoving && !this.isAboveGround()) {
                 if (currentTime - this.lastMovementTime >= this.idleTimeThreshold) {
                     if (!this.snoringSoundPlaying) {
@@ -181,24 +188,41 @@ class Character extends MovableObject {
             }
 
             this.world.camera_x = -this.x + 100;
-
         }, 1000 / 60);
 
         setInterval(() => {
-            if (this.isDead() && !this.dead) {
+            if (this.dead) return;
+            if (this.isDead()) {
                 this.dead = true;
-                this.playAnimation(this.IMAGES_DEAD);
-            }
-            else if (!this.isInvulnerable && this.isHurt()) {
-                this.takeDamage(5);
-            }
-            else if (!this.isInvulnerable && this.isAboveGround()) {
+                this.gameOver();
+            } else if (!this.isInvulnerable && this.isHurt()) {
+                this.takeDamage(20); // set DMG here
+            } else if (!this.isInvulnerable && this.isAboveGround()) {
                 this.playAnimation(this.IMAGES_JUMPING);
-            }
-            else if (!this.isInvulnerable && (this.world.keyboard.RIGHT || this.world.keyboard.LEFT)) {
+            } else if (!this.isInvulnerable && (this.world.keyboard.RIGHT || this.world.keyboard.LEFT)) {
                 this.playAnimation(this.IMAGES_WALKING);
             }
         }, 100);
+    }
+
+    isDead() {
+        return this.health <= 0;
+    }
+
+    gameOver() {
+        let frameIndex = 0;
+        const frameDuration = 200;
+        const animationInterval = setInterval(() => {
+            this.img = this.imageCache[this.IMAGES_DEAD[frameIndex]];
+            frameIndex++;
+            if (frameIndex >= this.IMAGES_DEAD.length) {
+                clearInterval(animationInterval);
+                setTimeout(() => {
+                    alert("Game Over!");
+                    location.reload();
+                }, 1000);
+            }
+        }, frameDuration);
     }
 
     setMute(muted) {
@@ -208,6 +232,4 @@ class Character extends MovableObject {
         this.character_hurt_sound.muted = muted;
         this.snoring_sound.muted = muted;
     }
-
-    // function gameOver();
 }
