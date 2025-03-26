@@ -123,7 +123,6 @@ class Character extends MovableObject {
     takeDamage(damageAmount) {
         if (this.isInvulnerable || this.dead) return;
         this.health -= damageAmount;
-        console.log("Aktuelle Lebenspunkte:", this.health);
         if (this.health <= 0) {
             this.health = 0;
             if (!this.dead) {
@@ -218,8 +217,11 @@ class Character extends MovableObject {
             if (frameIndex >= this.IMAGES_DEAD.length) {
                 clearInterval(animationInterval);
                 setTimeout(() => {
-                    alert("Game Over!");
-                    location.reload();
+                    document.getElementById("gameOverScreen").classList.remove("hidden");
+                    document.getElementById("tryAgainButton").classList.remove("hidden");
+                    if (this.world && typeof this.world.pauseGame === "function") {
+                        this.world.pauseGame();
+                    }
                 }, 1000);
             }
         }, frameDuration);
