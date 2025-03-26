@@ -64,7 +64,6 @@ function isFullscreen() {
  */
 function openModal() {
     modal.style.display = "block";
-    requestFullscreen(document.documentElement);
 }
 
 /**
