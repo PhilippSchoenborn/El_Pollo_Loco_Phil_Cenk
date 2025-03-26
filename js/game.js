@@ -71,7 +71,6 @@ function openModal() {
  */
 function closeModal() {
     modal.style.display = "none";
-    exitFullscreen();
 }
 
 /**

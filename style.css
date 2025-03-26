@@ -20,7 +20,7 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    height: 100vh;
+    height: 98vh;
     background-image: url('./img/5_background/background_body.jpg');
     background-repeat: no-repeat;
     background-size: cover;
