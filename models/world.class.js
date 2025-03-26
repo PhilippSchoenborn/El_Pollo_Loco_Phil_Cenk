@@ -9,6 +9,7 @@ class World {
     throwableObjects = [];
     collectableCoins = [];
     collectableBottles = [];
+    gamePaused = false;
 
     soundtrack_sound = new Audio('audio/soundtrack.mp3');
     coin_sound = new Audio('audio/coin.mp3');
@@ -65,6 +66,7 @@ class World {
 
     run() {
         setInterval(() => {
+            if (this.gamePaused) return;
             this.checkCollisions();
             this.checkThrowObjects();
         }, this.COLLISION_CHECK_INTERVAL);
@@ -121,7 +123,12 @@ class World {
         this.throwableObjects.push(new ThrowableObject(x, y));
     }
 
+    pauseGame() {
+        this.gamePaused = true;
+    }
+
     draw() {
+        if (this.gamePaused) return;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.applyCamera(() => this.addObjects([this.level.backgroundObjects]));
         this.drawStatus();
