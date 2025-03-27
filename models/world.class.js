@@ -102,15 +102,16 @@ class World {
                     if (enemy instanceof Endboss) {
                         if (!enemy.isInvulnerable) {
                             enemy.hitPoints--;
-                            enemy.hit();
-
                             if (enemy.hitPoints <= 0) {
-                                this.killEnemy(enemy);
+                                enemy.die();
+                            } else {
+                                enemy.hit();
                             }
                         }
                     } else {
                         this.killEnemy(enemy);
                     }
+
 
 
                     setTimeout(() => {
@@ -216,7 +217,7 @@ class World {
         mo.draw(this.ctx);
         this.ctx.restore();
     }
-    
+
     flipImage(mo) {
         this.ctx.translate(mo.x + mo.width / 2, mo.y);
         this.ctx.scale(-1, 1);

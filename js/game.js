@@ -152,6 +152,14 @@ function gameOver() {
     disableUserInput();
 }
 
+function win() {
+    const winScreen = document.getElementById('winScreen');
+    const winAgainButton = document.getElementById('winAgainButton');
+    winScreen.classList.remove('hidden');
+    winAgainButton.classList.remove('hidden');
+    disableUserInput();
+}
+
 /**
  * Detaches any global key listeners
  */

@@ -146,7 +146,7 @@ class Character extends MovableObject {
             if (this.dead) return;
             this.walking_sound.pause();
             let currentTime = Date.now();
-            let isMoving = false;
+            let isMoving = Object.values(this.world.keyboard).some(key => key === true);
             if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
                 this.moveRight();
                 this.walking_sound.play();

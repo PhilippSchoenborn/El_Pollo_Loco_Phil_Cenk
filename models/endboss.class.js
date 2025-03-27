@@ -138,10 +138,45 @@ class Endboss extends MovableObject {
 
             if (frameIndex >= this.IMAGES_DEAD.length) {
                 clearInterval(deathAnim);
+
                 setTimeout(() => {
                     world.level.enemies = world.level.enemies.filter(e => e !== this);
+
+                    // ✅ Now show the win screen!
+                    //    (This calls the global function you defined in game.class.js)
+                    win();
+
                 }, 500);
             }
         }, frameDelay);
+    }
+
+
+    win() {
+        let frameIndex = 0;
+        const frameDuration = 200;
+
+        // Example if you have a win animation array:
+        // (If you just want to show a static image, you can skip this loop)
+        const animationInterval = setInterval(() => {
+            this.img = this.imageCache[this.IMAGES_WIN[frameIndex]];
+            frameIndex++;
+
+            // Once we've shown all frames
+            if (frameIndex >= this.IMAGES_WIN.length) {
+                clearInterval(animationInterval);
+
+                // Small delay before showing the Win Screen
+                setTimeout(() => {
+                    document.getElementById("winScreen").classList.remove("hidden");
+                    document.getElementById("winAgainButton").classList.remove("hidden");
+
+                    // Pause the game if that logic exists
+                    if (this.world && typeof this.world.pauseGame === "function") {
+                        this.world.pauseGame();
+                    }
+                }, 500);
+            }
+        }, frameDuration);
     }
 }
