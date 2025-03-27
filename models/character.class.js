@@ -107,36 +107,31 @@ class Character extends MovableObject {
         this.hitboxHeight = this.height - 80;
     }
 
-
     playHurtAnimation() {
-        if (this.isAnimatingHurt) return; // Prevent animation restart if it's already running
-    
-        this.isAnimatingHurt = true; // Set flag to prevent restart
+        if (this.isAnimatingHurt) return;
+        this.isAnimatingHurt = true;
         let frameIndex = 0;
         let lastFrameTime = 0;
-        const frameDuration = 150; // Duration for each frame in the hurt animation
+        const frameDuration = 150;
         const animateHurt = (timestamp) => {
             if (!lastFrameTime) lastFrameTime = timestamp;
             const deltaTime = timestamp - lastFrameTime;
-            
             if (deltaTime >= frameDuration) {
-                this.img = this.imageCache[this.IMAGES_HURT[frameIndex]]; // Set the next hurt animation frame
+                this.img = this.imageCache[this.IMAGES_HURT[frameIndex]];
                 frameIndex++;
                 if (frameIndex >= this.IMAGES_HURT.length) {
-                    this.isAnimatingHurt = false; // Animation is done, damage is now allowed again
+                    this.isAnimatingHurt = false;
                     return;
                 }
                 lastFrameTime = timestamp;
             }
-            
             requestAnimationFrame(animateHurt);
         };
         requestAnimationFrame(animateHurt);
     }
 
     takeDamage(damageAmount) {
-        if (this.isInvulnerable || this.dead || this.isAnimatingHurt) return; // Block further damage if hurt animation is running
-    
+        if (this.isInvulnerable || this.dead || this.isAnimatingHurt) return;
         this.health -= damageAmount;
         if (this.health <= 0) {
             this.health = 0;
@@ -148,14 +143,12 @@ class Character extends MovableObject {
         if (this.statusBar) {
             this.statusBar.setPercentage(this.health);
         }
-        
         this.isInvulnerable = true;
-        this.playHurtAnimation(); // Play hurt animation only once
+        this.playHurtAnimation();
         this.character_hurt_sound.play();
-        
         setTimeout(() => {
-            this.isInvulnerable = false; // Disable invulnerability after the animation ends
-        }, 150 * this.IMAGES_HURT.length); // Based on the number of hurt frames
+            this.isInvulnerable = false;
+        }, 150 * this.IMAGES_HURT.length);
     }
 
     animate() {
