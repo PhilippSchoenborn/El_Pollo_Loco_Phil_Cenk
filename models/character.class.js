@@ -105,7 +105,7 @@ class Character extends MovableObject {
         this.hitboxWidth = this.width - 40;
         this.hitboxHeight = this.height - 80;
     }
-    
+
 
     playHurtAnimation() {
         let frameIndex = 0;
@@ -236,10 +236,10 @@ class Character extends MovableObject {
     }
 
     isAbove(otherObject) {
-        return (this.y + this.hitboxHeight) <= (otherObject.y + 15);
-    }    
+        return this.y + this.hitboxHeight - 10 <= otherObject.y; // Adds a little buffer
+    }
 
     bounce() {
         this.speedY = 15;
-    }    
+    }
 }

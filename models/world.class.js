@@ -19,7 +19,7 @@ class World {
     COIN_MIN_X = 350;
     COIN_MAX_X = 2200;
     COIN_SPACING = 120;
-    COIN_COUNT = 10;
+    COIN_COUNT = 5;
     THROW_OFFSET_X = 65;
     THROW_OFFSET_Y = 100;
     COLLISION_CHECK_INTERVAL = 200;
@@ -85,8 +85,8 @@ class World {
 
             if (isColliding) {
                 if (isStomping && !(enemy instanceof Endboss)) {
-                    // No more bounce
                     this.killEnemy(enemy);
+                    // Optionally play stomp sound here
                 } else if (!isStomping && !this.character.isInvulnerable) {
                     this.character.hit();
                     this.statusBar.setPercentage(this.character.health);
@@ -220,21 +220,33 @@ class World {
     }
 
     spawnCoins() {
-        this.collectableCoins = Array.from({ length: this.COIN_COUNT }, () => {
-            let x;
-            while (this.checkOverlap(x = this.randomX()));
-            return new CollectableCoins(x, this.COIN_Y);
-        });
+        this.collectableCoins = [];
+        let placed = 0;
+
+        while (placed < this.COIN_COUNT) {
+            let x = this.randomX();
+            if (!this.checkOverlap(x)) {
+                this.collectableCoins.push(new CollectableCoins(x, this.COIN_Y));
+                placed++;
+            }
+        }
     }
 
     spawnBottles() {
         const fixedY = 350;
-        this.collectableBottles = Array.from({ length: 15 }, () => {
-            let x;
-            while (this.checkBottleOverlap(x = 250 + Math.random() * 2200));
-            return new CollectableBottle(x, fixedY);
-        });
+        const bottleCount = 6;
+        this.collectableBottles = [];
+
+        let placed = 0;
+        while (placed < bottleCount) {
+            let x = 250 + Math.random() * 2200;
+            if (!this.checkBottleOverlap(x)) {
+                this.collectableBottles.push(new CollectableBottle(x, fixedY));
+                placed++;
+            }
+        }
     }
+
 
     randomX() {
         return this.COIN_MIN_X + Math.random() * (this.COIN_MAX_X - this.COIN_MIN_X);
