@@ -97,6 +97,7 @@ class World {
             this.throwableObjects.forEach((bottle, index) => {
                 if (bottle.isColliding(enemy)) {
                     bottle.splash();
+                    console.log('💥 Bottle hit enemy:', enemy);
 
                     if (enemy instanceof Endboss) {
                         enemy.hitPoints = (enemy.hitPoints || 3) - 1;
@@ -205,13 +206,30 @@ class World {
 
     drawObject(mo) {
         this.ctx.save();
+
         if (mo.otherDirection) {
             this.flipImage(mo);
         }
+
         mo.draw(this.ctx);
-        mo.drawFrame(this.ctx);
+        mo.drawFrame(this.ctx); // if needed
+
+        // ✅ Hitbox debug (safe)
+        if (mo.hitboxOffsetX !== undefined) {
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = 'red';
+            this.ctx.strokeRect(
+                mo.x + mo.hitboxOffsetX,
+                mo.y + mo.hitboxOffsetY,
+                mo.hitboxWidth,
+                mo.hitboxHeight
+            );
+            this.ctx.closePath();
+        }
+
         this.ctx.restore();
     }
+
 
     flipImage(mo) {
         this.ctx.translate(mo.x + mo.width / 2, mo.y);

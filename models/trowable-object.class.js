@@ -1,7 +1,7 @@
+// ✅ ThrowableObject class with smash sound and fixed hitbox
 class ThrowableObject extends MovableObject {
     throw_sound = new Audio('audio/throw.mp3');
     smash_sound = new Audio('audio/bottleSmash.mp3');
-
 
     IMAGES_ROTATION = [
         './img/6_salsa_bottle/bottle_rotation/1_bottle_rotation.png',
@@ -26,12 +26,20 @@ class ThrowableObject extends MovableObject {
         this.width = 60;
         this.height = 70;
         this.throw_sound.volume = 0.5;
+        this.smash_sound.volume = 0.4;
         this.throw();
+
+        // Hitbox tuning
+        this.hitboxOffsetX = 5;
+        this.hitboxOffsetY = 5;
+        this.hitboxWidth = this.width - 10;
+        this.hitboxHeight = this.height - 10;
     }
 
     throw() {
         this.speedY = 15;
         this.applyGravity();
+
         this.moveInterval = setInterval(() => {
             this.x += 10;
         }, 35);
@@ -46,8 +54,12 @@ class ThrowableObject extends MovableObject {
     splash() {
         this.loadImages(this.IMAGES_SPLASH);
         this.playAnimation(this.IMAGES_SPLASH);
+
         clearInterval(this.moveInterval);
         clearInterval(this.animateInterval);
+
+        this.smash_sound.play();
+
         setTimeout(() => {
             world.throwableObjects.splice(world.throwableObjects.indexOf(this), 1);
         }, 600);

@@ -7,65 +7,78 @@ class MovableObject extends DrawableObject {
     lastHit = 0;
 
 
-    applyGravity(){
+    applyGravity() {
         setInterval(() => {
-            if(this.isAboveGround() || this.speedY > 0){
+            if (this.isAboveGround() || this.speedY > 0) {
                 this.y -= this.speedY;
                 this.speedY -= this.accerleration;
             }
         }, 1000 / 25);
     }
 
-    isAboveGround(){
-        if(this instanceof ThrowableObject){
+    isAboveGround() {
+        if (this instanceof ThrowableObject) {
             return true;
-        } else{
+        } else {
             return this.y < 193;
         }
     }
 
-    moveRight(){
+    moveRight() {
         this.x += this.speed;
     }
 
-    moveLeft(){
+    moveLeft() {
         this.x -= this.speed;
     }
 
-    playAnimation(images){
+    playAnimation(images) {
         let i = this.currentImage % images.length;
-        let path = images[i]; 
+        let path = images[i];
         this.img = this.imageCache[path];
         this.currentImage++;
     }
 
-    jump(){
+    jump() {
         this.speedY = 30;
     }
 
-    isColliding(mo){
-        return this.x + this.width > mo.x &&
-            this.y + this.height > mo.y &&
-            this.x < mo.x &&
-            this.y < mo.y + mo.height;
+    isColliding(mo) {
+        return (
+            this.x + (this.hitboxOffsetX || 0) + (this.hitboxWidth || this.width) > mo.x + (mo.hitboxOffsetX || 0) &&
+            this.y + (this.hitboxOffsetY || 0) + (this.hitboxHeight || this.height) > mo.y + (mo.hitboxOffsetY || 0) &&
+            this.x + (this.hitboxOffsetX || 0) < mo.x + (mo.hitboxOffsetX || 0) + (mo.hitboxWidth || mo.width) &&
+            this.y + (this.hitboxOffsetY || 0) < mo.y + (mo.hitboxOffsetY || 0) + (mo.hitboxHeight || mo.height)
+        );
     }
 
-    hit(){
+    hit() {
         this.energy -= 5;
-        if(this.energy < 0){
+        if (this.energy < 0) {
             this.energy = 0;
         } else {
-            this.lastHit =  new Date().getTime();
+            this.lastHit = new Date().getTime();
         }
     }
 
-    isHurt(){
+    isHurt() {
         let timepassed = new Date().getTime() - this.lastHit;
         timepassed = timepassed / 1000;
         return timepassed < 0.5;
     }
 
-    isDead(){
+    isDead() {
         return this.energy == 0;
     }
 }
+
+// Draw hitbox for debugging
+this.ctx.beginPath();
+this.ctx.strokeStyle = 'red';
+this.ctx.strokeRect(
+    mo.x + (mo.hitboxOffsetX || 0),
+    mo.y + (mo.hitboxOffsetY || 0),
+    mo.hitboxWidth || mo.width,
+    mo.hitboxHeight || mo.height
+);
+this.ctx.closePath();

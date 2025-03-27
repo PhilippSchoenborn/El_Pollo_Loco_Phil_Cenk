@@ -15,12 +15,10 @@ class Chick extends MovableObject {
         this.loadImages(this.IMAGES_WALKING);
         this.x = x;
         this.speed = 0.15 + Math.random() * 0.3;
-
         this.hitboxOffsetX = 8;
         this.hitboxOffsetY = 10;
-        this.hitboxWidth = this.width - 16;
-        this.hitboxHeight = this.height - 20;
-
+        this.hitboxWidth = this.width - 16;   // Smaller width
+        this.hitboxHeight = this.height - 20; // Smaller height
         this.animate();
     }
 
@@ -28,12 +26,12 @@ class Chick extends MovableObject {
         this.moveInterval = setInterval(() => {
             this.moveLeft();
         }, 1000 / 60);
-    
+
         this.animationInterval = setInterval(() => {
             this.playAnimation(this.IMAGES_WALKING);
         }, 125);
     }
-    
+
     die() {
         this.loadImage('./img/3_enemies_chicken/chicken_small/2_dead/dead.png');
         clearInterval(this.moveInterval);
