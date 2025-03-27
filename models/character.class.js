@@ -234,4 +234,12 @@ class Character extends MovableObject {
         this.character_hurt_sound.muted = muted;
         this.snoring_sound.muted = muted;
     }
+
+    isAbove(otherObject) {
+        return (this.y + this.hitboxHeight) <= (otherObject.y + 15);
+    }    
+
+    bounce() {
+        this.speedY = 15;
+    }    
 }

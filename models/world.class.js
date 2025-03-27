@@ -80,19 +80,28 @@ class World {
 
     handleEnemyCollisions() {
         this.level.enemies.forEach((enemy) => {
-            // Character collision with enemy
-            if (this.character.isColliding(enemy) && !this.character.isInvulnerable) {
-                this.character.hit();
-                this.statusBar.setPercentage(this.character.health);
+            const isColliding = this.character.isColliding(enemy);
+            const isStomping = this.character.isAbove(enemy) && this.character.speedY < 0;
+
+            // Character stomps enemy
+            if (isColliding) {
+                if (isStomping && !(enemy instanceof Endboss)) {
+                    this.character.bounce(); // jump back up
+                    this.killEnemy(enemy);
+                } else if (!this.character.isInvulnerable) {
+                    this.character.hit(); // take damage
+                    this.statusBar.setPercentage(this.character.health);
+                }
             }
 
+            // Bottle hits enemy
             this.throwableObjects.forEach((bottle, index) => {
                 if (bottle.isColliding(enemy)) {
                     bottle.splash();
 
-                    // Handle enemy hit logic
                     if (enemy instanceof Endboss) {
                         enemy.hitPoints = (enemy.hitPoints || 3) - 1;
+                        enemy.hit();
                         if (enemy.hitPoints <= 0) {
                             this.killEnemy(enemy);
                         }
@@ -100,7 +109,6 @@ class World {
                         this.killEnemy(enemy);
                     }
 
-                    // Remove bottle after splash
                     setTimeout(() => {
                         this.throwableObjects.splice(index, 1);
                     }, 500);
