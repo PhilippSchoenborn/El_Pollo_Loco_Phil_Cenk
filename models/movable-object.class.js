@@ -71,14 +71,3 @@ class MovableObject extends DrawableObject {
         return this.energy == 0;
     }
 }
-
-// Draw hitbox for debugging
-this.ctx.beginPath();
-this.ctx.strokeStyle = 'red';
-this.ctx.strokeRect(
-    mo.x + (mo.hitboxOffsetX || 0),
-    mo.y + (mo.hitboxOffsetY || 0),
-    mo.hitboxWidth || mo.width,
-    mo.hitboxHeight || mo.height
-);
-this.ctx.closePath();

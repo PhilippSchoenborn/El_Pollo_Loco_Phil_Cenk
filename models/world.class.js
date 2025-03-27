@@ -100,14 +100,18 @@ class World {
                     console.log('💥 Bottle hit enemy:', enemy);
 
                     if (enemy instanceof Endboss) {
-                        enemy.hitPoints = (enemy.hitPoints || 3) - 1;
-                        enemy.hit();
-                        if (enemy.hitPoints <= 0) {
-                            this.killEnemy(enemy);
+                        if (!enemy.isInvulnerable) {
+                            enemy.hitPoints--;
+                            enemy.hit();
+
+                            if (enemy.hitPoints <= 0) {
+                                this.killEnemy(enemy);
+                            }
                         }
                     } else {
                         this.killEnemy(enemy);
                     }
+
 
                     setTimeout(() => {
                         this.throwableObjects.splice(index, 1);
@@ -206,31 +210,13 @@ class World {
 
     drawObject(mo) {
         this.ctx.save();
-
         if (mo.otherDirection) {
             this.flipImage(mo);
         }
-
         mo.draw(this.ctx);
-        mo.drawFrame(this.ctx); // if needed
-
-        // ✅ Hitbox debug (safe)
-        if (mo.hitboxOffsetX !== undefined) {
-            this.ctx.beginPath();
-            this.ctx.strokeStyle = 'red';
-            this.ctx.strokeRect(
-                mo.x + mo.hitboxOffsetX,
-                mo.y + mo.hitboxOffsetY,
-                mo.hitboxWidth,
-                mo.hitboxHeight
-            );
-            this.ctx.closePath();
-        }
-
         this.ctx.restore();
     }
-
-
+    
     flipImage(mo) {
         this.ctx.translate(mo.x + mo.width / 2, mo.y);
         this.ctx.scale(-1, 1);

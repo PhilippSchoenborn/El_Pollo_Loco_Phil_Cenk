@@ -1,4 +1,3 @@
-// ✅ ThrowableObject class with smash sound and fixed hitbox
 class ThrowableObject extends MovableObject {
     throw_sound = new Audio('audio/throw.mp3');
     smash_sound = new Audio('audio/bottleSmash.mp3');
