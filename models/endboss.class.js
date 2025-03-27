@@ -11,8 +11,7 @@ class Endboss extends MovableObject {
     isInvulnerable = false;
     hitPoints = 3;
 
-    // Boss states
-    currentState = 'walk'; // 'walk' | 'hurt' | 'dead'
+    currentState = 'walk';
 
     hit_sound = new Audio('audio/endboss_hit.mp3');
     death_sound = new Audio('audio/chicken_dead.mp3');
@@ -56,7 +55,6 @@ class Endboss extends MovableObject {
         const frameInterval = 200;
 
         const update = (timestamp) => {
-            // Only move and walk-animate if boss is in 'walk' state
             if (this.currentState === 'walk') {
                 this.moveBoss();
 
@@ -65,8 +63,6 @@ class Endboss extends MovableObject {
                     lastFrameTime = timestamp;
                 }
             }
-
-            // Keep updating until boss is 'dead'
             if (this.currentState !== 'dead') {
                 requestAnimationFrame(update);
             }
@@ -100,15 +96,13 @@ class Endboss extends MovableObject {
      * Slows, plays 'hurt' frames, and becomes invulnerable briefly.
      */
     hit() {
-        // If we are already hurting or dead, skip
         if (this.currentState === 'hurt' || this.currentState === 'dead') return;
-
-        this.currentState = 'hurt';  // Switch to 'hurt' state
+        this.currentState = 'hurt';
         this.isInvulnerable = true;
         this.hit_sound.play();
 
         let frameIndex = 0;
-        const frameDelay = 300;
+        const frameDelay = 100;
 
         const hurtAnim = setInterval(() => {
             this.img = this.imageCache[this.IMAGES_HURT[frameIndex]];
@@ -116,10 +110,7 @@ class Endboss extends MovableObject {
 
             if (frameIndex >= this.IMAGES_HURT.length) {
                 clearInterval(hurtAnim);
-
-                // Pause on the final frame a bit
                 setTimeout(() => {
-                    // Return to walking if not killed
                     if (this.currentState !== 'dead') {
                         this.currentState = 'walk';
                         this.isInvulnerable = false;
@@ -134,7 +125,7 @@ class Endboss extends MovableObject {
      * Plays 'dead' frames, ends movement, and eventually removes itself.
      */
     die() {
-        this.currentState = 'dead'; // Switch to 'dead' state
+        this.currentState = 'dead';
         this.speed = 0;
         this.death_sound.play();
 
@@ -147,8 +138,6 @@ class Endboss extends MovableObject {
 
             if (frameIndex >= this.IMAGES_DEAD.length) {
                 clearInterval(deathAnim);
-
-                // Remove from world after finishing death frames
                 setTimeout(() => {
                     world.level.enemies = world.level.enemies.filter(e => e !== this);
                 }, 500);
