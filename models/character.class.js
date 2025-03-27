@@ -236,7 +236,7 @@ class Character extends MovableObject {
     }
 
     isAbove(otherObject) {
-        return this.y + this.hitboxHeight - 10 <= otherObject.y; // Adds a little buffer
+        return this.y + this.hitboxHeight - 10 <= otherObject.y;
     }
 
     bounce() {
