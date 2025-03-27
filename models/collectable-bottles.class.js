@@ -29,6 +29,6 @@ class CollectableBottle extends MovableObject {
         setInterval(() => {
             currentImageIndex = (currentImageIndex + 1) % images.length;
             this.loadImage(images[currentImageIndex]);
-        }, 250);
+        }, 700);
     }
 }

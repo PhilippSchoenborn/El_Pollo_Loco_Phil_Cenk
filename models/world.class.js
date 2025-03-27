@@ -79,14 +79,47 @@ class World {
     }
 
     handleEnemyCollisions() {
-        this.level.enemies.forEach(e => {
-            // Prüfe zusätzlich, ob der Charakter nicht invulnerable ist
-            if (this.character.isColliding(e) && !this.character.isInvulnerable) {
-                this.character.hit(); // oder besser: this.character.takeDamage(20);
+        this.level.enemies.forEach((enemy) => {
+            // Character collision with enemy
+            if (this.character.isColliding(enemy) && !this.character.isInvulnerable) {
+                this.character.hit();
                 this.statusBar.setPercentage(this.character.health);
             }
+
+            this.throwableObjects.forEach((bottle, index) => {
+                if (bottle.isColliding(enemy)) {
+                    bottle.splash();
+
+                    // Handle enemy hit logic
+                    if (enemy instanceof Endboss) {
+                        enemy.hitPoints = (enemy.hitPoints || 3) - 1;
+                        if (enemy.hitPoints <= 0) {
+                            this.killEnemy(enemy);
+                        }
+                    } else {
+                        this.killEnemy(enemy);
+                    }
+
+                    // Remove bottle after splash
+                    setTimeout(() => {
+                        this.throwableObjects.splice(index, 1);
+                    }, 500);
+                }
+            });
         });
     }
+
+    killEnemy(enemy) {
+        if (enemy.die) {
+            enemy.die();
+            setTimeout(() => {
+                this.level.enemies = this.level.enemies.filter(e => e !== enemy);
+            }, 800); // delay to allow death animation
+        } else {
+            this.level.enemies = this.level.enemies.filter(e => e !== enemy);
+        }
+    }
+
 
     handleCoinCollisions() {
         this.collectableCoins = this.collectableCoins.filter(c => {

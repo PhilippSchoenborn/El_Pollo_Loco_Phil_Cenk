@@ -26,4 +26,8 @@ class Chicken extends MovableObject {
         }, 125);
     }
 
+    die() {
+        this.loadImage('./img/3_enemies_chicken/chicken_normal/2_dead/dead.png');
+        clearInterval(this.animationInterval);
+    }
 }

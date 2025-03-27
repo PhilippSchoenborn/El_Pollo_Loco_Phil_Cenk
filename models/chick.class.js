@@ -30,4 +30,9 @@ class Chick extends MovableObject {
             this.playAnimation(this.IMAGES_WALKING);
         }, 125);
     }
+
+    die() {
+        this.loadImage('./img/3_enemies_chicken/chicken_small/2_dead/dead.png');
+        clearInterval(this.animationInterval);
+    }
 } 

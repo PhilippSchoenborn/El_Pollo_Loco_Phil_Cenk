@@ -80,4 +80,14 @@ class Endboss extends MovableObject {
         requestAnimationFrame(update);
     }
     
+    hit() {
+        this.loadImages(this.IMAGES_HURT);
+        this.playAnimation(this.IMAGES_HURT);
+    }
+    
+    die() {
+        this.loadImages(this.IMAGES_DEAD);
+        this.playAnimation(this.IMAGES_DEAD);
+        this.speed = 0;
+    }    
 }

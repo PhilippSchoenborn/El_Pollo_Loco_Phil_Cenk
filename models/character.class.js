@@ -222,7 +222,7 @@ class Character extends MovableObject {
                     if (this.world && typeof this.world.pauseGame === "function") {
                         this.world.pauseGame();
                     }
-                }, 1000);
+                }, 500);
             }
         }, frameDuration);
     }
