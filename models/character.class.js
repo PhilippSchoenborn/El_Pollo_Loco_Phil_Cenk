@@ -1,7 +1,7 @@
 class Character extends MovableObject {
     height = 220;
     width = 120;
-    speed = 3;
+    speed = 1.5;
     lastMovementTime = Date.now();
     isIdle = false;
     idleTimeThreshold = 5000;
@@ -14,6 +14,7 @@ class Character extends MovableObject {
     dead = false;
     statusBar = null;
     isInvulnerable = false;
+    isAnimatingHurt = false;
 
     IMAGES_IDLE = [
         './img/2_character_pepe/1_idle/idle/I-1.png',
@@ -108,20 +109,34 @@ class Character extends MovableObject {
 
 
     playHurtAnimation() {
+        if (this.isAnimatingHurt) return; // Prevent animation restart if it's already running
+    
+        this.isAnimatingHurt = true; // Set flag to prevent restart
         let frameIndex = 0;
-        const frameDuration = 150;
-        const animationInterval = setInterval(() => {
-            this.img = this.imageCache[this.IMAGES_HURT[frameIndex]];
-            frameIndex++;
-            if (frameIndex >= this.IMAGES_HURT.length) {
-                clearInterval(animationInterval);
-                frameIndex = 0;
+        let lastFrameTime = 0;
+        const frameDuration = 150; // Duration for each frame in the hurt animation
+        const animateHurt = (timestamp) => {
+            if (!lastFrameTime) lastFrameTime = timestamp;
+            const deltaTime = timestamp - lastFrameTime;
+            
+            if (deltaTime >= frameDuration) {
+                this.img = this.imageCache[this.IMAGES_HURT[frameIndex]]; // Set the next hurt animation frame
+                frameIndex++;
+                if (frameIndex >= this.IMAGES_HURT.length) {
+                    this.isAnimatingHurt = false; // Animation is done, damage is now allowed again
+                    return;
+                }
+                lastFrameTime = timestamp;
             }
-        }, frameDuration);
+            
+            requestAnimationFrame(animateHurt);
+        };
+        requestAnimationFrame(animateHurt);
     }
 
     takeDamage(damageAmount) {
-        if (this.isInvulnerable || this.dead) return;
+        if (this.isInvulnerable || this.dead || this.isAnimatingHurt) return; // Block further damage if hurt animation is running
+    
         this.health -= damageAmount;
         if (this.health <= 0) {
             this.health = 0;
@@ -133,75 +148,105 @@ class Character extends MovableObject {
         if (this.statusBar) {
             this.statusBar.setPercentage(this.health);
         }
+        
         this.isInvulnerable = true;
-        this.playHurtAnimation();
+        this.playHurtAnimation(); // Play hurt animation only once
         this.character_hurt_sound.play();
+        
         setTimeout(() => {
-            this.isInvulnerable = false;
-        }, 150 * this.IMAGES_HURT.length);
+            this.isInvulnerable = false; // Disable invulnerability after the animation ends
+        }, 150 * this.IMAGES_HURT.length); // Based on the number of hurt frames
     }
 
     animate() {
-        setInterval(() => {
+        let lastFrameTime = 0;
+        const handleMovement = (timestamp) => {
             if (this.dead) return;
-            this.walking_sound.pause();
             let currentTime = Date.now();
-            let isMoving = Object.values(this.world.keyboard).some(key => key === true);
+            let isMoving = false;
+            let movementSpeed = 0;
             if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
-                this.moveRight();
-                this.walking_sound.play();
-                this.otherDirection = false;
-                this.lastMovementTime = currentTime;
+                this.handleWalk(true, currentTime);
+                movementSpeed = this.speed;
                 isMoving = true;
             }
             if (this.world.keyboard.LEFT && this.x > 0) {
-                this.moveLeft();
-                this.walking_sound.play();
-                this.otherDirection = true;
-                this.lastMovementTime = currentTime;
+                this.handleWalk(false, currentTime);
+                movementSpeed = -this.speed;
                 isMoving = true;
             }
-            if ((this.world.keyboard.UP && !this.isAboveGround()) || (this.world.keyboard.SPACE && !this.isAboveGround())) {
-                this.jump();
-                this.character_jump_sound.play();
-                setTimeout(() => { this.jump_sound.play(); }, 150);
-                this.lastMovementTime = currentTime;
+            if ((this.world.keyboard.UP && !this.isAboveGround()) ||
+                (this.world.keyboard.SPACE && !this.isAboveGround())) {
+                this.handleJump(currentTime);
                 isMoving = true;
             }
             if (!isMoving && !this.isAboveGround()) {
-                if (currentTime - this.lastMovementTime >= this.idleTimeThreshold) {
-                    if (!this.snoringSoundPlaying) {
-                        this.snoring_sound.play();
-                        this.snoringSoundPlaying = true;
-                    }
-                    this.longIdleFrameCounter++;
-                    if (this.longIdleFrameCounter % this.longIdleAnimationSpeed === 0) {
-                        this.playAnimation(this.IMAGES_LONG_IDLE);
-                    }
-                } else {
-                    this.idleAnimationFrameCounter++;
-                    if (this.idleAnimationFrameCounter % this.idleAnimationSpeed === 0) {
-                        this.playAnimation(this.IMAGES_IDLE);
-                    }
-                }
+                this.handleIdle(currentTime);
             }
-
             this.world.camera_x = -this.x + 100;
-        }, 1000 / 60);
-
-        setInterval(() => {
+            let frameDuration = this.calculateFrameDuration(movementSpeed);
+            requestAnimationFrame(() => handleAnimations(timestamp, frameDuration));
+            requestAnimationFrame(handleMovement);
+        };
+        const handleAnimations = (timestamp, frameDuration) => {
             if (this.dead) return;
-            if (this.isDead()) {
-                this.dead = true;
-                this.gameOver();
-            } else if (!this.isInvulnerable && this.isHurt()) {
-                this.takeDamage(20); // set DMG here
-            } else if (!this.isInvulnerable && this.isAboveGround()) {
-                this.playAnimation(this.IMAGES_JUMPING);
-            } else if (!this.isInvulnerable && (this.world.keyboard.RIGHT || this.world.keyboard.LEFT)) {
-                this.playAnimation(this.IMAGES_WALKING);
+            const deltaTime = timestamp - lastFrameTime;
+            if (deltaTime >= frameDuration) {
+                if (this.isDead()) {
+                    this.dead = true;
+                    this.gameOver();
+                } else if (!this.isInvulnerable && this.isHurt()) {
+                    this.takeDamage(20);
+                } else if (!this.isInvulnerable && this.isAboveGround()) {
+                    this.playAnimation(this.IMAGES_JUMPING);
+                } else if (!this.isInvulnerable &&
+                          (this.world.keyboard.RIGHT || this.world.keyboard.LEFT)) {
+                    this.playAnimation(this.IMAGES_WALKING);
+                }
+                lastFrameTime = timestamp;
             }
-        }, 100);
+            requestAnimationFrame(() => handleAnimations(timestamp, frameDuration));
+        };
+        requestAnimationFrame(handleMovement);
+    }
+    
+    calculateFrameDuration(movementSpeed) {
+        const baseDuration = 200;
+        let speedFactor = Math.abs(movementSpeed) / this.speed;
+        let adjustedDuration = baseDuration / (1 + speedFactor);
+        return Math.max(adjustedDuration, 100);
+    }
+    
+    handleWalk(direction, currentTime) {
+        direction ? this.moveRight() : this.moveLeft();
+        this.walking_sound.play();
+        this.otherDirection = !direction;
+        this.lastMovementTime = currentTime;
+    }
+    
+    handleJump(currentTime) {
+        this.jump();
+        this.character_jump_sound.play();
+        setTimeout(() => this.jump_sound.play(), 150);
+        this.lastMovementTime = currentTime;
+    }
+    
+    handleIdle(currentTime) {
+        if (currentTime - this.lastMovementTime >= this.idleTimeThreshold) {
+            if (!this.snoringSoundPlaying) {
+                this.snoring_sound.play();
+                this.snoringSoundPlaying = true;
+            }
+            this.longIdleFrameCounter++;
+            if (this.longIdleFrameCounter % this.longIdleAnimationSpeed === 0) {
+                this.playAnimation(this.IMAGES_LONG_IDLE);
+            }
+        } else {
+            this.idleAnimationFrameCounter++;
+            if (this.idleAnimationFrameCounter % this.idleAnimationSpeed === 0) {
+                this.playAnimation(this.IMAGES_IDLE);
+            }
+        }
     }
 
     isDead() {
@@ -211,20 +256,29 @@ class Character extends MovableObject {
     gameOver() {
         let frameIndex = 0;
         const frameDuration = 200;
-        const animationInterval = setInterval(() => {
-            this.img = this.imageCache[this.IMAGES_DEAD[frameIndex]];
-            frameIndex++;
-            if (frameIndex >= this.IMAGES_DEAD.length) {
-                clearInterval(animationInterval);
+        let lastFrameTime = 0;
+        const animateGameOver = (timestamp) => {
+            if (!lastFrameTime) lastFrameTime = timestamp;
+            const deltaTime = timestamp - lastFrameTime;
+            if (deltaTime >= frameDuration) {
+                this.img = this.imageCache[this.IMAGES_DEAD[frameIndex]];
+                frameIndex++;
+                lastFrameTime = timestamp;
+            }
+            if (frameIndex < this.IMAGES_DEAD.length) {
+                requestAnimationFrame(animateGameOver);
+            } else {
                 setTimeout(() => {
                     document.getElementById("gameOverScreen").classList.remove("hidden");
                     document.getElementById("tryAgainButton").classList.remove("hidden");
+    
                     if (this.world && typeof this.world.pauseGame === "function") {
                         this.world.pauseGame();
                     }
                 }, 500);
             }
-        }, frameDuration);
+        };
+        requestAnimationFrame(animateGameOver);
     }
 
     setMute(muted) {
