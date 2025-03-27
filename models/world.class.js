@@ -83,18 +83,17 @@ class World {
             const isColliding = this.character.isColliding(enemy);
             const isStomping = this.character.isAbove(enemy) && this.character.speedY < 0;
 
-            // Character stomps enemy
             if (isColliding) {
                 if (isStomping && !(enemy instanceof Endboss)) {
-                    this.character.bounce(); // jump back up
+                    // No more bounce
                     this.killEnemy(enemy);
-                } else if (!this.character.isInvulnerable) {
-                    this.character.hit(); // take damage
+                } else if (!isStomping && !this.character.isInvulnerable) {
+                    this.character.hit();
                     this.statusBar.setPercentage(this.character.health);
                 }
             }
 
-            // Bottle hits enemy
+            // Bottle collision
             this.throwableObjects.forEach((bottle, index) => {
                 if (bottle.isColliding(enemy)) {
                     bottle.splash();
@@ -120,14 +119,17 @@ class World {
     killEnemy(enemy) {
         if (enemy.die) {
             enemy.die();
+
+            const sound = enemy.death_sound;
+            const duration = sound?.duration ? sound.duration * 1000 : 500;
+
             setTimeout(() => {
                 this.level.enemies = this.level.enemies.filter(e => e !== enemy);
-            }, 800); // delay to allow death animation
+            }, duration);
         } else {
             this.level.enemies = this.level.enemies.filter(e => e !== enemy);
         }
     }
-
 
     handleCoinCollisions() {
         this.collectableCoins = this.collectableCoins.filter(c => {
