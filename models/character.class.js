@@ -1,4 +1,8 @@
+/**
+ * Represents the main character in the game with movement, animations, and sounds.
+ */
 class Character extends MovableObject {
+
     height = 220
     width = 120
     speed = 1.5
@@ -28,6 +32,7 @@ class Character extends MovableObject {
         './img/2_character_pepe/1_idle/idle/I-9.png',
         './img/2_character_pepe/1_idle/idle/I-10.png'
     ]
+
     IMAGES_LONG_IDLE = [
         './img/2_character_pepe/1_idle/long_idle/I-11.png',
         './img/2_character_pepe/1_idle/long_idle/I-12.png',
@@ -40,6 +45,7 @@ class Character extends MovableObject {
         './img/2_character_pepe/1_idle/long_idle/I-19.png',
         './img/2_character_pepe/1_idle/long_idle/I-20.png'
     ]
+
     IMAGES_WALKING = [
         './img/2_character_pepe/2_walk/W-21.png',
         './img/2_character_pepe/2_walk/W-22.png',
@@ -48,6 +54,7 @@ class Character extends MovableObject {
         './img/2_character_pepe/2_walk/W-25.png',
         './img/2_character_pepe/2_walk/W-26.png'
     ]
+
     IMAGES_JUMPING = [
         './img/2_character_pepe/3_jump/J-31.png',
         './img/2_character_pepe/3_jump/J-32.png',
@@ -59,6 +66,7 @@ class Character extends MovableObject {
         './img/2_character_pepe/3_jump/J-38.png',
         './img/2_character_pepe/3_jump/J-39.png'
     ]
+
     IMAGES_DEAD = [
         './img/2_character_pepe/5_dead/D-51.png',
         './img/2_character_pepe/5_dead/D-52.png',
@@ -68,6 +76,7 @@ class Character extends MovableObject {
         './img/2_character_pepe/5_dead/D-56.png',
         './img/2_character_pepe/5_dead/D-57.png'
     ]
+
     IMAGES_HURT = [
         './img/2_character_pepe/4_hurt/H-41.png',
         './img/2_character_pepe/4_hurt/H-42.png',
@@ -81,6 +90,10 @@ class Character extends MovableObject {
     character_hurt_sound = new Audio('audio/character_hurt.mp3')
     snoring_sound = new Audio('audio/snoring.mp3')
 
+    /**
+     * Constructs a new character instance with given status bar.
+     * @param {Object} statusBar - The status bar for health updates.
+     */
     constructor(statusBar) {
         super().loadImage('./img/2_character_pepe/2_walk/W-21.png')
         this.loadImages(this.IMAGES_WALKING)
@@ -104,6 +117,9 @@ class Character extends MovableObject {
         this.hitboxHeight = this.height - 80
     }
 
+    /**
+     * Stops the snoring sound if playing.
+     */
     stopSnoring() {
         if (this.snoringSoundPlaying) {
             this.snoring_sound.pause()
@@ -112,6 +128,9 @@ class Character extends MovableObject {
         }
     }
 
+    /**
+     * Plays the hurt animation.
+     */
     playHurtAnimation() {
         if (this.isAnimatingHurt) return
         this.isAnimatingHurt = true
@@ -135,6 +154,10 @@ class Character extends MovableObject {
         requestAnimationFrame(animateHurt)
     }
 
+    /**
+     * Applies damage, updates health, plays hurt animation.
+     * @param {number} damageAmount - Amount of damage to apply.
+     */
     takeDamage(damageAmount) {
         if (this.isInvulnerable || this.dead || this.isAnimatingHurt) return
         this.health -= damageAmount
@@ -156,14 +179,21 @@ class Character extends MovableObject {
         }, 150 * this.IMAGES_HURT.length)
     }
 
+    /**
+     * Main animation loop for movement, jumping, idle handling.
+     */
     animate() {
         let lastFrameTime = 0
         const handleMovement = t => {
             if (this.dead) return
             let currentTime = Date.now()
+
+            if (this.world.keyboard.D) {
+                this.lastMovementTime = currentTime
+            }
+
             let isMoving = false
             let movementSpeed = 0
-
             if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
                 this.handleWalk(true, currentTime)
                 movementSpeed = this.speed
@@ -176,8 +206,8 @@ class Character extends MovableObject {
                 isMoving = true
                 this.stopSnoring()
             }
-            if ((this.world.keyboard.UP && !this.isAboveGround()) ||
-                (this.world.keyboard.SPACE && !this.isAboveGround())) {
+            if ((this.world.keyboard.UP && !this.isAboveGround())
+                || (this.world.keyboard.SPACE && !this.isAboveGround())) {
                 this.handleJump(currentTime)
                 isMoving = true
                 this.stopSnoring()
@@ -186,11 +216,9 @@ class Character extends MovableObject {
                 this.walking_sound.pause()
                 this.walking_sound.currentTime = 0
             }
-
             if (!isMoving && !this.isAboveGround()) {
                 this.handleIdle(currentTime)
             }
-            
             this.world.camera_x = -this.x + 100
             let frameDuration = this.calculateFrameDuration(movementSpeed)
             requestAnimationFrame(() => handleAnimations(t, frameDuration))
@@ -208,19 +236,23 @@ class Character extends MovableObject {
                     this.takeDamage(20)
                 } else if (!this.isInvulnerable && this.isAboveGround()) {
                     this.playAnimation(this.IMAGES_JUMPING)
-                } else if (
-                    !this.isInvulnerable &&
-                    (this.world.keyboard.RIGHT || this.world.keyboard.LEFT)
-                ) {
+                } else if (!this.isInvulnerable
+                    && (this.world.keyboard.RIGHT || this.world.keyboard.LEFT)) {
                     this.playAnimation(this.IMAGES_WALKING)
                 }
                 lastFrameTime = t
             }
             requestAnimationFrame(() => handleAnimations(t, frameDuration))
         }
+
         requestAnimationFrame(handleMovement)
     }
 
+    /**
+     * Calculates frame duration based on movement speed.
+     * @param {number} movementSpeed - Current movement speed.
+     * @returns {number}
+     */
     calculateFrameDuration(movementSpeed) {
         const baseDuration = 200
         let speedFactor = Math.abs(movementSpeed) / this.speed
@@ -228,6 +260,11 @@ class Character extends MovableObject {
         return Math.max(adjustedDuration, 100)
     }
 
+    /**
+     * Handles walking and walking sound playback.
+     * @param {boolean} direction - True for right, false for left.
+     * @param {number} currentTime - Current timestamp.
+     */
     handleWalk(direction, currentTime) {
         direction ? this.moveRight() : this.moveLeft()
         this.walking_sound.play()
@@ -235,6 +272,10 @@ class Character extends MovableObject {
         this.lastMovementTime = currentTime
     }
 
+    /**
+     * Handles jumping logic and jump sounds.
+     * @param {number} currentTime - Current timestamp.
+     */
     handleJump(currentTime) {
         this.jump()
         this.character_jump_sound.play()
@@ -242,6 +283,10 @@ class Character extends MovableObject {
         this.lastMovementTime = currentTime
     }
 
+    /**
+     * Handles idle animation and snoring if enough time passes.
+     * @param {number} currentTime - Current timestamp.
+     */
     handleIdle(currentTime) {
         if (currentTime - this.lastMovementTime >= this.idleTimeThreshold) {
             if (!this.snoringSoundPlaying) {
@@ -260,10 +305,17 @@ class Character extends MovableObject {
         }
     }
 
+    /**
+     * Checks if character is dead.
+     * @returns {boolean}
+     */
     isDead() {
         return this.health <= 0
     }
 
+    /**
+     * Plays death animation and shows game over screen.
+     */
     gameOver() {
         let frameIndex = 0
         const frameDuration = 200
@@ -291,6 +343,10 @@ class Character extends MovableObject {
         requestAnimationFrame(animateGameOver)
     }
 
+    /**
+     * Toggles mute for all character sounds.
+     * @param {boolean} muted - If true, mute all sounds.
+     */
     setMute(muted) {
         this.walking_sound.muted = muted
         this.jump_sound.muted = muted
@@ -299,11 +355,12 @@ class Character extends MovableObject {
         this.snoring_sound.muted = muted
     }
 
+    /**
+     * Checks if the character is above another object.
+     * @param {Object} otherObject - Object to check against.
+     * @returns {boolean}
+     */
     isAbove(otherObject) {
         return this.y + this.hitboxHeight - 10 <= otherObject.y
-    }
-
-    bounce() {
-        this.speedY = 15
     }
 }
