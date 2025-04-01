@@ -182,13 +182,14 @@ h3,
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     background-color: rgba(0, 0, 0, 0.7);
     z-index: 6;
 }
 
 .game-over img {
-    width: 720px;
-    height: 480px;
+    width: 570px;
+    height: 380px;
 }
 
 .hidden {
@@ -333,4 +334,13 @@ h3,
 
 .legal-notice-container::-webkit-scrollbar {
     display: none; /* Chrome, Safari */
+}
+
+.colleted-coins-end-screen {
+    color: white;
+    font-size: 28px;
+    text-shadow: 2px 2px 0px rgba(177, 103, 92, 0.9),
+    -2px 2px 0px rgba(177, 103, 92, 0.9),
+    2px -2px 0px rgba(177, 103, 92, 0.9),
+    -2px -2px 0px rgba(177, 103, 92, 0.9);
 }
