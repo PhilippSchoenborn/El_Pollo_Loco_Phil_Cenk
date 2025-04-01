@@ -14,7 +14,7 @@ class Character extends MovableObject {
     idleAnimationSpeed = 40
     longIdleAnimationSpeed = 40
     snoringSoundPlaying = false
-    health = 100
+    health = 10000
     dead = false
     statusBar = null
     isInvulnerable = false

@@ -1,182 +1,233 @@
 class Endboss extends MovableObject {
-    height = 180;
-    width = 165;
-    y = 260;
-    initialX = 2800;
-    x = this.initialX;
-    speed = 1;
-    walkRadius = 100;
-    direction = 'left';
-    otherDirection = false;
-    isInvulnerable = false;
-    hitPoints = 3;
-
-    currentState = 'walk';
-
-    hit_sound = new Audio('audio/endboss_hit.mp3');
-    death_sound = new Audio('audio/chicken_dead.mp3');
-
-    IMAGES_WALKING = [
+    height = 250
+    width = 200
+    y = 195
+    speed = 0.9
+    canTakeDamage = false
+    hitPoints = 3
+    currentState = 'waiting'
+    walkImages = [
         './img/4_enemie_boss_chicken/1_walk/G1.png',
         './img/4_enemie_boss_chicken/1_walk/G2.png',
         './img/4_enemie_boss_chicken/1_walk/G3.png',
-        './img/4_enemie_boss_chicken/1_walk/G4.png',
-    ];
-
-    IMAGES_HURT = [
+        './img/4_enemie_boss_chicken/1_walk/G4.png'
+    ]
+    alertImages = [
+        './img/4_enemie_boss_chicken/2_alert/G5.png',
+        './img/4_enemie_boss_chicken/2_alert/G6.png',
+        './img/4_enemie_boss_chicken/2_alert/G7.png',
+        './img/4_enemie_boss_chicken/2_alert/G8.png',
+        './img/4_enemie_boss_chicken/2_alert/G9.png',
+        './img/4_enemie_boss_chicken/2_alert/G10.png',
+        './img/4_enemie_boss_chicken/2_alert/G11.png',
+        './img/4_enemie_boss_chicken/2_alert/G12.png'
+    ]
+    attackImages = [
+        './img/4_enemie_boss_chicken/3_attack/G13.png',
+        './img/4_enemie_boss_chicken/3_attack/G14.png',
+        './img/4_enemie_boss_chicken/3_attack/G15.png',
+        './img/4_enemie_boss_chicken/3_attack/G16.png',
+        './img/4_enemie_boss_chicken/3_attack/G17.png',
+        './img/4_enemie_boss_chicken/3_attack/G18.png',
+        './img/4_enemie_boss_chicken/3_attack/G19.png',
+        './img/4_enemie_boss_chicken/3_attack/G20.png'
+    ]
+    hurtImages = [
         './img/4_enemie_boss_chicken/4_hurt/G21.png',
         './img/4_enemie_boss_chicken/4_hurt/G22.png',
-        './img/4_enemie_boss_chicken/4_hurt/G23.png',
-    ];
-
-    IMAGES_DEAD = [
+        './img/4_enemie_boss_chicken/4_hurt/G23.png'
+    ]
+    deadImages = [
         './img/4_enemie_boss_chicken/5_dead/G24.png',
         './img/4_enemie_boss_chicken/5_dead/G25.png',
-        './img/4_enemie_boss_chicken/5_dead/G26.png',
-    ];
+        './img/4_enemie_boss_chicken/5_dead/G26.png'
+    ]
+    hit_sound = new Audio('audio/endboss_hit.mp3')
+    death_sound = new Audio('audio/chicken_dead.mp3')
+    roosterCry = new Audio('audio/roosterCry.mp3')
 
-    constructor() {
-        super().loadImage(this.IMAGES_WALKING[0]);
-        this.loadImages(this.IMAGES_WALKING);
-        this.loadImages(this.IMAGES_HURT);
-        this.loadImages(this.IMAGES_DEAD);
-        this.x = this.initialX;
-        this.hit_sound.volume = 0.5;
-        this.death_sound.volume = 0.5;
-        this.animate();
+    /**
+     * Creates a new Endboss with given x position.
+     * @param {number} x - Starting x position of the boss.
+     */
+    constructor(x) {
+        super()
+        this.x = x
+        this.loadImages(this.walkImages)
+        this.loadImages(this.alertImages)
+        this.loadImages(this.attackImages)
+        this.loadImages(this.hurtImages)
+        this.loadImages(this.deadImages)
+        this.loadImage(this.walkImages[0])
+        this.hit_sound.volume = 0.5
+        this.death_sound.volume = 0.5
+        this.roosterCry.volume = 0.8
+        this.otherDirection = false
+        this.animate()
     }
 
     /**
-     * Main loop controlling movement/animation.
-     * We only move/play walking frames if the boss is in 'walk' state.
+     * Main animation loop controlling movement and frames.
      */
     animate() {
-        let lastFrameTime = 0;
-        const frameInterval = 200;
+        let lastFrameTime = 0
+        const frameInterval = 200
 
-        const update = (timestamp) => {
-            if (this.currentState === 'walk') {
-                this.moveBoss();
-
+        const update = timestamp => {
+            if (this.currentState === 'entrance') {
                 if (timestamp - lastFrameTime >= frameInterval) {
-                    this.playAnimation(this.IMAGES_WALKING);
-                    lastFrameTime = timestamp;
+                    this.playAnimation(this.walkImages)
+                    lastFrameTime = timestamp
                 }
+            } else if (this.currentState === 'alert') {
+                if (timestamp - lastFrameTime >= 150) {
+                    this.playAnimation(this.alertImages)
+                    lastFrameTime = timestamp
+                }
+            } else if (this.currentState === 'chase') {
+                this.chasePlayer()
+                if (timestamp - lastFrameTime >= frameInterval) {
+                    this.playAnimation(this.walkImages)
+                    lastFrameTime = timestamp
+                }
+            } else if (this.currentState === 'attack') {
             }
             if (this.currentState !== 'dead') {
-                requestAnimationFrame(update);
+                requestAnimationFrame(update)
             }
-        };
-
-        requestAnimationFrame(update);
+        }
+        requestAnimationFrame(update)
     }
 
     /**
-     * Simple side-to-side walk logic.
-     * Called only if currentState is 'walk'.
+     * Moves toward the player, flipping if needed.
      */
-    moveBoss() {
-        if (this.direction === 'left') {
-            this.x -= this.speed;
-            if (this.x <= this.initialX - this.walkRadius) {
-                this.direction = 'right';
-                this.otherDirection = true;
-            }
-        } else {
-            this.x += this.speed;
-            if (this.x >= this.initialX) {
-                this.direction = 'left';
-                this.otherDirection = false;
+    chasePlayer() {
+        if (!world || !world.character) return
+        const playerX = world.character.x
+        if (Math.abs(this.x - playerX) > 10) {
+            if (this.x < playerX) {
+                this.x += this.speed
+                this.otherDirection = false
+            } else {
+                this.x -= this.speed
+                this.otherDirection = false
             }
         }
     }
 
     /**
-     * Called when boss is hit by a bottle or other attack.
-     * Slows, plays 'hurt' frames, and becomes invulnerable briefly.
+     * Plays the attack frames once, then returns to chase state.
      */
-    hit() {
-        if (this.currentState === 'hurt' || this.currentState === 'dead') return;
-        this.currentState = 'hurt';
-        this.isInvulnerable = true;
-        this.hit_sound.play();
-
-        let frameIndex = 0;
-        const frameDelay = 100;
-
-        const hurtAnim = setInterval(() => {
-            this.img = this.imageCache[this.IMAGES_HURT[frameIndex]];
-            frameIndex++;
-
-            if (frameIndex >= this.IMAGES_HURT.length) {
-                clearInterval(hurtAnim);
-                setTimeout(() => {
-                    if (this.currentState !== 'dead') {
-                        this.currentState = 'walk';
-                        this.isInvulnerable = false;
-                    }
-                }, 100);
+    doAttack() {
+        if (this.currentState === 'attack' || this.currentState === 'dead' || this.currentState === 'hurt') return
+        this.currentState = 'attack'
+        let frameIndex = 0
+        const frameDelay = 150
+        const attackAnim = setInterval(() => {
+            if (frameIndex < this.attackImages.length) {
+                this.img = this.imageCache[this.attackImages[frameIndex]]
+            } else {
+                clearInterval(attackAnim)
+                if (this.currentState !== 'dead') {
+                    this.currentState = 'chase'
+                }
             }
-        }, frameDelay);
+            frameIndex++
+        }, frameDelay)
     }
 
     /**
-     * Called when boss runs out of HP.
-     * Plays 'dead' frames, ends movement, and eventually removes itself.
+     * Boss takes damage only if canTakeDamage is true.
      */
-    die() {
-        this.currentState = 'dead';
-        this.speed = 0;
-        this.death_sound.play();
-
-        let frameIndex = 0;
-        const frameDelay = 350;
-
-        const deathAnim = setInterval(() => {
-            this.img = this.imageCache[this.IMAGES_DEAD[frameIndex]];
-            frameIndex++;
-
-            if (frameIndex >= this.IMAGES_DEAD.length) {
-                clearInterval(deathAnim);
-
-                setTimeout(() => {
-                    world.level.enemies = world.level.enemies.filter(e => e !== this);
-
-                    // ✅ Now show the win screen!
-                    //    (This calls the global function you defined in game.class.js)
-                    win();
-
-                }, 500);
-            }
-        }, frameDelay);
+    hit() {
+        if (!this.canTakeDamage) return
+        if (this.currentState === 'dead' || this.currentState === 'hurt') return
+        this.hitPoints--
+        this.hit_sound.play()
+        if (this.hitPoints <= 0) {
+            this.die()
+        } else {
+            this.currentState = 'hurt'
+            this.playHurtAnimation(() => {
+                this.currentState = 'chase'
+            })
+        }
     }
 
-
-    win() {
-        let frameIndex = 0;
-        const frameDuration = 200;
-
-        // Example if you have a win animation array:
-        // (If you just want to show a static image, you can skip this loop)
-        const animationInterval = setInterval(() => {
-            this.img = this.imageCache[this.IMAGES_WIN[frameIndex]];
-            frameIndex++;
-
-            // Once we've shown all frames
-            if (frameIndex >= this.IMAGES_WIN.length) {
-                clearInterval(animationInterval);
-
-                // Small delay before showing the Win Screen
-                setTimeout(() => {
-                    document.getElementById("winScreen").classList.remove("hidden");
-                    document.getElementById("winAgainButton").classList.remove("hidden");
-
-                    // Pause the game if that logic exists
-                    if (this.world && typeof this.world.pauseGame === "function") {
-                        this.world.pauseGame();
-                    }
-                }, 500);
+    /**
+     * Plays hurt frames, then calls onComplete.
+     * @param {Function} onComplete
+     */
+    playHurtAnimation(onComplete) {
+        let frameIndex = 0
+        const frameDelay = 100
+        const hurtAnim = setInterval(() => {
+            if (frameIndex < this.hurtImages.length) {
+                this.img = this.imageCache[this.hurtImages[frameIndex]]
+            } else {
+                clearInterval(hurtAnim)
+                onComplete()
             }
-        }, frameDuration);
+            frameIndex++
+        }, frameDelay)
+    }
+
+    /**
+     * Boss dies with a death animation, then removes itself.
+     */
+    die() {
+        this.currentState = 'dead'
+        this.speed = 0
+        this.death_sound.play()
+        let frameIndex = 0
+        const frameDelay = 350
+        const deathAnim = setInterval(() => {
+            if (frameIndex < this.deadImages.length) {
+                this.img = this.imageCache[this.deadImages[frameIndex]]
+            } else {
+                clearInterval(deathAnim)
+                setTimeout(() => {
+                    world.level.enemies = world.level.enemies.filter(e => e !== this)
+                    win()
+                }, 500)
+            }
+            frameIndex++
+        }, frameDelay)
+    }
+
+    /**
+     * Entrance movement from x=3400 to x=3300, then alert phase.
+     */
+    doEntrance() {
+        this.currentState = 'entrance'
+        const targetX = 3300
+        const entranceInterval = setInterval(() => {
+            if (this.x > targetX) {
+                this.x -= this.speed
+            } else {
+                clearInterval(entranceInterval)
+                this.doAlertPhase()
+            }
+        }, 1000 / 60)
+    }
+
+    /**
+     * Boss alert animation and rooster cry, then chase and canTakeDamage = true.
+     */
+    doAlertPhase() {
+        this.currentState = 'alert'
+        this.roosterCry.currentTime = 0
+        this.roosterCry.play()
+        setTimeout(() => {
+            this.roosterCry.currentTime = 0
+            this.roosterCry.play()
+            setTimeout(() => {
+                this.currentState = 'chase'
+                world.startBossMusic()
+                world.unfreezePlayer()
+                this.canTakeDamage = true
+            }, 800)
+        }, 2000)
     }
 }

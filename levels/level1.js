@@ -10,8 +10,6 @@ const level1 = new Level(
         new Chick(600),
         new Chick(1300),
         new Chick(2000),
-        new Chick(3900),
-        new Endboss(2500),
     ],
     [
         new Cloud(2800),
@@ -41,7 +39,9 @@ const level1 = new Level(
         new BackgroundObject('./img/5_background/layers/3_third_layer/1.png', 719 * 4),
         new BackgroundObject('./img/5_background/layers/2_second_layer/1.png', 719 * 4),
         new BackgroundObject('./img/5_background/layers/1_first_layer/1.png', 719 * 4),
+        new BackgroundObject('./img/5_background/layers/air.png', 719 * 5),
+        new BackgroundObject('./img/5_background/layers/3_third_layer/2.png', 719 * 5),
+        new BackgroundObject('./img/5_background/layers/2_second_layer/2.png', 719 * 5),
+        new BackgroundObject('./img/5_background/layers/1_first_layer/2.png', 719 * 5),
     ],
-
-
 );

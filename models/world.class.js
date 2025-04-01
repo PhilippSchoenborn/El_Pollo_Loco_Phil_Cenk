@@ -1,6 +1,3 @@
-/**
- * Represents the main game world, containing the character, enemies, items, and drawing logic.
- */
 class World {
     level = level1
     canvas
@@ -16,6 +13,7 @@ class World {
     soundtrack_sound = new Audio('audio/soundtrack.mp3')
     coin_sound = new Audio('audio/coin.mp3')
     pickup_bottle_sound = new Audio('audio/pickup_bottle.mp3')
+    bossMusic = new Audio('audio/EndbossSoundtrack.mp3')
     COIN_Y = 350
     COIN_MIN_X = 350
     COIN_MAX_X = 2200
@@ -25,11 +23,13 @@ class World {
     THROW_OFFSET_Y = 100
     COLLISION_CHECK_INTERVAL = 200
     dWasHeld = false
+    lastThrowTime = 0
+    throwCooldown = 1000
 
     /**
-     * Initializes the game world.
-     * @param {HTMLCanvasElement} canvas - Canvas to render on.
-     * @param {Keyboard} keyboard - Keyboard input handler.
+     * Constructs the game world with a character, boss, etc.
+     * @param {HTMLCanvasElement} canvas
+     * @param {Keyboard} keyboard
      */
     constructor(canvas, keyboard) {
         this.canvas = canvas
@@ -38,6 +38,7 @@ class World {
         this.statusBar = new StatusBar()
         this.character = new Character(this.statusBar)
         this.character.world = this
+        this.endboss = new Endboss(3400)
         this.initSounds()
         this.soundtrack_sound.play()
         this.run()
@@ -52,35 +53,37 @@ class World {
     initSounds() {
         this.soundtrack_sound.loop = true
         this.soundtrack_sound.volume = 0.05
+        this.bossMusic.loop = true
+        this.bossMusic.volume = 0.2
         this.coin_sound.volume = 0.5
         this.pickup_bottle_sound.volume = 0.5
     }
 
     /**
-     * Mutes or unmutes game audio.
-     * @param {boolean} muted - True to mute all sounds, false to unmute.
+     * Mutes or unmutes all game sounds.
+     * @param {boolean} muted
      */
     setMute(muted) {
         this.soundtrack_sound.muted = muted
         this.coin_sound.muted = muted
         this.pickup_bottle_sound.muted = muted
-        if (this.character) {
-            this.character.setMute(muted)
-        }
+        this.bossMusic.muted = muted
+        this.character.setMute(muted)
     }
 
     /**
-     * Starts the main collision checking interval.
+     * Main interval for checking collisions and boss trigger.
      */
     run() {
         setInterval(() => {
             if (this.gamePaused) return
             this.checkCollisions()
+            this.checkBossTrigger()
         }, this.COLLISION_CHECK_INTERVAL)
     }
 
     /**
-     * Checks collisions with enemies, coins, and bottles.
+     * Checks collisions with enemies, coins, bottles.
      */
     checkCollisions() {
         this.handleEnemyCollisions()
@@ -89,7 +92,7 @@ class World {
     }
 
     /**
-     * Handles enemy collisions, stomping, and bottle hits.
+     * Handles collisions with enemies, including the Endboss.
      */
     handleEnemyCollisions() {
         this.level.enemies.forEach(enemy => {
@@ -99,6 +102,9 @@ class World {
                 if (isStomping && !(enemy instanceof Endboss)) {
                     this.killEnemy(enemy)
                 } else if (!isStomping && !this.character.isInvulnerable) {
+                    if (enemy instanceof Endboss) {
+                        enemy.doAttack()
+                    }
                     this.character.hit()
                     this.statusBar.setPercentage(this.character.health)
                 }
@@ -106,15 +112,9 @@ class World {
             this.throwableObjects.forEach((bottle, index) => {
                 if (bottle.isColliding(enemy)) {
                     bottle.splash()
-                    console.log('💥 Bottle hit enemy:', enemy)
                     if (enemy instanceof Endboss) {
-                        if (!enemy.isInvulnerable) {
-                            enemy.hitPoints--
-                            if (enemy.hitPoints <= 0) {
-                                enemy.die()
-                            } else {
-                                enemy.hit()
-                            }
+                        if (enemy.hitPoints > 0) {
+                            enemy.hit()
                         }
                     } else {
                         this.killEnemy(enemy)
@@ -128,8 +128,8 @@ class World {
     }
 
     /**
-     * Removes or kills an enemy from the level.
-     * @param {Object} enemy - The enemy to remove or kill.
+     * Removes an enemy from the level or calls its die() method.
+     * @param {Object} enemy
      */
     killEnemy(enemy) {
         if (enemy.die) {
@@ -173,14 +173,18 @@ class World {
     }
 
     /**
-     * Detects a bottle throw input once per key press.
+     * Detects a bottle throw input with a cooldown timer.
      */
     checkThrowObjects() {
         if (this.keyboard.D && !this.dWasHeld) {
             this.dWasHeld = true
-            if (this.statusBarBottles.percentage > 0) {
-                this.throwObject()
-                this.statusBarBottles.decreaseBottles()
+            let now = Date.now()
+            if ((now - this.lastThrowTime) >= this.throwCooldown) {
+                if (this.statusBarBottles.percentage > 0) {
+                    this.throwObject()
+                    this.statusBarBottles.decreaseBottles()
+                }
+                this.lastThrowTime = now
             }
         }
         if (!this.keyboard.D) {
@@ -189,12 +193,16 @@ class World {
     }
 
     /**
-     * Creates a new ThrowableObject and adds it to the scene.
+     * Creates a new bottle thrown in the direction Pepe faces.
      */
     throwObject() {
-        const x = this.character.x + this.THROW_OFFSET_X
-        const y = this.character.y + this.THROW_OFFSET_Y
-        this.throwableObjects.push(new ThrowableObject(x, y))
+        const facingLeft = this.character.otherDirection
+        const offsetX = facingLeft ? -30 : 65
+        const offsetY = 100
+        const x = this.character.x + offsetX
+        const y = this.character.y + offsetY
+        const bottle = new ThrowableObject(x, y, facingLeft)
+        this.throwableObjects.push(bottle)
     }
 
     /**
@@ -205,7 +213,7 @@ class World {
     }
 
     /**
-     * Draw loop that updates the canvas and checks for throw inputs.
+     * Draw loop for updating the canvas.
      */
     draw() {
         if (this.gamePaused) return
@@ -227,8 +235,8 @@ class World {
     }
 
     /**
-     * Applies camera transformations and restores context afterwards.
-     * @param {Function} drawFn - Drawing callback.
+     * Applies camera transformations and restores context.
+     * @param {Function} drawFn
      */
     applyCamera(drawFn) {
         this.ctx.save()
@@ -238,7 +246,7 @@ class World {
     }
 
     /**
-     * Draws status bars on the top of the screen.
+     * Draws status bars.
      */
     drawStatus() {
         this.addObjects([[this.statusBar, this.statusBarCoins, this.statusBarBottles]])
@@ -246,15 +254,15 @@ class World {
 
     /**
      * Adds objects or arrays of objects to be drawn.
-     * @param {Array} objectGroups - Arrays of drawable objects.
+     * @param {Array} objectGroups
      */
     addObjects(objectGroups) {
         objectGroups.flat().forEach(obj => this.drawObject(obj))
     }
 
     /**
-     * Draws a MovableObject, flipping if necessary.
-     * @param {MovableObject} mo - The object to draw.
+     * Draws a MovableObject, flipping if needed.
+     * @param {MovableObject} mo
      */
     drawObject(mo) {
         this.ctx.save()
@@ -267,7 +275,7 @@ class World {
 
     /**
      * Flips an object horizontally before drawing.
-     * @param {MovableObject} mo - The object to flip.
+     * @param {MovableObject} mo
      */
     flipImage(mo) {
         this.ctx.translate(mo.x + mo.width / 2, mo.y)
@@ -308,24 +316,41 @@ class World {
     }
 
     /**
-     * Returns a random x position for a coin within defined bounds.
+     * Returns a random x position.
      * @returns {number}
      */
     randomX() {
         return this.COIN_MIN_X + Math.random() * (this.COIN_MAX_X - this.COIN_MIN_X)
     }
 
-    /**
-     * Checks overlap for coins to avoid placing them too close.
-     * @param {number} x - X position.
-     * @returns {boolean}
-     */
     checkOverlap = x => this.collectableCoins.some(c => Math.abs(x - c.x) < this.COIN_SPACING)
+    checkBottleOverlap = x => this.collectableBottles.some(b => Math.abs(x - b.x) < 120)
 
     /**
-     * Checks overlap for bottles to avoid placing them too close.
-     * @param {number} x - X position.
-     * @returns {boolean}
+     * If Pepe crosses x=2800, freeze him, remove main music, add boss, start entrance.
      */
-    checkBottleOverlap = x => this.collectableBottles.some(b => Math.abs(x - b.x) < 120)
+    checkBossTrigger() {
+        if (!window.bossTriggered && this.character.x >= 2800) {
+            window.bossTriggered = true
+            this.character.canMove = false
+            this.soundtrack_sound.pause()
+            this.soundtrack_sound.currentTime = 0
+            this.level.enemies.push(this.endboss)
+            this.endboss.doEntrance()
+        }
+    }
+
+    /**
+     * Called by the boss after alert, starts EndbossSoundtrack.
+     */
+    startBossMusic() {
+        this.bossMusic.play()
+    }
+
+    /**
+     * Called by the boss after alert, unfreezes player.
+     */
+    unfreezePlayer() {
+        this.character.canMove = true
+    }
 }
