@@ -141,6 +141,20 @@ document.getElementById('openLegalNotice').addEventListener('click', function (e
     }
 })
 
+document.querySelector('.game-instructions-link').addEventListener('click', function (event) {
+    event.preventDefault()
+    document.getElementById('gameInstructions').classList.remove('hidden')
+    document.body.classList.add('no-scroll')
+})
+
+document.getElementById('gameInstructions').addEventListener('click', function (event) {
+    const legalNoticeContainer = document.querySelector('.game-instructions-container')
+    if (!legalNoticeContainer.contains(event.target)) {
+        document.getElementById('gameInstructions').classList.add('hidden')
+        document.body.classList.remove('no-scroll')
+    }
+})
+
 /**
  * Opens the controls modal.
  */
