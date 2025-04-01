@@ -25,6 +25,7 @@ class World {
     dWasHeld = false
     lastThrowTime = 0
     throwCooldown = 1000
+    collectedCoinsCount = 0;
 
     /**
      * Constructs the game world with a character, boss, etc.
@@ -148,14 +149,16 @@ class World {
      * Checks and handles collisions with coins.
      */
     handleCoinCollisions() {
-        this.collectableCoins = this.collectableCoins.filter(c => {
-            if (this.character.isColliding(c)) {
-                this.statusBarCoins.increaseCoins()
-                this.coin_sound.play()
-                return false
+        this.collectableCoins = this.collectableCoins.filter(coin => {
+            if (this.character.isColliding(coin)) {
+                this.collectedCoinsCount++;
+                this.statusBarCoins.increaseCoins();
+                this.coin_sound.play();
+                this.updateCollectedCoinsDisplay();
+                return false; // Entfernt die eingesammelte Münze aus dem Array
             }
-            return true
-        })
+            return true;
+        });
     }
 
     /**
@@ -352,5 +355,11 @@ class World {
      */
     unfreezePlayer() {
         this.character.canMove = true
+    }
+
+    updateCollectedCoinsDisplay() {
+        const totalCoins = this.COIN_COUNT;
+        document.getElementById('collectedCoinsGameOver').textContent = `You have collected ${this.collectedCoinsCount} / ${totalCoins} coins!`;
+        document.getElementById('collectedCoinsWin').textContent = `You have collected ${this.collectedCoinsCount} / ${totalCoins} coins!`;
     }
 }
