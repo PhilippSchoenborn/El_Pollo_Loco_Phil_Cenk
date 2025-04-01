@@ -74,11 +74,13 @@ function startGame() {
     const gameContainer = document.getElementById('gameContainer')
     const startButton = document.querySelector('.start-screen-icon')
     const legalButton = document.querySelector('.legal-notice-section')
+    const gameInstructions = document.querySelector('.game-instructions-section')
     loadingImage.classList.add('hidden')
     startButton.style.display = 'none'
     startButton.onclick = null
     gameContainer.style.display = 'block'
     legalButton.style.display = 'none'
+    gameInstructions.style.display ='none'
     init()
     if (isMuted && world) {
         world.setMute(true)
@@ -90,11 +92,12 @@ function startGame() {
  * Shows the game over screen and disables user input.
  */
 function gameOver() {
-    const gameOverScreen = document.getElementById('gameOverScreen')
-    const tryAgainButton = document.getElementById('tryAgainButton')
-    gameOverScreen.classList.remove('hidden')
-    tryAgainButton.classList.remove('hidden')
-    disableUserInput()
+    const gameOverScreen = document.getElementById('gameOverScreen');
+    const tryAgainButton = document.getElementById('tryAgainButton');
+    gameOverScreen.classList.remove('hidden');
+    tryAgainButton.classList.remove('hidden');
+    disableUserInput();
+    world.updateCollectedCoinsDisplay(); // Aufruf der Methode über das globale world-Objekt
 }
 
 /**
@@ -113,6 +116,7 @@ function win() {
     const winAgainButton = document.getElementById('winAgainButton');
     winScreen.classList.remove('hidden');
     winAgainButton.classList.remove('hidden');
+    world.updateCollectedCoinsDisplay(); // Auch hier über world aufrufen
 }
 
 /**
