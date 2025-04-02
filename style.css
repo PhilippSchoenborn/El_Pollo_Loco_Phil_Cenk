@@ -113,7 +113,8 @@ h3,
     text-align: center;
 }
 
-.modal-content h3, h2 {
+.modal-content h3,
+h2 {
     margin: 0 !important;
 }
 
@@ -267,7 +268,8 @@ h3,
 }
 
 #openLegalNotice.hidden {
-    display: none; /* Popup bleibt ausgeblendet */
+    display: none;
+    /* Popup bleibt ausgeblendet */
 }
 
 #gameInstructions {
@@ -285,23 +287,25 @@ h3,
 }
 
 #gameInstructions.hidden {
-    display: none; /* Popup bleibt ausgeblendet */
+    display: none;
+    /* Popup bleibt ausgeblendet */
 }
 
 .game-instructions-container {
     max-width: 720px;
-    max-height: 90%; /* Begrenzung der Höhe für Scrollen */
+    max-height: 90%;
+    /* Begrenzung der Höhe für Scrollen */
     display: flex;
     flex-direction: column;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.5);
-    padding: 60px;
     color: white;
     font-size: 18px;
 
     /* Hier wird der Container scrollbar, aber ohne sichtbare Leiste */
     overflow-y: auto;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
+    /* Firefox */
     text-shadow: 2px 2px 0px rgba(177, 103, 92, 0.9),
         -2px 2px 0px rgba(177, 103, 92, 0.9),
         2px -2px 0px rgba(177, 103, 92, 0.9),
@@ -309,23 +313,25 @@ h3,
 }
 
 .game-instructions-container::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
+    display: none;
+    /* Chrome, Safari */
 }
 
 .legal-notice-container {
     max-width: 720px;
-    max-height: 90%; /* Begrenzung der Höhe für Scrollen */
+    max-height: 90%;
+    /* Begrenzung der Höhe für Scrollen */
     display: flex;
     flex-direction: column;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.5);
-    padding: 20px;
     color: white;
     font-size: 18px;
 
     /* Hier wird der Container scrollbar, aber ohne sichtbare Leiste */
     overflow-y: auto;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
+    /* Firefox */
     text-shadow: 2px 2px 0px rgba(177, 103, 92, 0.9),
         -2px 2px 0px rgba(177, 103, 92, 0.9),
         2px -2px 0px rgba(177, 103, 92, 0.9),
@@ -333,14 +339,38 @@ h3,
 }
 
 .legal-notice-container::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
+    display: none;
+    /* Chrome, Safari */
 }
 
 .colleted-coins-end-screen {
     color: white;
     font-size: 28px;
     text-shadow: 2px 2px 0px rgba(177, 103, 92, 0.9),
-    -2px 2px 0px rgba(177, 103, 92, 0.9),
-    2px -2px 0px rgba(177, 103, 92, 0.9),
-    -2px -2px 0px rgba(177, 103, 92, 0.9);
+        -2px 2px 0px rgba(177, 103, 92, 0.9),
+        2px -2px 0px rgba(177, 103, 92, 0.9),
+        -2px -2px 0px rgba(177, 103, 92, 0.9);
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: 'Stardos Stencil', serif;
+    font-weight: bold;
+    font-size: 40px;
+    color: white;
+    text-align: center;
+    /* Same red-ish outline you use for titles and headings */
+    text-shadow: 2px 2px 0px rgb(177, 103, 92, 0.9),
+        -2px 2px 0px rgb(177, 103, 92, 0.9),
+        2px -2px 0px rgb(177, 103, 92, 0.9),
+        -2px -2px 0px rgb(177, 103, 92, 0.9);
+    cursor: pointer;
+    z-index: 1000;
+    /* keep it on top of everything in the modal */
+}
+
+.close-modal:hover {
+    transform: scale(1.1);
 }

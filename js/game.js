@@ -80,7 +80,7 @@ function startGame() {
     startButton.onclick = null
     gameContainer.style.display = 'block'
     legalButton.style.display = 'none'
-    gameInstructions.style.display ='none'
+    gameInstructions.style.display = 'none'
     init()
     if (isMuted && world) {
         world.setMute(true)
@@ -218,4 +218,20 @@ function toggleFullscreen() {
  */
 function reloadGame() {
     location.reload()
+}
+
+/**
+        * Closes the Legal Notice modal.
+        */
+function closeLegalNotice() {  // NEW
+    document.getElementById('openLegalNotice').classList.add('hidden');
+    document.body.classList.remove('no-scroll');
+}
+
+/**
+ * Closes the Game Instructions modal.
+ */
+function closeGameInstructions() {  // NEW
+    document.getElementById('gameInstructions').classList.add('hidden');
+    document.body.classList.remove('no-scroll');
 }
