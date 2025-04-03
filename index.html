@@ -128,7 +128,7 @@
 
             <h3>Represented by:</h3>
             <span>Cenk Korkmaz</span> <br>
-            <span>Philipp Schönborn</span>
+            <span>Philipp Schönborn</span> <br>
 
             <h2>Liability for Content</h2>
             <p>
@@ -213,6 +213,23 @@
             <h1>Help Pepe win the Game. Jump on Chicken and Chicks or throw Salsa at them. But be carefull with your Salsa you might need more than one for the Big one! How Many Coins can you collect?</h1>
         </div>
     </div>
+
+      <!-- Landscape Warning: wird angezeigt, wenn das Gerät im Hochformat ist -->
+  <div id="landscapeWarning" class="landscape-warning">
+    Bitte Gerät ins Querformat drehen!
+  </div>
+
+  <!-- Touch Controls: erscheinen nur im Querformat -->
+  <div id="touchControls" class="touch-controls">
+    <div class="left-controls">
+      <button class="touch-button" onclick="moveLeft()">←</button>
+      <button class="touch-button" onclick="jump()">↑</button>
+      <button class="touch-button" onclick="moveDown()">↓</button>
+    </div>
+    <div class="right-controls">
+      <button class="touch-button" onclick="moveRight()">→</button>
+    </div>
+  </div>
 
     <script src="./js/game.js"></script>
 </body>
