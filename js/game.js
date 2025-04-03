@@ -168,3 +168,23 @@ document.getElementById('gameInstructions').addEventListener('click', e => {
         closeGameInstructions();
     }
 });
+
+
+// landscape warning
+function checkOrientation() {
+    // Prüfen: Ist die Breite kleiner als die Höhe? -> Hochformat
+    if (window.innerWidth < window.innerHeight) {
+      document.getElementById("landscapeWarning").style.display = "flex";
+      document.getElementById("touchControls").style.display = "none";
+    } else {
+      document.getElementById("landscapeWarning").style.display = "none";
+      document.getElementById("touchControls").style.display = "flex";
+    }
+  }
+  
+  // Eventlistener, um bei Größenänderung oder Drehung neu zu prüfen:
+  window.addEventListener("resize", checkOrientation);
+  window.addEventListener("orientationchange", checkOrientation);
+  
+  // Direkt beim Laden der Seite prüfen:
+  document.addEventListener("DOMContentLoaded", checkOrientation);
