@@ -83,34 +83,42 @@ class World {
     }
 
     processEnemyCollision(enemy) {
+        if (enemy.dead) return;
         if (this.character.isColliding(enemy)) {
-            // Check if the character is jumping on the enemy
-            if (this.character.isAbove(enemy) && this.character.speedY < 0) {
+            if (this.isStompingOn(enemy)) {
                 this.handleJumpOnEnemy(enemy);
-            }
-            // Otherwise, if not stomping and the character is vulnerable, treat it as a touch collision
-            else if (!this.character.isInvulnerable) {
+            } else if (!this.character.isInvulnerable) {
                 this.handleTouchEnemy(enemy);
             }
         }
-
-        // Handle collisions between throwable objects (bottles) and the enemy
         this.handleThrowableCollision(enemy);
     }
 
     handleJumpOnEnemy(enemy) {
-        // Only allow stomp-killing if the enemy is not an Endboss
         if (!(enemy instanceof Endboss)) {
+            this.character.isInvulnerable = true;
+            const delay = enemy.death_sound?.duration ? enemy.death_sound.duration * 1000 : 500;
             this.killEnemy(enemy);
+            this.character.y = 400 - (this.character.hitboxOffsetY + this.character.hitboxHeight);
+            this.character.speedY = 0;
+            setTimeout(() => {
+                this.character.isInvulnerable = false;
+            }, delay);
         }
+    }
+    
+    isStompingOn(enemy) {
+        const tolerance = 30;
+        const characterBottom = this.character.bottom();
+        const enemyTop = enemy.top();
+        console.log("Character Bottom:", characterBottom, "Enemy Top:", enemyTop, "SpeedY:", this.character.speedY);
+        return characterBottom <= enemyTop + tolerance && this.character.speedY < 0;
     }
 
     handleTouchEnemy(enemy) {
-        // If touching an enemy and it's an Endboss, perform a special attack
         if (enemy instanceof Endboss) {
             enemy.doAttack();
         }
-        // For other enemies, inflict damage to the character
         this.character.hit();
         this.statusBar.setPercentage(this.character.health);
     }
@@ -119,14 +127,11 @@ class World {
         this.throwableObjects.forEach((bottle, i) => {
             if (bottle.isColliding(enemy)) {
                 bottle.splash();
-                // If the enemy is an Endboss, just call its hit method,
-                // otherwise kill the enemy
                 enemy instanceof Endboss ? enemy.hit() : this.killEnemy(enemy);
                 setTimeout(() => this.throwableObjects.splice(i, 1), 500);
             }
         });
     }
-
 
     killEnemy(enemy) {
         if (enemy.die) {

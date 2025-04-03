@@ -69,11 +69,11 @@ class MovableObject extends DrawableObject {
 
     top() {
         return this.y + (this.hitboxOffsetY || 0);
-    }
+    }    
 
     bottom() {
         return this.top() + (this.hitboxHeight || this.height);
-    }
+    }    
 
     hit() {
         this.energy = Math.max(this.energy - 5, 0);
