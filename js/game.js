@@ -172,29 +172,65 @@ document.getElementById('gameInstructions').addEventListener('click', e => {
 
 // landscape warning and play buttons
 function checkOrientation() {
-    // Definiere einen Threshold: Geräte mit einer Breite unter 768px gelten als mobile Devices.
     const mobileThreshold = 768;
-    // Optional: Zusätzlich prüfen, ob Touch-Events unterstützt werden.
     const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-  
-    // Falls das Gerät als mobile Device erkannt wird:
     if (window.innerWidth < mobileThreshold || isTouchDevice) {
-      // Hochformat: Wenn die Fensterhöhe größer ist als die Breite, warnen
       if (window.innerWidth < window.innerHeight) {
         document.getElementById("landscapeWarning").style.display = "flex";
         document.getElementById("touchControls").style.display = "none";
-      } else { // Querformat: Buttons anzeigen
+      } else {
         document.getElementById("landscapeWarning").style.display = "none";
         document.getElementById("touchControls").style.display = "flex";
       }
     } else {
-      // Auf PC bzw. Geräten mit hoher Bildschirmbreite: Beide Elemente ausblenden
       document.getElementById("landscapeWarning").style.display = "none";
       document.getElementById("touchControls").style.display = "none";
     }
   }
   
-  // Eventlistener, um bei Größenänderung oder Drehung neu zu prüfen:
+  // Eventlistener landscape warning and playbuttons
   window.addEventListener("resize", checkOrientation);
   window.addEventListener("orientationchange", checkOrientation);
   document.addEventListener("DOMContentLoaded", checkOrientation);
+
+
+  function setupTouchControls() {
+    const btnLeft  = document.getElementById("btnLeft");
+    const btnRight = document.getElementById("btnRight");
+    const btnJump  = document.getElementById("btnJump");
+    const btnThrow = document.getElementById("btnThrow");
+  
+    // Für kontinuierliche Eingabe setzen wir Touchstart und Touchend (sowie Maus-Events als Fallback)
+    
+    // Links bewegen
+    btnLeft.addEventListener("touchstart", () => keyboard.LEFT = true);
+    btnLeft.addEventListener("touchend",   () => keyboard.LEFT = false);
+    btnLeft.addEventListener("mousedown",  () => keyboard.LEFT = true);
+    btnLeft.addEventListener("mouseup",    () => keyboard.LEFT = false);
+  
+    // Rechts bewegen
+    btnRight.addEventListener("touchstart", () => keyboard.RIGHT = true);
+    btnRight.addEventListener("touchend",   () => keyboard.RIGHT = false);
+    btnRight.addEventListener("mousedown",  () => keyboard.RIGHT = true);
+    btnRight.addEventListener("mouseup",    () => keyboard.RIGHT = false);
+  
+    // Springen
+    btnJump.addEventListener("touchstart", () => keyboard.UP = true);
+    btnJump.addEventListener("touchend",   () => keyboard.UP = false);
+    btnJump.addEventListener("mousedown",  () => keyboard.UP = true);
+    btnJump.addEventListener("mouseup",    () => keyboard.UP = false);
+  
+    // Werfen (zum Beispiel wird der Key "D" genutzt)
+    btnThrow.addEventListener("touchstart", () => keyboard.D = true);
+    btnThrow.addEventListener("touchend",   () => keyboard.D = false);
+    btnThrow.addEventListener("mousedown",  () => keyboard.D = true);
+    btnThrow.addEventListener("mouseup",    () => keyboard.D = false);
+  }
+  
+  // Rufe die Setup-Funktion nach DOM-Loaded oder in deiner init()-Funktion auf:
+  document.addEventListener('DOMContentLoaded', () => {
+    modal = document.getElementById('infoModal');
+    bindKeyEvents();
+    setupTouchControls(); // Touch-Steuerung initialisieren
+  });
+  
