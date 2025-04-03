@@ -83,27 +83,50 @@ class World {
     }
 
     processEnemyCollision(enemy) {
-        const colliding = this.character.isColliding(enemy);
-        const stomping = this.character.isAbove(enemy) && this.character.speedY < 0;
-
-        if (colliding) {
-            if (stomping && !(enemy instanceof Endboss)) {
-                this.killEnemy(enemy);
-            } else if (!stomping && !this.character.isInvulnerable) {
-                if (enemy instanceof Endboss) enemy.doAttack();
-                this.character.hit();
-                this.statusBar.setPercentage(this.character.health);
+        if (this.character.isColliding(enemy)) {
+            // Check if the character is jumping on the enemy
+            if (this.character.isAbove(enemy) && this.character.speedY < 0) {
+                this.handleJumpOnEnemy(enemy);
+            }
+            // Otherwise, if not stomping and the character is vulnerable, treat it as a touch collision
+            else if (!this.character.isInvulnerable) {
+                this.handleTouchEnemy(enemy);
             }
         }
 
+        // Handle collisions between throwable objects (bottles) and the enemy
+        this.handleThrowableCollision(enemy);
+    }
+
+    handleJumpOnEnemy(enemy) {
+        // Only allow stomp-killing if the enemy is not an Endboss
+        if (!(enemy instanceof Endboss)) {
+            this.killEnemy(enemy);
+        }
+    }
+
+    handleTouchEnemy(enemy) {
+        // If touching an enemy and it's an Endboss, perform a special attack
+        if (enemy instanceof Endboss) {
+            enemy.doAttack();
+        }
+        // For other enemies, inflict damage to the character
+        this.character.hit();
+        this.statusBar.setPercentage(this.character.health);
+    }
+
+    handleThrowableCollision(enemy) {
         this.throwableObjects.forEach((bottle, i) => {
             if (bottle.isColliding(enemy)) {
                 bottle.splash();
+                // If the enemy is an Endboss, just call its hit method,
+                // otherwise kill the enemy
                 enemy instanceof Endboss ? enemy.hit() : this.killEnemy(enemy);
                 setTimeout(() => this.throwableObjects.splice(i, 1), 500);
             }
         });
     }
+
 
     killEnemy(enemy) {
         if (enemy.die) {
