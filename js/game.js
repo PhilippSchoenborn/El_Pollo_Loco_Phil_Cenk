@@ -170,21 +170,31 @@ document.getElementById('gameInstructions').addEventListener('click', e => {
 });
 
 
-// landscape warning
+// landscape warning and play buttons
 function checkOrientation() {
-    // Prüfen: Ist die Breite kleiner als die Höhe? -> Hochformat
-    if (window.innerWidth < window.innerHeight) {
-      document.getElementById("landscapeWarning").style.display = "flex";
-      document.getElementById("touchControls").style.display = "none";
+    // Definiere einen Threshold: Geräte mit einer Breite unter 768px gelten als mobile Devices.
+    const mobileThreshold = 768;
+    // Optional: Zusätzlich prüfen, ob Touch-Events unterstützt werden.
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  
+    // Falls das Gerät als mobile Device erkannt wird:
+    if (window.innerWidth < mobileThreshold || isTouchDevice) {
+      // Hochformat: Wenn die Fensterhöhe größer ist als die Breite, warnen
+      if (window.innerWidth < window.innerHeight) {
+        document.getElementById("landscapeWarning").style.display = "flex";
+        document.getElementById("touchControls").style.display = "none";
+      } else { // Querformat: Buttons anzeigen
+        document.getElementById("landscapeWarning").style.display = "none";
+        document.getElementById("touchControls").style.display = "flex";
+      }
     } else {
+      // Auf PC bzw. Geräten mit hoher Bildschirmbreite: Beide Elemente ausblenden
       document.getElementById("landscapeWarning").style.display = "none";
-      document.getElementById("touchControls").style.display = "flex";
+      document.getElementById("touchControls").style.display = "none";
     }
   }
   
   // Eventlistener, um bei Größenänderung oder Drehung neu zu prüfen:
   window.addEventListener("resize", checkOrientation);
   window.addEventListener("orientationchange", checkOrientation);
-  
-  // Direkt beim Laden der Seite prüfen:
   document.addEventListener("DOMContentLoaded", checkOrientation);
