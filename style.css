@@ -100,6 +100,8 @@ h3,
 .modal {
     display: none;
     position: absolute;
+    top: 42px;
+    left: 176px;
     z-index: 4;
     background-color: rgba(0, 0, 0, 0.4);
 }
@@ -223,12 +225,11 @@ h2 {
 
 .bottom-buttons-container {
     position: absolute;
-    bottom: 10px;
-    left: 0;
-    width: 100%;
+    bottom: 10px;  
+    left: 10px;  /* statt left: 0; kann hier ein kleiner Abstand sinnvoll sein */
+    right: 10px; /* so wird sichergestellt, dass der Container den gesamten unteren Bereich ausfüllt */
     display: flex;
-    justify-content: center;
-    gap: 20px;
+    justify-content: space-between;
     z-index: 99;
 }
 
@@ -437,6 +438,20 @@ h2 {
     border: solid 1px white;
 }
 
+@media (max-width: 1024px){
+    .canvas-container {
+        width: 100vw !important;
+        height: 100vh !important;
+        min-height: 320px;
+        border: none !important;
+        border-radius: 0 !important;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        z-index: 1;
+    }
+}
+
 @media (max-width: 768px) {
 
     html,
@@ -473,5 +488,35 @@ h2 {
 
     #loadingImage {
         object-fit: fill !important;
+    }
+
+    .modal {
+        top: 1px;
+    }
+
+    .modal-content {
+        width: 315px;
+        height: 280px;
+        padding: 2.5px;
+    }
+
+    .controls-images {
+        height: 225px;
+    }
+
+    .controls {
+        height: 55px;
+    }
+
+    .bottom-buttons-container {
+        gap: 10px;
+    }
+
+    .legal-notice-section {
+        top: 300px;
+    }
+
+    .game-instructions-section {
+        top: 300px;
     }
 }
