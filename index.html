@@ -60,12 +60,22 @@
                     <a href="#" class="game-instructions-link">Game Instructions</a>
                 </div>
             </div>
+            <div id="touchControls" class="touch-controls">
+                <div class="left-controls">
+                    <button class="touch-button" id="btnLeft">&#129044;</button>
+                    <button class="touch-button" id="btnRight">&#129046;</button>
 
+                </div>
+                <div class="right-controls">
+                    <button class="touch-button" id="btnJump">&#129045;</button>
+                    <button class="touch-button" id="btnThrow">&#128293;</button>
+                </div>
+            </div>
         </div>
 
         <div id="gameOverScreen" class="game-over hidden"><img src="./img/9_intro_outro_screens/game_over/game over.png"
                 alt="Game Over">
-                <span id="collectedCoinsGameOver" class="colleted-coins-end-screen"></span>
+            <span id="collectedCoinsGameOver" class="colleted-coins-end-screen"></span>
         </div>
         <img id="tryAgainButton" onclick="reloadGame()" class="start-screen-icon hidden "
             src="./img/10_interface_icons/again_button.png" alt="start button">
@@ -210,27 +220,13 @@
     <div id="gameInstructions" class="modal-game-instructions hidden">
         <div class="game-instructions-container">
             <div class="close-modal" onclick="closeGameInstructions()">&times;</div>
-            <h1>Help Pepe win the Game. Jump on Chicken and Chicks or throw Salsa at them. But be carefull with your Salsa you might need more than one for the Big one! How Many Coins can you collect?</h1>
+            <h1>Help Pepe win the Game. Jump on Chicken and Chicks or throw Salsa at them. But be carefull with your
+                Salsa you might need more than one for the Big one! How Many Coins can you collect?</h1>
         </div>
     </div>
-
-      <!-- Landscape Warning: wird angezeigt, wenn das Gerät im Hochformat ist -->
-      <div id="landscapeWarning" class="landscape-warning">
+    <div id="landscapeWarning" class="landscape-warning">
         Bitte Gerät ins Querformat drehen!
-      </div>
-    
-      <!-- Touch Controls: erscheinen nur im Querformat -->
-      <div id="touchControls" class="touch-controls">
-        <div class="left-controls">
-          <button class="touch-button" id="btnLeft">←</button>
-          <button class="touch-button" id="btnRight">→</button>
-          <button class="touch-button" id="btnJump">↑</button>
-        </div>
-        <div class="right-controls">
-          <button class="touch-button" id="btnThrow">Throw</button>
-        </div>
-      </div>
-
+    </div>
     <script src="./js/game.js"></script>
 </body>
 

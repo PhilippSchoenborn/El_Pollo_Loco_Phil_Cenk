@@ -64,12 +64,31 @@ function startGame() {
 
     init();
     if (isMuted) world.setMute(true);
+    if (isTouchDevice()) handleTouchControlsVisibility();
+}
+
+function isTouchDevice() {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
+
+function handleTouchControlsVisibility() {
+    if (!isTouchDevice()) return;
+
+    if (window.innerWidth > window.innerHeight) {
+        document.getElementById("landscapeWarning").style.display = "none";
+        document.getElementById("touchControls").setAttribute("style", "display: flex !important");
+
+    } else {
+        document.getElementById("landscapeWarning").style.display = "flex";
+        document.getElementById("touchControls").style.display = "none";
+    }
 }
 
 function gameOver() {
     document.getElementById('gameOverScreen').classList.remove('hidden');
     document.getElementById('tryAgainButton').classList.remove('hidden');
     disableUserInput();
+    document.getElementById('touchControls').style.display = 'none';
     world.updateCollectedCoinsDisplay();
 }
 
@@ -82,6 +101,7 @@ function win() {
     world?.pauseGame?.();
     document.getElementById('winScreen').classList.remove('hidden');
     document.getElementById('winAgainButton').classList.remove('hidden');
+    document.getElementById('touchControls').style.display = 'none';
     world.updateCollectedCoinsDisplay();
 }
 
@@ -175,62 +195,64 @@ function checkOrientation() {
     const mobileThreshold = 768;
     const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     if (window.innerWidth < mobileThreshold || isTouchDevice) {
-      if (window.innerWidth < window.innerHeight) {
-        document.getElementById("landscapeWarning").style.display = "flex";
-        document.getElementById("touchControls").style.display = "none";
-      } else {
-        document.getElementById("landscapeWarning").style.display = "none";
-        document.getElementById("touchControls").style.display = "flex";
-      }
+        if (window.innerWidth < window.innerHeight) {
+            document.getElementById("landscapeWarning").style.display = "flex";
+            document.getElementById("touchControls").style.display = "none";
+        } else {
+            document.getElementById("landscapeWarning").style.display = "none";
+            document.getElementById("touchControls").style.display = "flex";
+        }
     } else {
-      document.getElementById("landscapeWarning").style.display = "none";
-      document.getElementById("touchControls").style.display = "none";
+        document.getElementById("landscapeWarning").style.display = "none";
+        document.getElementById("touchControls").style.display = "none";
     }
-  }
-  
-  // Eventlistener landscape warning and playbuttons
-  window.addEventListener("resize", checkOrientation);
-  window.addEventListener("orientationchange", checkOrientation);
-  document.addEventListener("DOMContentLoaded", checkOrientation);
+}
+
+// Eventlistener landscape warning and playbuttons
+window.addEventListener("resize", () => {
+    if (world && isTouchDevice()) handleTouchControlsVisibility();
+});
+window.addEventListener("orientationchange", () => {
+    if (world && isTouchDevice()) handleTouchControlsVisibility();
+});
 
 
-  function setupTouchControls() {
-    const btnLeft  = document.getElementById("btnLeft");
+function setupTouchControls() {
+    const btnLeft = document.getElementById("btnLeft");
     const btnRight = document.getElementById("btnRight");
-    const btnJump  = document.getElementById("btnJump");
+    const btnJump = document.getElementById("btnJump");
     const btnThrow = document.getElementById("btnThrow");
-  
+
     // Für kontinuierliche Eingabe setzen wir Touchstart und Touchend (sowie Maus-Events als Fallback)
-    
+
     // Links bewegen
     btnLeft.addEventListener("touchstart", () => keyboard.LEFT = true);
-    btnLeft.addEventListener("touchend",   () => keyboard.LEFT = false);
-    btnLeft.addEventListener("mousedown",  () => keyboard.LEFT = true);
-    btnLeft.addEventListener("mouseup",    () => keyboard.LEFT = false);
-  
+    btnLeft.addEventListener("touchend", () => keyboard.LEFT = false);
+    btnLeft.addEventListener("mousedown", () => keyboard.LEFT = true);
+    btnLeft.addEventListener("mouseup", () => keyboard.LEFT = false);
+
     // Rechts bewegen
     btnRight.addEventListener("touchstart", () => keyboard.RIGHT = true);
-    btnRight.addEventListener("touchend",   () => keyboard.RIGHT = false);
-    btnRight.addEventListener("mousedown",  () => keyboard.RIGHT = true);
-    btnRight.addEventListener("mouseup",    () => keyboard.RIGHT = false);
-  
+    btnRight.addEventListener("touchend", () => keyboard.RIGHT = false);
+    btnRight.addEventListener("mousedown", () => keyboard.RIGHT = true);
+    btnRight.addEventListener("mouseup", () => keyboard.RIGHT = false);
+
     // Springen
     btnJump.addEventListener("touchstart", () => keyboard.UP = true);
-    btnJump.addEventListener("touchend",   () => keyboard.UP = false);
-    btnJump.addEventListener("mousedown",  () => keyboard.UP = true);
-    btnJump.addEventListener("mouseup",    () => keyboard.UP = false);
-  
+    btnJump.addEventListener("touchend", () => keyboard.UP = false);
+    btnJump.addEventListener("mousedown", () => keyboard.UP = true);
+    btnJump.addEventListener("mouseup", () => keyboard.UP = false);
+
     // Werfen (zum Beispiel wird der Key "D" genutzt)
     btnThrow.addEventListener("touchstart", () => keyboard.D = true);
-    btnThrow.addEventListener("touchend",   () => keyboard.D = false);
-    btnThrow.addEventListener("mousedown",  () => keyboard.D = true);
-    btnThrow.addEventListener("mouseup",    () => keyboard.D = false);
-  }
-  
-  // Rufe die Setup-Funktion nach DOM-Loaded oder in deiner init()-Funktion auf:
-  document.addEventListener('DOMContentLoaded', () => {
+    btnThrow.addEventListener("touchend", () => keyboard.D = false);
+    btnThrow.addEventListener("mousedown", () => keyboard.D = true);
+    btnThrow.addEventListener("mouseup", () => keyboard.D = false);
+}
+
+// Rufe die Setup-Funktion nach DOM-Loaded oder in deiner init()-Funktion auf:
+document.addEventListener('DOMContentLoaded', () => {
     modal = document.getElementById('infoModal');
     bindKeyEvents();
     setupTouchControls(); // Touch-Steuerung initialisieren
-  });
-  
+});
