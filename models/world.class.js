@@ -1,4 +1,3 @@
-// Refactored World Class
 class World {
     level = level1;
     canvas;
