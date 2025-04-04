@@ -402,15 +402,14 @@ h2 {
     bottom: 0;
     left: 0;
     width: 100%;
+    height: 45px;
     display: none !important;
     z-index: 5;
     padding: 10px;
     box-sizing: border-box;
     display: flex;
     justify-content: space-between;
-    background: rgba(0, 0, 0, 0.5);
-    border-top: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 0 0 4px 4px;
+    background: transparent;
 }
 
 
@@ -423,9 +422,51 @@ h2 {
 
 /* Styling der Buttons */
 .touch-button {
+    display: flex;
+    align-items: center;
     padding: 10px 20px;
     font-size: 1em;
     border: none;
     border-radius: 5px;
-    background: #ccc;
+    background: rgba(223, 161, 153, 0.9);
+    border: solid 1px white;
+}
+
+@media (max-width: 768px) {
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100vh;
+        width: 100vw;
+    }
+
+    .canvas-container {
+        width: 100vw !important;
+        height: 100vh !important;
+        border: none !important;
+        border-radius: 0 !important;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        z-index: 1;
+    }
+
+    #canvas {
+        width: 100vw !important;
+        height: 100vh !important;
+    }
+
+    .touch-controls {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 10px;
+    }
+
+    #loadingImage {
+        object-fit: fill !important;
+    }
 }
