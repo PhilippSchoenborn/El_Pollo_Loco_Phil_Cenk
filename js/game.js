@@ -255,4 +255,5 @@ document.addEventListener('DOMContentLoaded', () => {
     modal = document.getElementById('infoModal');
     bindKeyEvents();
     setupTouchControls(); // Touch-Steuerung initialisieren
+    checkOrientation();
 });
