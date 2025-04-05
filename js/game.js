@@ -1,11 +1,49 @@
+/**
+ * Canvas element for rendering the game.
+ * @type {HTMLCanvasElement}
+ */
 let canvas;
+
+/**
+ * The main world object controlling the game state.
+ * @type {World}
+ */
 let world;
+
+/**
+ * Object representing keyboard input state.
+ * @type {Keyboard}
+ */
 let keyboard = new Keyboard();
+
+/**
+ * Indicates whether the game is muted.
+ * @type {boolean}
+ */
 let isMuted = false;
+
+/**
+ * Modal element for showing information.
+ * @type {HTMLElement}
+ */
 let modal;
+
+/**
+ * Event listener reference for keydown.
+ * @type {Function}
+ */
 let handleKeyDown;
+
+/**
+ * Event listener reference for keyup.
+ * @type {Function}
+ */
 let handleKeyUp;
 
+/**
+ * Maps key values to keyboard state keys.
+ * @type {Object.<string, string>}
+ */
 const keyMap = {
     ArrowRight: 'RIGHT',
     ArrowLeft: 'LEFT',
@@ -16,18 +54,29 @@ const keyMap = {
     D: 'D'
 };
 
+/**
+ * Initializes the game world and canvas.
+ */
 function init() {
     canvas = document.getElementById('canvas');
     world = new World(canvas, keyboard);
     if (isMuted) world.setMute(true);
 }
 
+/**
+ * Updates the keyboard state based on event and state.
+ * @param {KeyboardEvent} e - The key event.
+ * @param {boolean} state - Whether the key is pressed or released.
+ */
 function setKeyboardState(e, state) {
     if (keyMap[e.key] !== undefined) {
         keyboard[keyMap[e.key]] = state;
     }
 }
 
+/**
+ * Binds keydown and keyup events to window.
+ */
 function bindKeyEvents() {
     handleKeyDown = e => setKeyboardState(e, true);
     handleKeyUp = e => setKeyboardState(e, false);
@@ -35,17 +84,26 @@ function bindKeyEvents() {
     window.addEventListener('keyup', handleKeyUp);
 }
 
+/**
+ * Removes key event listeners from window.
+ */
 function unbindKeyEvents() {
     if (handleKeyDown) window.removeEventListener('keydown', handleKeyDown);
     if (handleKeyUp) window.removeEventListener('keyup', handleKeyUp);
 }
 
+/**
+ * Toggles game audio mute state and updates the icon.
+ */
 function toggleMute() {
     isMuted = !isMuted;
     updateVolumeIcon();
     if (world) world.setMute(isMuted);
 }
 
+/**
+ * Updates the mute/volume icon on the button.
+ */
 function updateVolumeIcon() {
     const btn = document.getElementById('volume-button');
     btn.src = isMuted
@@ -53,6 +111,9 @@ function updateVolumeIcon() {
         : './img/10_interface_icons/volume.png';
 }
 
+/**
+ * Starts the game and displays the main game screen.
+ */
 function startGame() {
     document.getElementById('loadingImage').classList.add('hidden');
     document.querySelector('.start-screen-icon').style.display = 'none';
@@ -61,19 +122,24 @@ function startGame() {
     document.querySelector('.legal-notice-section').style.display = 'none';
     document.querySelector('.game-instructions-section').style.display = 'none';
     document.querySelector('.reload-button').classList.remove('hidden');
-
     init();
     if (isMuted) world.setMute(true);
     if (isTouchDevice()) handleTouchControlsVisibility();
 }
 
+/**
+ * Checks if the device supports touch input.
+ * @returns {boolean}
+ */
 function isTouchDevice() {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
 
+/**
+ * Handles the visibility of touch controls based on orientation.
+ */
 function handleTouchControlsVisibility() {
     if (!isTouchDevice()) return;
-
     if (window.innerWidth > window.innerHeight) {
         document.getElementById("landscapeWarning").style.display = "none";
         document.getElementById("touchControls").setAttribute("style", "display: flex !important");
@@ -83,6 +149,9 @@ function handleTouchControlsVisibility() {
     }
 }
 
+/**
+ * Displays the game over screen and disables input.
+ */
 function gameOver() {
     document.getElementById('gameOverScreen').classList.remove('hidden');
     document.getElementById('tryAgainButton').classList.remove('hidden');
@@ -91,6 +160,9 @@ function gameOver() {
     world.updateCollectedCoinsDisplay();
 }
 
+/**
+ * Displays the win screen and disables input.
+ */
 function win() {
     disableUserInput();
     if (world?.character) {
@@ -104,18 +176,31 @@ function win() {
     world.updateCollectedCoinsDisplay();
 }
 
+/**
+ * Disables user input by unbinding key events.
+ */
 function disableUserInput() {
     unbindKeyEvents();
 }
 
+/**
+ * Opens the modal window.
+ */
 function openModal() {
     modal.style.display = 'block';
 }
 
+/**
+ * Closes the modal window.
+ */
 function closeModal() {
     modal.style.display = 'none';
 }
 
+/**
+ * Checks whether the browser is currently in fullscreen mode.
+ * @returns {boolean}
+ */
 function isFullscreen() {
     return document.fullscreenElement ||
         document.mozFullScreenElement ||
@@ -123,6 +208,10 @@ function isFullscreen() {
         document.msFullscreenElement;
 }
 
+/**
+ * Requests fullscreen mode for a given element.
+ * @param {HTMLElement} elem - The element to display in fullscreen.
+ */
 function requestFullscreen(elem) {
     (elem.requestFullscreen ||
         elem.mozRequestFullScreen ||
@@ -130,6 +219,9 @@ function requestFullscreen(elem) {
         elem.msRequestFullscreen)?.call(elem);
 }
 
+/**
+ * Exits fullscreen mode.
+ */
 function exitFullscreen() {
     (document.exitFullscreen ||
         document.mozCancelFullScreen ||
@@ -137,25 +229,40 @@ function exitFullscreen() {
         document.msExitFullscreen)?.call(document);
 }
 
+/**
+ * Toggles fullscreen mode for the game container.
+ */
 function toggleFullscreen() {
     const canvasContainer = document.querySelector('.canvas-container');
     isFullscreen() ? exitFullscreen() : requestFullscreen(canvasContainer);
 }
 
+/**
+ * Reloads the current game.
+ */
 function reloadGame() {
     location.reload();
 }
 
+/**
+ * Closes the legal notice overlay.
+ */
 function closeLegalNotice() {
     document.getElementById('openLegalNotice').classList.add('hidden');
     document.body.classList.remove('no-scroll');
 }
 
+/**
+ * Closes the game instructions overlay.
+ */
 function closeGameInstructions() {
     document.getElementById('gameInstructions').classList.add('hidden');
     document.body.classList.remove('no-scroll');
 }
 
+/**
+ * Checks screen orientation and adjusts UI accordingly.
+ */
 function checkOrientation() {
     const mobileThreshold = 768;
     const isTouch = isTouchDevice();
@@ -173,72 +280,73 @@ function checkOrientation() {
     }
 }
 
+/**
+ * Sets up touch control event listeners.
+ */
 function setupTouchControls() {
-    const btnLeft = document.getElementById("btnLeft");
-    const btnRight = document.getElementById("btnRight");
-    const btnJump = document.getElementById("btnJump");
-    const btnThrow = document.getElementById("btnThrow");
-
-    btnLeft.addEventListener("touchstart", () => keyboard.LEFT = true);
-    btnLeft.addEventListener("touchend", () => keyboard.LEFT = false);
-    btnLeft.addEventListener("mousedown", () => keyboard.LEFT = true);
-    btnLeft.addEventListener("mouseup", () => keyboard.LEFT = false);
-
-    btnRight.addEventListener("touchstart", () => keyboard.RIGHT = true);
-    btnRight.addEventListener("touchend", () => keyboard.RIGHT = false);
-    btnRight.addEventListener("mousedown", () => keyboard.RIGHT = true);
-    btnRight.addEventListener("mouseup", () => keyboard.RIGHT = false);
-
-    btnJump.addEventListener("touchstart", () => keyboard.UP = true);
-    btnJump.addEventListener("touchend", () => keyboard.UP = false);
-    btnJump.addEventListener("mousedown", () => keyboard.UP = true);
-    btnJump.addEventListener("mouseup", () => keyboard.UP = false);
-
-    btnThrow.addEventListener("touchstart", () => keyboard.D = true);
-    btnThrow.addEventListener("touchend", () => keyboard.D = false);
-    btnThrow.addEventListener("mousedown", () => keyboard.D = true);
-    btnThrow.addEventListener("mouseup", () => keyboard.D = false);
+    addControlEvents("btnLeft", "LEFT");
+    addControlEvents("btnRight", "RIGHT");
+    addControlEvents("btnJump", "UP");
+    addControlEvents("btnThrow", "D");
 }
 
-// === DOM Ready ===
+/**
+ * Adds touch and mouse event listeners for a button.
+ * @param {string} buttonId - ID of the button element.
+ * @param {string} key - Key to toggle in the keyboard object.
+ */
+function addControlEvents(buttonId, key) {
+    const button = document.getElementById(buttonId);
+    if (!button) return;
+    const activate = () => keyboard[key] = true;
+    const deactivate = () => keyboard[key] = false;
+    button.addEventListener("touchstart", activate);
+    button.addEventListener("touchend", deactivate);
+    button.addEventListener("mousedown", activate);
+    button.addEventListener("mouseup", deactivate);
+}
+
+// Event bindings when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     modal = document.getElementById('infoModal');
     bindKeyEvents();
     setupTouchControls();
-    checkOrientation(); // Show landscape warning immediately
+    checkOrientation();
 });
 
-// === Legal Notice Events ===
+// Event listener for opening legal notice
 document.querySelector('.legal-notice-link').addEventListener('click', e => {
     e.preventDefault();
     document.getElementById('openLegalNotice').classList.remove('hidden');
     document.body.classList.add('no-scroll');
 });
 
+// Close legal notice on outside click
 document.getElementById('openLegalNotice').addEventListener('click', e => {
     if (!document.querySelector('.legal-notice-container').contains(e.target)) {
         closeLegalNotice();
     }
 });
 
-// === Game Instructions Events ===
+// Event listener for opening game instructions
 document.querySelector('.game-instructions-link').addEventListener('click', e => {
     e.preventDefault();
     document.getElementById('gameInstructions').classList.remove('hidden');
     document.body.classList.add('no-scroll');
 });
 
+// Close game instructions on outside click
 document.getElementById('gameInstructions').addEventListener('click', e => {
     if (!document.querySelector('.game-instructions-container').contains(e.target)) {
         closeGameInstructions();
     }
 });
 
-// === Resize & Orientation Watchers ===
+// Update UI on resize and orientation change
 window.addEventListener("resize", () => {
-    checkOrientation(); // Always check orientation
+    checkOrientation();
 });
 
 window.addEventListener("orientationchange", () => {
-    checkOrientation(); // Always check orientation
+    checkOrientation();
 });
