@@ -438,6 +438,8 @@ h2 {
     border: solid 1px white;
 }
 
+
+
 @media (max-width: 1024px){
     .canvas-container {
         width: 100vw !important;
@@ -449,6 +451,14 @@ h2 {
         top: 0;
         left: 0;
         z-index: 1;
+    }
+
+    .legal-notice-section {
+        top: 685px;
+    }
+
+    .game-instructions-section {
+        top: 685px;
     }
 }
 
@@ -518,5 +528,105 @@ h2 {
 
     .game-instructions-section {
         top: 300px;
+    }
+}
+
+@media (max-width: 932px){
+    .legal-notice-section {
+        top: 355px;
+    }
+
+    .game-instructions-section {
+        top: 355px;
+    }
+}
+
+@media (max-width: 915px){
+    .legal-notice-section {
+        top: 340px;
+    }
+
+    .game-instructions-section {
+        top: 340px;
+    }
+}
+
+@media (max-width: 882px){
+    .legal-notice-section {
+        top: 270px;
+    }
+
+    .game-instructions-section {
+        top: 270px;
+    }
+}
+
+@media (max-width: 853px){
+    .legal-notice-section {
+        top: 495px;
+    }
+
+    .game-instructions-section {
+        top: 495px;
+    }
+}
+
+@media (max-width: 844px){
+    .legal-notice-section {
+        top: 315px;
+    }
+
+    .game-instructions-section {
+        top: 315px;
+    }
+}
+
+@media (max-width: 820px){
+    .legal-notice-section {
+        top: 470px;
+    }
+
+    .game-instructions-section {
+        top: 470px;
+    }
+}
+
+@media (max-width: 740px){
+    .legal-notice-section {
+        top: 285px;
+    }
+
+    .game-instructions-section {
+        top: 285px;
+    }
+}
+
+@media (max-width: 720px){
+    .legal-notice-section {
+        top: 465px;
+    }
+
+    .game-instructions-section {
+        top: 465px;
+    }
+}
+
+@media (max-width: 667px){
+    .legal-notice-section {
+        top: 300px;
+    }
+
+    .game-instructions-section {
+        top: 300px;
+    }
+}
+
+@media (max-width: 658px){
+    .legal-notice-section {
+        top: 250px;
+    }
+
+    .game-instructions-section {
+        top: 250px;
     }
 }
