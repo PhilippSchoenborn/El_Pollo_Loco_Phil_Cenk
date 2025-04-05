@@ -102,7 +102,7 @@ h3,
     position: absolute;
     top: 42px;
     left: 176px;
-    z-index: 4;
+    z-index: 100;
     background-color: rgba(0, 0, 0, 0.4);
 }
 
@@ -460,6 +460,11 @@ h2 {
     .game-instructions-section {
         top: 685px;
     }
+
+    .modal {
+        top: 155px;
+        left: 315px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -539,6 +544,11 @@ h2 {
     .game-instructions-section {
         top: 355px;
     }
+
+    .modal {
+        top: 25px;
+        left: 270px;
+    }
 }
 
 @media (max-width: 915px){
@@ -549,6 +559,18 @@ h2 {
     .game-instructions-section {
         top: 340px;
     }
+
+    .modal {
+        top: 12px;
+        left: 270px;
+    }
+}
+
+@media (max-width: 896px){
+    .modal {
+        top: 14px;
+        left: 255px;
+    }
 }
 
 @media (max-width: 882px){
@@ -558,6 +580,10 @@ h2 {
 
     .game-instructions-section {
         top: 270px;
+    }
+
+    .controls{
+        height: 55px;
     }
 }
 
@@ -578,6 +604,11 @@ h2 {
 
     .game-instructions-section {
         top: 315px;
+    }
+
+    .modal {
+        top: 2px;
+        left: 255px;
     }
 }
 
@@ -609,6 +640,11 @@ h2 {
     .game-instructions-section {
         top: 465px;
     }
+
+    .modal {
+        top: 90px;
+        left: 190px;
+    }
 }
 
 @media (max-width: 667px){
@@ -619,6 +655,11 @@ h2 {
     .game-instructions-section {
         top: 300px;
     }
+
+    .modal {
+        top: 30px;
+        left: 155px;
+    }
 }
 
 @media (max-width: 658px){
@@ -628,5 +669,17 @@ h2 {
 
     .game-instructions-section {
         top: 250px;
+    }
+
+    .modal {
+        top: 1px;
+        left: 170px;
+    }
+}
+
+@media (max-width: 480px){
+    .modal {
+        top: 1px;
+        left: 75px;
     }
 }
