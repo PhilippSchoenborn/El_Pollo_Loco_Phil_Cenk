@@ -12,7 +12,7 @@ class Character extends MovableObject {
     idleAnimationSpeed = 40
     longIdleAnimationSpeed = 40
     snoringSoundPlaying = false
-    health = 10000
+    health = 20
     dead = false
     statusBar = null
     isInvulnerable = false
@@ -32,235 +32,312 @@ class Character extends MovableObject {
     character_hurt_sound = new Audio('audio/character_hurt.mp3')
     snoring_sound = new Audio('audio/snoring.mp3')
 
+    /**
+     * Creates an instance of Character.
+     * @param {StatusBar} statusBar - The UI element displaying health.
+     */
     constructor(statusBar) {
-        super().loadImage(this.IMAGES_WALKING[0])
-        this.loadAllImages()
-        this.applyGravityWith(2.5)
-        this.statusBar = statusBar
-        this.configureSounds()
-        this.setHitbox()
-        this.animate()
+        super().loadImage(this.IMAGES_WALKING[0]);
+        this.loadAllImages();
+        this.applyGravityWith(2.5);
+        this.statusBar = statusBar;
+        this.configureSounds();
+        this.setHitbox();
+        this.animate();
     }
 
+    /** Loads all character animations into memory. */
     loadAllImages() {
-        this.loadImages(this.IMAGES_WALKING)
-        this.loadImages(this.IMAGES_JUMPING)
-        this.loadImages(this.IMAGES_DEAD)
-        this.loadImages(this.IMAGES_HURT)
-        this.loadImages(this.IMAGES_IDLE)
-        this.loadImages(this.IMAGES_LONG_IDLE)
+        this.loadImages(this.IMAGES_WALKING);
+        this.loadImages(this.IMAGES_JUMPING);
+        this.loadImages(this.IMAGES_DEAD);
+        this.loadImages(this.IMAGES_HURT);
+        this.loadImages(this.IMAGES_IDLE);
+        this.loadImages(this.IMAGES_LONG_IDLE);
     }
 
+    /** Configures audio volumes and looping. */
     configureSounds() {
-        this.walking_sound.volume = 0.15
-        this.jump_sound.volume = 0.3
-        this.character_jump_sound.volume = 0.2
-        this.character_hurt_sound.volume = 0.2
-        this.snoring_sound.volume = 0.5
-        this.snoring_sound.loop = true
+        this.walking_sound.volume = 0.15;
+        this.jump_sound.volume = 0.3;
+        this.character_jump_sound.volume = 0.2;
+        this.character_hurt_sound.volume = 0.2;
+        this.snoring_sound.volume = 0.5;
+        this.snoring_sound.loop = true;
     }
 
+    /** Defines the hitbox area for collision detection. */
     setHitbox() {
-        this.hitboxOffsetX = 20
-        this.hitboxOffsetY = 50
-        this.hitboxWidth = this.width - 40
-        this.hitboxHeight = this.height - 80
+        this.hitboxOffsetX = 20;
+        this.hitboxOffsetY = 50;
+        this.hitboxWidth = this.width - 40;
+        this.hitboxHeight = this.height - 80;
     }
 
+    /** Starts the character animation loop using requestAnimationFrame. */
     animate() {
-        requestAnimationFrame(this.update.bind(this))
+        requestAnimationFrame(this.update.bind(this));
     }
 
+    /**
+     * Main update loop called on every animation frame.
+     * @param {DOMHighResTimeStamp} timestamp - The current time.
+     */
     update(timestamp) {
-        if (this.dead) return
-        this.updatePosition()
-        this.updateCamera()
-        this.handleIdleState()
-        this.updateAnimationFrame(timestamp)
-        requestAnimationFrame(this.update.bind(this))
+        if (this.dead) return;
+        this.updatePosition();
+        this.updateCamera();
+        this.handleIdleState();
+        this.updateAnimationFrame(timestamp);
+        requestAnimationFrame(this.update.bind(this));
     }
 
+    /** Handles character movement based on keyboard input. */
     updatePosition() {
-        const keys = this.world.keyboard
-        const now = Date.now()
-
+        const keys = this.world.keyboard;
+        const now = Date.now();
         if (keys.RIGHT && this.x < this.world.level.level_end_x) {
-            this.moveCharacter(true, now)
+            this.moveCharacter(true, now);
         } else if (keys.LEFT && this.x > 0) {
-            this.moveCharacter(false, now)
+            this.moveCharacter(false, now);
         } else {
-            this.stopWalkingSound()
+            this.stopWalkingSound();
         }
-
         if ((keys.UP || keys.SPACE) && !this.isAboveGround()) {
-            this.jumpCharacter(now)
+            this.jumpCharacter(now);
         }
     }
 
+    /**
+     * Moves the character left or right.
+     * @param {boolean} toRight - Direction to move.
+     * @param {number} time - Current time for idle tracking.
+     */
     moveCharacter(toRight, time) {
-        toRight ? this.moveRight() : this.moveLeft()
-        this.otherDirection = !toRight
-        this.walking_sound.play()
-        this.lastMovementTime = time
-        this.stopSnoring()
+        toRight ? this.moveRight() : this.moveLeft();
+        this.otherDirection = !toRight;
+        this.walking_sound.play();
+        this.lastMovementTime = time;
+        this.stopSnoring();
     }
 
+    /**
+     * Makes the character jump.
+     * @param {number} time - Current time for idle tracking.
+     */
     jumpCharacter(time) {
-        this.jump()
-        this.character_jump_sound.play()
-        setTimeout(() => this.jump_sound.play(), 150)
-        this.lastMovementTime = time
-        this.stopSnoring()
+        this.jump();
+        this.character_jump_sound.play();
+        setTimeout(() => this.jump_sound.play(), 150);
+        this.lastMovementTime = time;
+        this.stopSnoring();
     }
 
+    /** Stops the walking sound if it's currently playing. */
     stopWalkingSound() {
         if (!this.walking_sound.paused) {
-            this.walking_sound.pause()
-            this.walking_sound.currentTime = 0
+            this.walking_sound.pause();
+            this.walking_sound.currentTime = 0;
         }
     }
 
+    /** Stops the snoring sound if it's playing. */
     stopSnoring() {
         if (this.snoringSoundPlaying) {
-            this.snoring_sound.pause()
-            this.snoring_sound.currentTime = 0
-            this.snoringSoundPlaying = false
+            this.snoring_sound.pause();
+            this.snoring_sound.currentTime = 0;
+            this.snoringSoundPlaying = false;
         }
     }
 
+    /** Determines and plays idle or long idle animations based on inactivity. */
     handleIdleState() {
-        const now = Date.now()
+        const now = Date.now();
         if (!this.world.keyboard.LEFT && !this.world.keyboard.RIGHT && !this.isAboveGround()) {
-            this.playIdleAnimations(now)
+            this.playIdleAnimations(now);
         }
     }
 
+    /**
+     * Handles idle and long idle animation playback.
+     * @param {number} currentTime - Current timestamp.
+     */
     playIdleAnimations(currentTime) {
         if (currentTime - this.lastMovementTime >= this.idleTimeThreshold) {
             if (!this.snoringSoundPlaying) {
-                this.snoring_sound.play()
-                this.snoringSoundPlaying = true
+                this.snoring_sound.play();
+                this.snoringSoundPlaying = true;
             }
             if (++this.longIdleFrameCounter % this.longIdleAnimationSpeed === 0) {
-                this.playAnimation(this.IMAGES_LONG_IDLE)
+                this.playAnimation(this.IMAGES_LONG_IDLE);
             }
         } else {
             if (++this.idleAnimationFrameCounter % this.idleAnimationSpeed === 0) {
-                this.playAnimation(this.IMAGES_IDLE)
+                this.playAnimation(this.IMAGES_IDLE);
             }
         }
     }
 
+    /** Adjusts the camera to follow the character. */
     updateCamera() {
-        this.world.camera_x = -this.x + 100
+        this.world.camera_x = -this.x + 100;
     }
 
+    /**
+     * Updates the current animation frame based on time delta.
+     * @param {DOMHighResTimeStamp} timestamp
+     */
     updateAnimationFrame(timestamp) {
-        if (!this.lastFrameTime) this.lastFrameTime = timestamp
-        const delta = timestamp - this.lastFrameTime
-        const duration = this.calculateFrameDuration(this.speed)
-
+        if (!this.lastFrameTime) this.lastFrameTime = timestamp;
+        const delta = timestamp - this.lastFrameTime;
+        const duration = this.calculateFrameDuration(this.speed);
         if (delta >= duration) {
-            this.decideCurrentAnimation()
-            this.lastFrameTime = timestamp
+            this.decideCurrentAnimation();
+            this.lastFrameTime = timestamp;
         }
     }
 
+    /**
+     * Calculates duration between frames based on movement speed.
+     * @param {number} speed
+     * @returns {number}
+     */
     calculateFrameDuration(speed) {
-        const base = 200
-        let factor = Math.abs(speed) / this.speed
-        return Math.max(base / (1 + factor), 100)
+        const base = 200;
+        const factor = Math.abs(speed) / this.speed;
+        return Math.max(base / (1 + factor), 100);
     }
 
+    /** Determines the current animation based on character state. */
     decideCurrentAnimation() {
         if (this.isDead()) {
-            this.dead = true
-            this.gameOver()
+            this.dead = true;
+            this.gameOver();
         } else if (!this.isInvulnerable && this.isHurt()) {
-            this.takeDamage(20)
+            this.takeDamage(20);
         } else if (!this.isInvulnerable && this.isAboveGround()) {
-            this.playAnimation(this.IMAGES_JUMPING)
+            this.playAnimation(this.IMAGES_JUMPING);
         } else if (!this.isInvulnerable && (this.world.keyboard.LEFT || this.world.keyboard.RIGHT)) {
-            this.playAnimation(this.IMAGES_WALKING)
+            this.playAnimation(this.IMAGES_WALKING);
         }
     }
 
+    /**
+     * Reduces health and triggers hurt animation/sound.
+     * @param {number} amount - The amount of health to reduce.
+     */
     takeDamage(amount) {
-        if (this.isInvulnerable || this.dead || this.isAnimatingHurt) return
-        this.health -= amount
+        if (this.isInvulnerable || this.dead || this.isAnimatingHurt) return;
+        this.health -= amount;
         if (this.health <= 0) {
-            this.health = 0
+            this.health = 0;
             if (!this.dead) {
-                this.dead = true
-                this.gameOver()
+                this.dead = true;
+                this.gameOver();
             }
         }
-        this.statusBar?.setPercentage(this.health)
-        this.isInvulnerable = true
-        this.playHurtAnimation()
-        this.character_hurt_sound.play()
-        setTimeout(() => this.isInvulnerable = false, 150 * this.IMAGES_HURT.length)
+        this.statusBar?.setPercentage(this.health);
+        this.isInvulnerable = true;
+        this.playHurtAnimation();
+        this.character_hurt_sound.play();
+        setTimeout(() => this.isInvulnerable = false, 150 * this.IMAGES_HURT.length);
     }
 
+    /** Starts the hurt animation sequence. */
     playHurtAnimation() {
-        if (this.isAnimatingHurt) return
-        this.isAnimatingHurt = true
-        let frameIndex = 0
-        let lastTime = 0
-        const duration = 150
-
-        const animate = t => {
-            if (!lastTime) lastTime = t
-            if (t - lastTime >= duration) {
-                this.img = this.imageCache[this.IMAGES_HURT[frameIndex++]]
-                lastTime = t
-            }
-            if (frameIndex < this.IMAGES_HURT.length) {
-                requestAnimationFrame(animate)
-            } else {
-                this.isAnimatingHurt = false
-            }
-        }
-        requestAnimationFrame(animate)
+        if (this.isAnimatingHurt) return;
+        this.isAnimatingHurt = true;
+        this._startAnimation(this.IMAGES_HURT, 150, () => {
+            this.isAnimatingHurt = false;
+        });
     }
 
+    /**
+     * Starts a frame-based animation using requestAnimationFrame.
+     * @param {string[]} frames - Array of image keys to animate through.
+     * @param {number} frameDuration - Time between frames in ms.
+     * @param {Function} onComplete - Callback when animation finishes.
+     */
+    _startAnimation(frames, frameDuration, onComplete) {
+        let frameIndex = 0;
+        let lastTime = 0;
+        const animate = (time) => {
+            if (this._shouldAdvanceFrame(time, lastTime, frameDuration)) {
+                this._setFrame(frames, frameIndex++);
+                lastTime = time;
+            }
+            frameIndex < frames.length
+                ? requestAnimationFrame(animate)
+                : onComplete?.();
+        };
+        requestAnimationFrame(animate);
+    }
+
+    /**
+     * Checks if enough time has passed to advance to the next frame.
+     * @param {number} currentTime
+     * @param {number} lastTime
+     * @param {number} duration
+     * @returns {boolean}
+     * @private
+     */
+    _shouldAdvanceFrame(currentTime, lastTime, duration) {
+        return !lastTime || (currentTime - lastTime >= duration);
+    }
+
+    /**
+     * Sets the current image from the frame array and image cache.
+     * @param {string[]} frames
+     * @param {number} index
+     * @private
+     */
+    _setFrame(frames, index) {
+        if (this.imageCache && frames[index]) {
+            this.img = this.imageCache[frames[index]];
+        }
+    }
+
+    /** @returns {boolean} True if the character is dead. */
     isDead() {
-        return this.health <= 0
+        return this.health <= 0;
     }
 
+    /** Triggers the game over animation and screen display. */
     gameOver() {
-        let frameIndex = 0
-        const duration = 200
-        let last = 0
-
-        const animate = t => {
-            if (!last) last = t
-            if (t - last >= duration) {
-                this.img = this.imageCache[this.IMAGES_DEAD[frameIndex++]]
-                last = t
-            }
-            if (frameIndex < this.IMAGES_DEAD.length) {
-                requestAnimationFrame(animate)
-            } else {
-                setTimeout(() => {
-                    document.getElementById('gameOverScreen').classList.remove('hidden')
-                    document.getElementById('tryAgainButton').classList.remove('hidden')
-                    this.world?.pauseGame?.()
-                }, 500)
-            }
-        }
-        requestAnimationFrame(animate)
+        this._startAnimation(this.IMAGES_DEAD, 200, () => this._onGameOverComplete());
     }
 
+    /**
+     * Called after the game over animation completes.
+     * Displays the game over screen and pauses the game.
+     * @private
+     */
+    _onGameOverComplete() {
+        setTimeout(() => {
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+            document.getElementById('tryAgainButton').classList.remove('hidden');
+            this.world?.pauseGame?.();
+        }, 500);
+    }
+
+    /**
+     * Mutes or unmutes all character sounds.
+     * @param {boolean} muted
+     */
     setMute(muted) {
-        this.walking_sound.muted = muted
-        this.jump_sound.muted = muted
-        this.character_jump_sound.muted = muted
-        this.character_hurt_sound.muted = muted
-        this.snoring_sound.muted = muted
+        this.walking_sound.muted = muted;
+        this.jump_sound.muted = muted;
+        this.character_jump_sound.muted = muted;
+        this.character_hurt_sound.muted = muted;
+        this.snoring_sound.muted = muted;
     }
 
+    /**
+     * Determines if this object is above another (for collision logic).
+     * @param {MovableObject} other
+     * @returns {boolean}
+     */
     isAbove(other) {
-        return this.y + this.hitboxHeight - 10 <= other.y
+        return this.y + this.hitboxHeight - 10 <= other.y;
     }
 }
