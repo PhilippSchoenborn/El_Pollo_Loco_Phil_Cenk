@@ -40,8 +40,8 @@ class CollectableCoins extends MovableObject {
     switchImage() {
         let currentImageIndex = 0;
         const images = [
-            '/img/8_coin/coin_1.png',
-            '/img/8_coin/coin_2.png'
+            './img/8_coin/coin_1.png',
+            './img/8_coin/coin_2.png'
         ];
         setInterval(() => {
             currentImageIndex = (currentImageIndex + 1) % images.length;

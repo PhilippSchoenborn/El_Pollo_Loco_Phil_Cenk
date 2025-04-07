@@ -6,7 +6,7 @@ class Chick extends MovableObject {
     height = 70;
     width = 65;
     y = 360;
-    death_sound = new Audio('/audio/chick_dead.mp3');
+    death_sound = new Audio('./audio/chick_dead.mp3');
 
     /**
      * Array of image paths for the walking animation.
