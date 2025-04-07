@@ -6,7 +6,7 @@ class Endboss extends MovableObject {
     height = 250;
     width = 200;
     y = 195;
-    speed = 0.9;
+    speed = 1.5;
     canTakeDamage = false;
     hitPoints = 3;
     currentState = 'waiting';

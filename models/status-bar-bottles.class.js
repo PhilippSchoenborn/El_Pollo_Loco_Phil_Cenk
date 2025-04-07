@@ -46,14 +46,14 @@ class StatusBarBottles extends DrawableObject {
      * Increases the bottle level by 10%, ensuring it doesn't exceed 100%.
      */
     increaseBottles() {
-        this.setPercentage(Math.min(this.percentage + 10, 100));
+        this.setPercentage(Math.min(this.percentage + 20, 100));
     }
 
     /**
      * Decreases the bottle level by 10%, ensuring it doesn't go below 0%.
      */
     decreaseBottles() {
-        this.setPercentage(Math.max(this.percentage - 10, 0));
+        this.setPercentage(Math.max(this.percentage - 20, 0));
     }
 
     /**

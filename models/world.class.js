@@ -355,7 +355,7 @@ class World {
      * Spawns collectible bottles in the world.
      */
     spawnBottles() {
-        const bottleCount = 6;
+        const bottleCount = 5;
         this.collectableBottles = [];
         let placed = 0;
         while (placed < bottleCount) {

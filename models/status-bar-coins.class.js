@@ -51,7 +51,7 @@ class StatusBarCoins extends DrawableObject {
      * Increases the coin level by 10%, ensuring the value doesn't exceed 100%.
      */
     increaseCoins() {
-        this.setPercentage(this.percentage + 10);
+        this.setPercentage(this.percentage + 20);
     }
 
     /**
