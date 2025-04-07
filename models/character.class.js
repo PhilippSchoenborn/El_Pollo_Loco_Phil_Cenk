@@ -31,6 +31,7 @@ class Character extends MovableObject {
     character_jump_sound = new Audio('audio/character_jump.mp3')
     character_hurt_sound = new Audio('audio/character_hurt.mp3')
     snoring_sound = new Audio('audio/snoring.mp3')
+    gameover_sound = new Audio('audio/gameover3.mp3');
 
     /**
      * Creates an instance of Character.
@@ -64,6 +65,7 @@ class Character extends MovableObject {
         this.character_hurt_sound.volume = 0.2;
         this.snoring_sound.volume = 0.5;
         this.snoring_sound.loop = true;
+        this.gameover_sound.volume = 0.6;
     }
 
     /** Defines the hitbox area for collision detection. */
@@ -304,6 +306,8 @@ class Character extends MovableObject {
 
     /** Triggers the game over animation and screen display. */
     gameOver() {
+        this.stopAllSounds();
+        this.gameover_sound.play();
         this._startAnimation(this.IMAGES_DEAD, 200, () => this._onGameOverComplete());
     }
 
@@ -320,6 +324,23 @@ class Character extends MovableObject {
         }, 500);
     }
 
+    stopAllSounds() {
+        const sounds = [
+            this.walking_sound,
+            this.jump_sound,
+            this.character_jump_sound,
+            this.character_hurt_sound,
+            this.snoring_sound
+        ];
+    
+        sounds.forEach(sound => {
+            sound.pause();
+            sound.currentTime = 0;
+        });
+    
+        this.snoringSoundPlaying = false;
+    }    
+
     /**
      * Mutes or unmutes all character sounds.
      * @param {boolean} muted
@@ -330,6 +351,7 @@ class Character extends MovableObject {
         this.character_jump_sound.muted = muted;
         this.character_hurt_sound.muted = muted;
         this.snoring_sound.muted = muted;
+        this.gameover_sound.muted = muted;
     }
 
     /**
