@@ -146,7 +146,6 @@ class World {
         const tolerance = 30;
         const characterBottom = this.character.bottom();
         const enemyTop = enemy.top();
-        console.log("Character Bottom:", characterBottom, "Enemy Top:", enemyTop, "SpeedY:", this.character.speedY);
         return characterBottom <= enemyTop + tolerance && this.character.speedY < 0;
     }
 
