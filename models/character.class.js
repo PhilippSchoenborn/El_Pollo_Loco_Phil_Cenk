@@ -72,7 +72,7 @@ class Character extends MovableObject {
     setHitbox() {
         this.hitboxOffsetX = 20;
         this.hitboxOffsetY = 50;
-        this.hitboxWidth = this.width - 40;
+        this.hitboxWidth = this.width - 50;
         this.hitboxHeight = this.height - 80;
     }
 

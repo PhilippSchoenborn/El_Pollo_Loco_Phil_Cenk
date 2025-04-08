@@ -117,36 +117,51 @@ class MovableObject extends DrawableObject {
     }
 
     /**
-     * Gets the left position of the object, considering any offset.
-     * @returns {number} The left position of the object.
-     */
+  * Gets the left position of the object for collision detection.
+  * If a custom hitbox is defined, uses the hitbox offset.
+  * @returns {number} The left position.
+  */
     left() {
+        if (this.hitbox) {
+            return this.x + this.hitbox.offsetX;
+        }
         return this.x + (this.hitboxOffsetX || 0);
     }
 
     /**
-     * Gets the right position of the object, considering any offset and width.
-     * @returns {number} The right position of the object.
+     * Gets the right position of the object for collision detection.
+     * If a custom hitbox is defined, adds the hitbox width.
+     * @returns {number} The right position.
      */
     right() {
+        if (this.hitbox) {
+            return this.x + this.hitbox.offsetX + this.hitbox.width;
+        }
         return this.left() + (this.hitboxWidth || this.width);
     }
 
     /**
-     * Gets the top position of the object, considering any offset.
-     * @returns {number} The top position of the object.
+     * Gets the top position of the object for collision detection.
+     * @returns {number} The top position.
      */
     top() {
+        if (this.hitbox) {
+            return this.y + this.hitbox.offsetY;
+        }
         return this.y + (this.hitboxOffsetY || 0);
     }
 
     /**
-     * Gets the bottom position of the object, considering any offset and height.
-     * @returns {number} The bottom position of the object.
+     * Gets the bottom position of the object for collision detection.
+     * @returns {number} The bottom position.
      */
     bottom() {
+        if (this.hitbox) {
+            return this.y + this.hitbox.offsetY + this.hitbox.height;
+        }
         return this.top() + (this.hitboxHeight || this.height);
     }
+
 
     /**
      * Reduces the energy of the object when it is hit.

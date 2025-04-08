@@ -42,10 +42,53 @@ class DrawableObject {
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context to draw the frame on.
      */
     drawFrame(ctx) {
-        if ([Character, Chicken, Chick, Endboss, CollectableCoins, CollectableBottle].some(cls => this instanceof cls)) {
-            ctx.strokeStyle = 'green';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(this.x, this.y, this.width, this.height);
+        // Determine which hitbox to use.
+        let x, y, width, height;
+        if (this.hitbox) { // Check if there is a hitbox object
+            x = this.x + this.hitbox.offsetX;
+            y = this.y + this.hitbox.offsetY;
+            width = this.hitbox.width;
+            height = this.hitbox.height;
+        } else if (this.hitboxOffsetX !== undefined) { // Otherwise check for individual properties
+            x = this.x + this.hitboxOffsetX;
+            y = this.y + this.hitboxOffsetY;
+            width = this.hitboxWidth || this.width;
+            height = this.hitboxHeight || this.height;
+        } else { // Default to full image frame if no custom hitbox is defined
+            x = this.x;
+            y = this.y;
+            width = this.width;
+            height = this.height;
         }
+
+        // Draw the hitbox in red
+        ctx.strokeStyle = 'green';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, width, height);
     }
+
+    drawHitbox(ctx) {
+        let x, y, width, height;
+        if (this.hitbox) {
+            x = this.x + this.hitbox.offsetX;
+            y = this.y + this.hitbox.offsetY;
+            width = this.hitbox.width;
+            height = this.hitbox.height;
+        } else if (this.hitboxOffsetX !== undefined) {
+            x = this.x + this.hitboxOffsetX;
+            y = this.y + this.hitboxOffsetY;
+            width = this.hitboxWidth || this.width;
+            height = this.hitboxHeight || this.height;
+        } else {
+            x = this.x;
+            y = this.y;
+            width = this.width;
+            height = this.height;
+        }
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, width, height);
+    }
+    
+
 }

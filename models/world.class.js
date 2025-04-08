@@ -279,12 +279,12 @@ class World {
         this.applyCamera(() => this.addObjects([this.level.backgroundObjects]));
         this.drawStatus();
         this.applyCamera(() => this.addObjects([
+            this.level.clouds,
             this.collectableCoins,
             this.collectableBottles,
             [this.character],
             this.throwableObjects,
             this.level.enemies,
-            this.level.clouds
         ]));
     }
 
@@ -320,10 +320,19 @@ class World {
      */
     drawObject(obj) {
         this.ctx.save();
-        if (obj.otherDirection) this.flipImage(obj);
+        if (obj.otherDirection) {
+            this.flipImage(obj);
+        }
+        // Draw the object image
         obj.draw(this.ctx);
+    
+        // If debugging, draw the hitbox on top of the object
+        if (DEBUG_MODE && typeof obj.drawHitbox === 'function') {
+            obj.drawHitbox(this.ctx);
+        }
         this.ctx.restore();
     }
+    
 
     /**
      * Flips an image horizontally for objects facing the other direction.
