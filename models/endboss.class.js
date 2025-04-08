@@ -117,7 +117,7 @@ class Endboss extends MovableObject {
         if (Math.abs(this.x - playerX) > 10) {
             if (this.x < playerX) {
                 this.x += this.speed;
-                this.otherDirection = false;
+                this.otherDirection = true;
             } else {
                 this.x -= this.speed;
                 this.otherDirection = false;

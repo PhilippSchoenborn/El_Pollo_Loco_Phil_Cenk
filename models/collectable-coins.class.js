@@ -1,26 +1,26 @@
 class CollectableCoins extends MovableObject {
+    /**
+     * Creates a collectible coin at a high, randomized y‑position.
+     * @param {number} x - The x-coordinate where the coin will be placed.
+     * @param {number} y - The base y-coordinate (ground level) for coin placement.
+     */
     constructor(x, y) {
         super().loadImage('./img/8_coin/coin_1.png');
-        Object.assign(this, { x, y, width: 150, height: 150, initialY: y });
-        // Adjust hitbox to be 50x50 instead of 70x70
+        const randomOffset = Math.floor(Math.random() * 200);
+        const newY = y - 50 - randomOffset;
+        Object.assign(this, { x, y: newY, width: 150, height: 150, initialY: newY });
         this.hitbox = {
-            offsetX: 55,  // Centers a 50-pixel wide hitbox in a 100-pixel frame
-            offsetY: 55,  // Centers a 50-pixel tall hitbox
+            offsetX: (this.width - 40) / 2,
+            offsetY: (this.height - 40) / 2,
             width: 40,
-            height: 40 
+            height: 40
         };
-        this.animate();
         this.switchImage();
     }
-    
-    animate() {
-        let direction = 1;
-        setInterval(() => {
-            this.y += direction * 1;
-            if (Math.abs(this.y - this.initialY) >= 10) direction *= -1;
-        }, 1000 / 60);
-    }
-    
+
+    /**
+     * Alternates the coin image for a simple animated effect.
+     */
     switchImage() {
         let currentImageIndex = 0;
         const images = [
