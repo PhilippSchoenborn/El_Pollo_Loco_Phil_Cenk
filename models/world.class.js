@@ -276,7 +276,10 @@ class World {
      */
     handleObjectsDrawing() {
         this.checkThrowObjects();
-        this.applyCamera(() => this.addObjects([this.level.backgroundObjects]));
+        this.applyCamera(() => this.addObjects([
+            this.level.backgroundObjects,
+            this.level.clouds
+        ]));
         this.drawStatus();
         this.applyCamera(() => this.addObjects([
             this.level.clouds,
@@ -284,7 +287,7 @@ class World {
             this.collectableBottles,
             [this.character],
             this.throwableObjects,
-            this.level.enemies,
+            this.level.enemies
         ]));
     }
 
