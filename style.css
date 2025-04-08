@@ -469,6 +469,14 @@ h2 {
         top: 155px;
         left: 315px;
     }
+
+    .game-instructions-container {
+        height: 100% !important;
+    }
+
+    .legal-notice-container {
+        height: 100% !important;
+    }
 }
 
 @media (max-width: 768px) {
