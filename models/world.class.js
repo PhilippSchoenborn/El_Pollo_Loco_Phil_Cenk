@@ -129,6 +129,8 @@ class World {
             this.character.isInvulnerable = true;
             this.killEnemy(enemy);
             this.character.speedY = 15;
+            this.character.bounce_sound.currentTime = 0;
+            this.character.bounce_sound.play();
             setTimeout(() => {
                 this.character.isInvulnerable = false;
             }, 300);

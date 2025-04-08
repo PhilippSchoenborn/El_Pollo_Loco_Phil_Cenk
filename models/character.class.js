@@ -32,6 +32,7 @@ class Character extends MovableObject {
     character_hurt_sound = new Audio('audio/character_hurt.mp3')
     snoring_sound = new Audio('audio/snoring.mp3')
     gameover_sound = new Audio('audio/gameover3.mp3');
+    bounce_sound = new Audio('./audio/jump.mp3');
 
     /**
      * Creates an instance of Character.
