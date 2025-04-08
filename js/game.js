@@ -125,9 +125,11 @@ function startGame() {
     document.querySelector('.game-instructions-section').style.display = 'none';
     document.querySelector('.reload-button').classList.remove('hidden');
     init();
+    world.init();
     if (isMuted) world.setMute(true);
     if (isTouchDevice()) handleTouchControlsVisibility();
 }
+
 
 /**
  * Checks if the device supports touch input.

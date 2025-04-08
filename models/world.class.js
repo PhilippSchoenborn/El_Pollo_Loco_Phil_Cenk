@@ -40,13 +40,17 @@ class World {
         this.character = new Character(this.statusBar);
         this.character.world = this;
         this.endboss = new Endboss(3400);
-        this.init();
     }
 
     /**
      * Initializes the game world, sets up sounds, and starts the game.
      */
     init() {
+        this.level.enemies.forEach(enemy => {
+            if (enemy.initMovement) {
+                enemy.initMovement();
+            }
+        });
         this.initSounds();
         this.soundtrack_sound.play();
         this.run();
