@@ -50,9 +50,15 @@ class MovableObject extends DrawableObject {
             if (this.shouldFall()) {
                 this.y -= this.speedY;
                 this.speedY -= acceleration;
+            } else {
+                // <<< New lines below >>>
+                // Force Pepe to snap to the ground and reset vertical speed
+                this.y = 210;  // or whatever your "ground" y-level is
+                this.speedY = 0;
             }
         }, intervalMs);
     }
+
 
     /**
      * Determines if the object should fall, either because it's above the ground or still moving downward.

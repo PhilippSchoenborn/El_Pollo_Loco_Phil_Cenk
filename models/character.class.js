@@ -71,9 +71,9 @@ class Character extends MovableObject {
     /** Defines the hitbox area for collision detection. */
     setHitbox() {
         this.hitboxOffsetX = 20;
-        this.hitboxOffsetY = 50;
+        this.hitboxOffsetY = 90;
         this.hitboxWidth = this.width - 50;
-        this.hitboxHeight = this.height - 80;
+        this.hitboxHeight = this.height - 100;
     }
 
     /** Starts the character animation loop using requestAnimationFrame. */

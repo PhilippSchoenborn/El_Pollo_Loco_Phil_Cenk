@@ -21,7 +21,7 @@ class World {
     COIN_COUNT = 5;
     THROW_OFFSET_X = 65;
     THROW_OFFSET_Y = 100;
-    COLLISION_CHECK_INTERVAL = 200;
+    COLLISION_CHECK_INTERVAL = 40;
     dWasHeld = false;
     lastThrowTime = 0;
     throwCooldown = 1000;
@@ -127,13 +127,11 @@ class World {
     handleJumpOnEnemy(enemy) {
         if (!(enemy instanceof Endboss)) {
             this.character.isInvulnerable = true;
-            const delay = enemy.death_sound?.duration ? enemy.death_sound.duration * 1000 : 500;
             this.killEnemy(enemy);
-            this.character.y = 400 - (this.character.hitboxOffsetY + this.character.hitboxHeight);
-            this.character.speedY = 0;
+            this.character.speedY = 15;
             setTimeout(() => {
                 this.character.isInvulnerable = false;
-            }, delay);
+            }, 300);
         }
     }
 
@@ -328,14 +326,14 @@ class World {
         }
         // Draw the object image
         obj.draw(this.ctx);
-    
+
         // If debugging, draw the hitbox on top of the object
         if (DEBUG_MODE && typeof obj.drawHitbox === 'function') {
             obj.drawHitbox(this.ctx);
         }
         this.ctx.restore();
     }
-    
+
 
     /**
      * Flips an image horizontally for objects facing the other direction.
