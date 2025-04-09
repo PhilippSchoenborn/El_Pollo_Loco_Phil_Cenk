@@ -197,7 +197,6 @@ function win() {
     }
     world?.pauseGame?.();
     document.getElementById('winScreen').classList.remove('hidden');
-    document.getElementById('winAgainButton').classList.remove('hidden');
     document.getElementById('touchControls').style.display = 'none';
     world.updateCollectedCoinsDisplay();
 }
@@ -284,7 +283,6 @@ function reloadGame() {
     document.getElementById('gameOverScreen').classList.add('hidden');
     document.getElementById('tryAgainButton').classList.add('hidden');
     document.getElementById('winScreen').classList.add('hidden');
-    document.getElementById('winAgainButton').classList.add('hidden');
     document.getElementById('touchControls').style.display = 'none';
     setupTouchControls();
     checkOrientation();
@@ -414,10 +412,7 @@ function retryGame() {
     world.setMute(isMuted);
     world.init();
     document.getElementById('gameOverScreen').classList.add('hidden');
-    document.getElementById('tryAgainButton').classList.add('hidden');
     document.getElementById('winScreen').classList.add('hidden');
-    document.getElementById('winAgainButton').classList.add('hidden');
-
     if (isTouchDevice()) {
         handleTouchControlsVisibility();
     }
