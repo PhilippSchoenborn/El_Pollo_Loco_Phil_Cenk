@@ -11,7 +11,7 @@ class Endboss extends MovableObject {
 
     canTakeDamage = false;
     hitPoints = 3;
-    currentState = 'waiting';  // 'waiting', 'entrance', 'alert', 'chase', 'attack', 'hurt', 'dead'
+    currentState = 'waiting';
 
     walkImages = [
         './img/4_enemie_boss_chicken/1_walk/G1.png',
@@ -61,28 +61,18 @@ class Endboss extends MovableObject {
     constructor(x) {
         super();
         this.x = x;
-
-        // Load the images
         this.loadImages(this.walkImages);
         this.loadImages(this.alertImages);
         this.loadImages(this.attackImages);
         this.loadImages(this.hurtImages);
         this.loadImages(this.deadImages);
-        this.loadImage(this.walkImages[0]);  // default image
-
-        // Audio volumes
+        this.loadImage(this.walkImages[0]);
         this.hit_sound.volume = 0.5;
         this.death_sound.volume = 0.5;
         this.roosterCry.volume = 0.8;
-
-        // Boss faces left or right by flipping this.otherDirection
         this.otherDirection = false;
-
-        // Create the boss status bar (purely for canvas drawing)
         this.statusBar = new StatusBarEndboss();
-        this.statusBar.setPercentage(100);  // start full
-
-        // Kick off animations
+        this.statusBar.setPercentage(100);
         this.animate();
     }
 
@@ -108,10 +98,8 @@ class Endboss extends MovableObject {
                     lastFrameTime = timestamp;
                 }
             } else if (this.currentState === 'attack') {
-                // The actual attack frames come from the setInterval in startAttack()
             }
 
-            // Keep updating frames unless the boss is dead
             if (this.currentState !== 'dead') {
                 requestAnimationFrame(update);
             }
@@ -155,10 +143,9 @@ class Endboss extends MovableObject {
             this.roosterCry.currentTime = 0;
             this.roosterCry.play();
             setTimeout(() => {
-                // Boss can now chase the player and be damaged
                 this.currentState = 'chase';
                 this.canTakeDamage = true;
-                this.statusBar.setPercentage(100); // reset to full if you want
+                this.statusBar.setPercentage(100);
                 world.startBossMusic();
                 world.unfreezePlayer();
             }, 800);
@@ -200,16 +187,11 @@ class Endboss extends MovableObject {
     }
 
     hit() {
-        // Only allow damage if we canTakeDamage and we're alive
         if (!this.canTakeDamage || this.currentState === 'dead') return;
-
         this.hitPoints--;
         this.hit_sound.play();
-
-        // Update health bar
         const pct = (this.hitPoints / 3) * 100;
         this.statusBar.setPercentage(pct);
-
         if (this.hitPoints <= 0) {
             this.die();
         } else {
@@ -265,7 +247,7 @@ class Endboss extends MovableObject {
         clearInterval(deathAnim);
         setTimeout(() => {
             this.removeFromGame();
-            win(); // Or whatever your "win" flow is
+            win();
         }, 500);
     }
 
