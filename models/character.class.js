@@ -4,7 +4,7 @@
 class Character extends MovableObject {
     height = 220
     width = 120
-    speed = 1.5
+    speed = 1.8
     lastMovementTime = Date.now()
     idleTimeThreshold = 5000
     idleAnimationFrameCounter = 0

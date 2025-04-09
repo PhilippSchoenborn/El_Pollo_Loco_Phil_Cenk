@@ -7,24 +7,30 @@ class World {
     ctx;
     keyboard;
     level;
+
     camera_x = 0;
     statusBar;
     statusBarCoins = new StatusBarCoins();
     statusBarBottles = new StatusBarBottles();
-    statusBarBoss = new StatusBarEndboss();
+
+    // (We no longer create a separate statusBarBoss. We rely on endboss.statusBar.)
+
     throwableObjects = [];
     collectableCoins = [];
     collectableBottles = [];
     gamePaused = false;
+
     soundtrack_sound = new Audio('audio/soundtrack.mp3');
     coin_sound = new Audio('audio/coin.mp3');
     pickup_bottle_sound = new Audio('audio/pickup_bottle.mp3');
     bossMusic = new Audio('audio/EndbossSoundtrack.mp3');
+
     COIN_Y = 350;
     COIN_MIN_X = 350;
     COIN_MAX_X = 2200;
     COIN_SPACING = 120;
     COIN_COUNT = 5;
+
     THROW_OFFSET_X = 65;
     THROW_OFFSET_Y = 100;
     COLLISION_CHECK_INTERVAL = 40;
@@ -37,18 +43,25 @@ class World {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.keyboard = keyboard;
+
+        // Setup the level, character, etc.
         this.level = createLevel1();
+
         this.statusBar = new StatusBar();
         this.character = new Character(this.statusBar);
-        this.statusBarBoss = new StatusBarEndboss();
         this.character.world = this;
+
+        // Create an Endboss instance
         this.endboss = new Endboss(3400);
     }
 
     init() {
+        // Some enemies might have custom movement
         this.level.enemies.forEach(e => e.initMovement?.());
+
         this.initSounds();
         this.soundtrack_sound.play();
+
         this.run();
         this.draw();
         this.spawnCoins();
@@ -58,16 +71,24 @@ class World {
     initSounds() {
         this.soundtrack_sound.loop = true;
         this.soundtrack_sound.volume = 0.05;
+
         this.bossMusic.loop = true;
         this.bossMusic.volume = 0.2;
+
         this.coin_sound.volume = 0.5;
         this.pickup_bottle_sound.volume = 0.5;
     }
 
     setMute(muted) {
-        [this.soundtrack_sound, this.coin_sound, this.pickup_bottle_sound, this.bossMusic].forEach(s => s.muted = muted);
+        [this.soundtrack_sound, this.coin_sound, this.pickup_bottle_sound, this.bossMusic].forEach(
+            s => (s.muted = muted)
+        );
+
+        // Mute all enemies & projectiles
         this.level.enemies.forEach(enemy => enemy.setMute?.(muted));
         this.throwableObjects.forEach(obj => obj.setMute?.(muted));
+
+        // Mute the character
         this.character.setMute(muted);
     }
 
@@ -94,26 +115,16 @@ class World {
         if (enemy.dead) return;
 
         if (this.character.isColliding(enemy)) {
-            this.character.isInvulnerable
-                ? null
-                : this.isStompingOn(enemy)
-                    ? this.handleJumpOnEnemy(enemy)
-                    : this.handleTouchEnemy(enemy);
+            if (this.character.isInvulnerable) {
+                // no effect if character is temporarily invulnerable
+            } else if (this.isStompingOn(enemy)) {
+                this.handleJumpOnEnemy(enemy);
+            } else {
+                this.handleTouchEnemy(enemy);
+            }
         }
 
         this.handleThrowableCollision(enemy);
-    }
-
-    handleJumpOnEnemy(enemy) {
-        if (enemy instanceof Endboss) return;
-
-        this.character.isInvulnerable = true;
-        this.killEnemy(enemy);
-        this.character.speedY = 15;
-        this.character.bounce_sound.currentTime = 0;
-        this.character.bounce_sound.play();
-
-        setTimeout(() => this.character.isInvulnerable = false, 300);
     }
 
     isStompingOn(enemy) {
@@ -121,9 +132,26 @@ class World {
         return this.character.bottom() <= enemy.top() + tolerance && this.character.speedY < 0;
     }
 
-    handleTouchEnemy(enemy) {
-        if (enemy instanceof Endboss) enemy.doAttack();
+    handleJumpOnEnemy(enemy) {
+        // If it's the Endboss, we don't kill it by jumping
+        if (enemy instanceof Endboss) return;
 
+        // Kill normal enemy
+        this.character.isInvulnerable = true;
+        this.killEnemy(enemy);
+        this.character.speedY = 15;
+        this.character.bounce_sound.currentTime = 0;
+        this.character.bounce_sound.play();
+
+        // Brief invulnerability so the player isn't immediately hurt
+        setTimeout(() => (this.character.isInvulnerable = false), 300);
+    }
+
+    handleTouchEnemy(enemy) {
+        // Endboss might do an attack
+        if (enemy instanceof Endboss) {
+            enemy.doAttack();
+        }
         this.character.hit();
         this.statusBar.setPercentage(this.character.health);
     }
@@ -136,7 +164,6 @@ class World {
 
                 if (enemy instanceof Endboss) {
                     enemy.hit();
-                    this.statusBarBoss.setPercentage((enemy.hitPoints / 3) * 100);
                 } else {
                     this.killEnemy(enemy);
                 }
@@ -184,58 +211,102 @@ class World {
         });
     }
 
-    checkThrowObjects() {
-        const now = Date.now();
+    /** 
+     * If the boss hasn't been triggered yet (global window.bossTriggered is false),
+     * and the character's x >= 2800, start the boss intro sequence.
+     */
+    checkBossTrigger() {
+        if (!window.bossTriggered && this.character.x >= 2800) {
+            window.bossTriggered = true;
+            this.character.canMove = false;
 
-        if (this.keyboard.D && !this.dWasHeld) {
-            this.dWasHeld = true;
-            this.character.wakeUp();
+            // Stop normal soundtrack
+            this.soundtrack_sound.pause();
+            this.soundtrack_sound.currentTime = 0;
 
-            if ((now - this.lastThrowTime) >= this.throwCooldown && this.statusBarBottles.percentage > 0) {
-                this.throwObject();
-                this.statusBarBottles.decreaseBottles();
-                this.lastThrowTime = now;
-            }
+            // Add the endboss to the enemies array if not already present
+            this.level.enemies.push(this.endboss);
+
+            // Make sure endboss has correct mute state
+            this.endboss.setMute?.(this.soundtrack_sound.muted);
+
+            // Start the boss entrance (walk in, alert, chase, etc.)
+            this.endboss.doEntrance();
         }
-
-        if (!this.keyboard.D) this.dWasHeld = false;
     }
 
-    throwObject() {
-        const facingLeft = this.character.otherDirection;
-        const x = this.character.x + (facingLeft ? -30 : 65);
-        const y = this.character.y + 100;
-        const bottle = new ThrowableObject(x, y, facingLeft);
-        bottle.setMute?.(this.soundtrack_sound.muted);
-        this.throwableObjects.push(bottle);
+    startBossMusic() {
+        this.bossMusic.play();
     }
 
-    pauseGame() {
-        this.gamePaused = true;
+    unfreezePlayer() {
+        this.character.canMove = true;
     }
 
+    /**
+     * Main game loop for rendering:
+     *  1) Clear the canvas
+     *  2) Let handleObjectsDrawing() do all object draws + checks
+     *  3) Request next frame
+     */
     draw() {
         if (this.gamePaused) return;
+
         this.clearCanvas();
         this.handleObjectsDrawing();
         requestAnimationFrame(() => this.draw());
+    }
+
+    /**
+     * Clears canvas, checks user input for throwing, 
+     * draws backgrounds/HUD/characters, etc.
+     */
+    handleObjectsDrawing() {
+        // 1) Check if user pressed "D" to throw a bottle
+        this.checkThrowObjects();
+
+        // 2) Draw background & clouds behind camera
+        this.applyCamera(() => {
+            this.addObjects([this.level.backgroundObjects, this.level.clouds]);
+        });
+
+        // 3) Draw the status bars (player + coins + bottles + conditionally the boss)
+        this.drawStatus();
+
+        // 4) Draw the main action area in front of camera: coins, bottles, character, enemies
+        this.applyCamera(() => {
+            this.addObjects([
+                this.collectableCoins,
+                this.collectableBottles,
+                [this.character],
+                this.throwableObjects,
+                this.level.enemies
+            ]);
+        });
     }
 
     clearCanvas() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    handleObjectsDrawing() {
-        this.checkThrowObjects();
-        this.applyCamera(() => this.addObjects([this.level.backgroundObjects, this.level.clouds]));
-        this.drawStatus();
-        this.applyCamera(() => this.addObjects([
-            this.collectableCoins,
-            this.collectableBottles,
-            [this.character],
-            this.throwableObjects,
-            this.level.enemies
-        ]));
+    /**
+     * Always show the player's HUD (health, coins, bottles).
+     * Only draw the Endboss bar if the boss is in a chase state & not dead.
+     */
+    drawStatus() {
+        const bars = [this.statusBar, this.statusBarCoins, this.statusBarBottles];
+
+        // Show the Endboss bar only if it's vulnerable and alive
+        if (
+            this.endboss &&
+            this.endboss.canTakeDamage &&
+            this.endboss.currentState === 'chase' &&
+            this.endboss.currentState !== 'dead'
+        ) {
+            bars.push(this.endboss.statusBar); // The same bar the Endboss updates in endboss.hit()
+        }
+
+        this.addObjects([bars]);
     }
 
     applyCamera(drawFn) {
@@ -243,12 +314,6 @@ class World {
         this.ctx.translate(this.camera_x, 0);
         drawFn();
         this.ctx.restore();
-    }
-
-    drawStatus() {
-        const bars = [this.statusBar, this.statusBarCoins, this.statusBarBottles];
-        if (this.statusBarBoss) bars.push(this.statusBarBoss);
-        this.addObjects([bars]);
     }
 
     addObjects(groups) {
@@ -259,9 +324,12 @@ class World {
         this.ctx.save();
         if (obj.otherDirection) this.flipImage(obj);
         obj.draw(this.ctx);
+
+        // If you have debug mode for bounding boxes
         if (DEBUG_MODE && typeof obj.drawHitbox === 'function') {
             obj.drawHitbox(this.ctx);
         }
+
         this.ctx.restore();
     }
 
@@ -271,10 +339,48 @@ class World {
         this.ctx.translate(-obj.x - obj.width / 2, -obj.y);
     }
 
+    /**
+     * Checks keyboard input for "D" to throw a bottle, respecting a cooldown.
+     */
+    checkThrowObjects() {
+        const now = Date.now();
+        // If "D" is pressed and wasn't previously pressed
+        if (this.keyboard.D && !this.dWasHeld) {
+            this.dWasHeld = true;
+            this.character.wakeUp();
+
+            // If enough time has passed & we have bottles left
+            if ((now - this.lastThrowTime) >= this.throwCooldown && this.statusBarBottles.percentage > 0) {
+                this.throwObject();
+                this.statusBarBottles.decreaseBottles();
+                this.lastThrowTime = now;
+            }
+        }
+        // Reset the flag if "D" is not pressed
+        if (!this.keyboard.D) {
+            this.dWasHeld = false;
+        }
+    }
+
+    /**
+     * Instantiates a new ThrowableObject (bottle) 
+     * at the character's position, with direction.
+     */
+    throwObject() {
+        const facingLeft = this.character.otherDirection;
+        const x = this.character.x + (facingLeft ? -30 : 65);
+        const y = this.character.y + 100;
+
+        const bottle = new ThrowableObject(x, y, facingLeft);
+        // Respect current mute state
+        bottle.setMute?.(this.soundtrack_sound.muted);
+
+        this.throwableObjects.push(bottle);
+    }
+
     spawnCoins() {
         this.collectableCoins = [];
         let placed = 0;
-
         while (placed < this.COIN_COUNT) {
             const x = this.randomX();
             if (!this.checkOverlap(x)) {
@@ -287,7 +393,6 @@ class World {
     spawnBottles() {
         this.collectableBottles = [];
         let placed = 0;
-
         while (placed < 5) {
             const x = 250 + Math.random() * 2200;
             if (!this.checkBottleOverlap(x)) {
@@ -309,39 +414,29 @@ class World {
         return this.collectableBottles.some(b => Math.abs(x - b.x) < 120);
     }
 
-    checkBossTrigger() {
-        if (!window.bossTriggered && this.character.x >= 2800) {
-            window.bossTriggered = true;
-            this.character.canMove = false;
-            this.soundtrack_sound.pause();
-            this.soundtrack_sound.currentTime = 0;
-            this.level.enemies.push(this.endboss);
-            this.endboss.setMute?.(this.soundtrack_sound.muted);
-            this.endboss.doEntrance();
-        }
-    }
-
-    startBossMusic() {
-        this.bossMusic.play();
-    }
-
-    unfreezePlayer() {
-        this.character.canMove = true;
-    }
-
     updateCollectedCoinsDisplay() {
         const msg = `You have collected ${this.collectedCoinsCount} / ${this.COIN_COUNT} coins!`;
         document.getElementById('collectedCoinsGameOver').textContent = msg;
         document.getElementById('collectedCoinsWin').textContent = msg;
     }
 
+    pauseGame() {
+        this.gamePaused = true;
+    }
+
     cleanUp() {
         this.pauseGame();
         this.setMute(true);
+
+        // Reset normal music
         this.soundtrack_sound.pause();
         this.soundtrack_sound.currentTime = 0;
+
+        // Reset boss music
         this.bossMusic.pause();
         this.bossMusic.currentTime = 0;
+
+        // Stop character sounds if needed
         this.character?.stopAllSounds?.();
     }
 }
