@@ -333,14 +333,14 @@ class Character extends MovableObject {
             this.character_hurt_sound,
             this.snoring_sound
         ];
-    
+
         sounds.forEach(sound => {
             sound.pause();
             sound.currentTime = 0;
         });
-    
+
         this.snoringSoundPlaying = false;
-    }    
+    }
 
     /**
      * Mutes or unmutes all character sounds.
