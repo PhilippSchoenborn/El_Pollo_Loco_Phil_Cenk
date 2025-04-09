@@ -405,6 +405,15 @@ class Character extends MovableObject {
         this.win_sound.play();
     }
 
+    /**
+     * Stops all sound effects associated with the character.
+     * 
+     * This method iterates through a predefined list of audio objects and, if they are defined
+     * and have a valid 'pause' function, it pauses the sound and resets its current playback time.
+     * Additionally, it resets the flag indicating if the snoring sound is playing.
+     *
+     * @returns {void}
+     */
     stopAllSounds() {
         const sounds = [
             this.walking_sound,
@@ -417,8 +426,10 @@ class Character extends MovableObject {
             this.win_sound
         ];
         sounds.forEach(sound => {
-            sound.pause();
-            sound.currentTime = 0;
+            if (sound && typeof sound.pause === "function") {
+                sound.pause();
+                sound.currentTime = 0;
+            }
         });
         this.snoringSoundPlaying = false;
     }
