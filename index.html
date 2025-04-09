@@ -48,8 +48,8 @@
                     alt="fullscreen button">
                 <img onclick="reloadGame()" class="img-icon reload-button hidden"
                     src="./img/10_interface_icons/home_white.png" alt="reload button">
-                <img onclick="retryGame()" class="img-icon retry-btn hidden"
-                    src="./img/10_interface_icons/reload.png" alt="reload button">
+                <img onclick="retryGame()" class="img-icon retry-btn hidden" src="./img/10_interface_icons/reload.png"
+                    alt="reload button">
             </div>
             <div class="legal-notice-section">
                 <div class="legal-notice">
@@ -74,21 +74,32 @@
             </div>
         </div>
 
-        <div id="gameOverScreen" class="game-over hidden"><img src="./img/9_intro_outro_screens/game_over/game over.png"
-                alt="Game Over">
+        <div id="gameOverScreen" class="game-over hidden">
+            <img src="./img/9_intro_outro_screens/game_over/game over.png" alt="Game Over">
             <span id="collectedCoinsGameOver" class="colleted-coins-end-screen"></span>
+            <div class="end-buttons-top-left">
+                <img onclick="reloadGame()" class="img-icon pulse-icon"
+                     src="./img/10_interface_icons/home.png" alt="Reload to Menu">
+                <img onclick="retryGame()" class="img-icon pulse-icon"
+                     src="./img/10_interface_icons/again_button.png" alt="Retry Game">
+            </div>
+            
+            </div>
         </div>
-
-        <img id="tryAgainButton" onclick="reloadGame()" class="start-screen-icon hidden "
-            src="./img/10_interface_icons/home.png" alt="start button">
 
         <div id="winScreen" class="game-over hidden">
             <img src="./img/9_intro_outro_screens/win/win_2.png" alt="You Win" />
             <span id="collectedCoinsWin" class="colleted-coins-end-screen"></span>
+            <div class="end-buttons-top-left">
+                <img onclick="reloadGame()" class="img-icon pulse-icon"
+                     src="./img/10_interface_icons/home.png" alt="Reload to Menu">
+                <img onclick="retryGame()" class="img-icon pulse-icon"
+                     src="./img/10_interface_icons/again_button.png" alt="Retry Game">
+            </div>
+            
+            </div>
         </div>
-
-        <img id="winAgainButton" onclick="reloadGame()" class="start-screen-icon hidden"
-            src="./img/10_interface_icons/home.png" alt="start button">
+        
         <div id="infoModal" class="modal">
 
             <div class="modal-content">
