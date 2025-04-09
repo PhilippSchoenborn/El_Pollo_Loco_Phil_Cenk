@@ -117,6 +117,7 @@ function updateVolumeIcon() {
  * Starts the game and displays the main game screen.
  */
 function startGame() {
+    canvas = document.getElementById('canvas'); // 🛠️ Re-assign canvas before using it
     document.getElementById('loadingImage').classList.add('hidden');
     document.querySelector('.start-screen-icon').style.display = 'none';
     document.querySelector('.start-screen-icon').onclick = null;
@@ -124,11 +125,31 @@ function startGame() {
     document.querySelector('.legal-notice-section').style.display = 'none';
     document.querySelector('.game-instructions-section').style.display = 'none';
     document.querySelector('.reload-button').classList.remove('hidden');
-    init();
+
+    // 🔥 IMPORTANT: Re-create fresh keyboard
+    keyboard = new Keyboard();
+    setupTouchControls();
+
+    // ✅ Re-bind key listeners to new keyboard
+    bindKeyEvents();
+
+    // 🎮 Create and init world with fresh keyboard
+    world = new World(canvas, keyboard);
+    world.setMute(isMuted);
     world.init();
-    if (isMuted) world.setMute(true);
-    if (isTouchDevice()) handleTouchControlsVisibility();
+
+    // 🕹️ Just in case
+    if (world.character) {
+        world.character.canMove = true;
+    }
+
+    if (isTouchDevice()) {
+        handleTouchControlsVisibility();
+    }
+
+    checkOrientation();
 }
+
 
 
 /**
@@ -245,8 +266,36 @@ function toggleFullscreen() {
  * Reloads the current game.
  */
 function reloadGame() {
-    location.reload();
+    // Clean up and stop the current world
+    if (world) {
+        world.cleanUp?.();
+        world = null;
+    }
+
+    // Clear canvas
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Unbind key events
+    disableUserInput();
+
+    // Reset UI to start screen
+    document.getElementById('loadingImage').classList.remove('hidden');
+    document.querySelector('.start-screen-icon').style.display = 'inline';
+    document.querySelector('.start-screen-icon').onclick = startGame;
+    document.querySelector('.legal-notice-section').style.display = 'block';
+    document.querySelector('.game-instructions-section').style.display = 'block';
+    document.querySelector('.reload-button').classList.add('hidden');
+    document.getElementById('gameOverScreen').classList.add('hidden');
+    document.getElementById('tryAgainButton').classList.add('hidden');
+    document.getElementById('winScreen').classList.add('hidden');
+    document.getElementById('winAgainButton').classList.add('hidden');
+    document.getElementById('touchControls').style.display = 'none';
+
+    setupTouchControls();
+    checkOrientation();
 }
+
 
 /**
  * Closes the legal notice overlay.

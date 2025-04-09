@@ -1,8 +1,8 @@
 class World {
-    level = level1;
     canvas;
     ctx;
     keyboard;
+    level;
     camera_x = 0;
     statusBarCoins = new StatusBarCoins();
     statusBarBottles = new StatusBarBottles();
@@ -36,15 +36,13 @@ class World {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.keyboard = keyboard;
+        this.level = createLevel1(); // ✅ Always get a fresh level
         this.statusBar = new StatusBar();
         this.character = new Character(this.statusBar);
         this.character.world = this;
         this.endboss = new Endboss(3400);
     }
 
-    /**
-     * Initializes the game world, sets up sounds, and starts the game.
-     */
     init() {
         this.level.enemies.forEach(enemy => {
             if (enemy.initMovement) {
@@ -59,9 +57,6 @@ class World {
         this.spawnBottles();
     }
 
-    /**
-     * Initializes the audio settings for the game.
-     */
     initSounds() {
         this.soundtrack_sound.loop = true;
         this.soundtrack_sound.volume = 0.05;
@@ -71,18 +66,11 @@ class World {
         this.pickup_bottle_sound.volume = 0.5;
     }
 
-    /**
-     * Mutes or unmutes all game sounds.
-     * @param {boolean} muted - Whether the sounds should be muted or not.
-     */
     setMute(muted) {
         [this.soundtrack_sound, this.coin_sound, this.pickup_bottle_sound, this.bossMusic].forEach(s => s.muted = muted);
         this.character.setMute(muted);
     }
 
-    /**
-     * Starts a regular check for collisions and boss trigger.
-     */
     run() {
         setInterval(() => {
             if (!this.gamePaused) {
@@ -92,26 +80,16 @@ class World {
         }, this.COLLISION_CHECK_INTERVAL);
     }
 
-    /**
-     * Checks all collisions in the game.
-     */
     checkCollisions() {
         this.handleEnemyCollisions();
         this.handleCoinCollisions();
         this.handleBottleCollisions();
     }
 
-    /**
-     * Checks and processes enemy collisions.
-     */
     handleEnemyCollisions() {
         this.level.enemies.forEach(enemy => this.processEnemyCollision(enemy));
     }
 
-    /**
-     * Processes a single enemy collision with the character.
-     * @param {Enemy} enemy - The enemy to check collisions with.
-     */
     processEnemyCollision(enemy) {
         if (enemy.dead) return;
         if (this.character.isColliding(enemy)) {
@@ -124,10 +102,6 @@ class World {
         this.handleThrowableCollision(enemy);
     }
 
-    /**
-     * Handles the case where the character jumps on an enemy.
-     * @param {Enemy} enemy - The enemy that the character jumped on.
-     */
     handleJumpOnEnemy(enemy) {
         if (!(enemy instanceof Endboss)) {
             this.character.isInvulnerable = true;
@@ -141,11 +115,6 @@ class World {
         }
     }
 
-    /**
-     * Checks if the character is stomping on an enemy.
-     * @param {Enemy} enemy - The enemy to check for.
-     * @returns {boolean} - Whether the character is stomping on the enemy.
-     */
     isStompingOn(enemy) {
         const tolerance = 30;
         const characterBottom = this.character.bottom();
@@ -153,10 +122,6 @@ class World {
         return characterBottom <= enemyTop + tolerance && this.character.speedY < 0;
     }
 
-    /**
-     * Handles the case where the character touches an enemy.
-     * @param {Enemy} enemy - The enemy that the character touched.
-     */
     handleTouchEnemy(enemy) {
         if (enemy instanceof Endboss) {
             enemy.doAttack();
@@ -165,10 +130,6 @@ class World {
         this.statusBar.setPercentage(this.character.health);
     }
 
-    /**
-     * Handles collisions between throwable objects (bottles) and enemies.
-     * @param {Enemy} enemy - The enemy to check for collisions with throwable objects.
-     */
     handleThrowableCollision(enemy) {
         this.throwableObjects.forEach((bottle, i) => {
             if (bottle.isColliding(enemy)) {
@@ -179,10 +140,6 @@ class World {
         });
     }
 
-    /**
-     * Kills an enemy and removes it from the level.
-     * @param {Enemy} enemy - The enemy to kill.
-     */
     killEnemy(enemy) {
         if (enemy.die) {
             enemy.die();
@@ -195,9 +152,6 @@ class World {
         }
     }
 
-    /**
-     * Handles collisions with collectible coins.
-     */
     handleCoinCollisions() {
         this.collectableCoins = this.collectableCoins.filter(coin => {
             if (this.character.isColliding(coin)) {
@@ -211,9 +165,6 @@ class World {
         });
     }
 
-    /**
-     * Handles collisions with collectible bottles.
-     */
     handleBottleCollisions() {
         this.collectableBottles = this.collectableBottles.filter(bottle => {
             if (this.character.isColliding(bottle)) {
@@ -225,9 +176,6 @@ class World {
         });
     }
 
-    /**
-     * Checks if the D key is pressed to throw objects.
-     */
     checkThrowObjects() {
         if (this.keyboard.D && !this.dWasHeld) {
             this.dWasHeld = true;
@@ -241,9 +189,6 @@ class World {
         if (!this.keyboard.D) this.dWasHeld = false;
     }
 
-    /**
-     * Throws a bottle object.
-     */
     throwObject() {
         const facingLeft = this.character.otherDirection;
         const x = this.character.x + (facingLeft ? -30 : 65);
@@ -251,16 +196,10 @@ class World {
         this.throwableObjects.push(new ThrowableObject(x, y, facingLeft));
     }
 
-    /**
-     * Pauses the game.
-     */
     pauseGame() {
         this.gamePaused = true;
     }
 
-    /**
-     * Draws the game world to the canvas.
-     */
     draw() {
         if (this.gamePaused) return;
         this.clearCanvas();
@@ -268,16 +207,10 @@ class World {
         requestAnimationFrame(() => this.draw());
     }
 
-    /**
-     * Clears the entire canvas.
-     */
     clearCanvas() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    /**
-     * Handles drawing of background, status, and game objects.
-     */
     handleObjectsDrawing() {
         this.checkThrowObjects();
         this.applyCamera(() => this.addObjects([
@@ -295,10 +228,6 @@ class World {
         ]));
     }
 
-    /**
-     * Applies camera translation and draws objects on the canvas.
-     * @param {function} drawFn - Function that draws the objects.
-     */
     applyCamera(drawFn) {
         this.ctx.save();
         this.ctx.translate(this.camera_x, 0);
@@ -306,54 +235,32 @@ class World {
         this.ctx.restore();
     }
 
-    /**
-     * Draws the status bars on the canvas.
-     */
     drawStatus() {
         this.addObjects([[this.statusBar, this.statusBarCoins, this.statusBarBottles]]);
     }
 
-    /**
-     * Adds a list of objects to be drawn on the canvas.
-     * @param {Array<Array<Object>>} groups - Groups of objects to be drawn.
-     */
     addObjects(groups) {
         groups.flat().forEach(obj => this.drawObject(obj));
     }
 
-    /**
-     * Draws a single object on the canvas.
-     * @param {Object} obj - The object to be drawn.
-     */
     drawObject(obj) {
         this.ctx.save();
         if (obj.otherDirection) {
             this.flipImage(obj);
         }
-        // Draw the object image
         obj.draw(this.ctx);
-
-        // If debugging, draw the hitbox on top of the object
         if (DEBUG_MODE && typeof obj.drawHitbox === 'function') {
             obj.drawHitbox(this.ctx);
         }
         this.ctx.restore();
     }
 
-
-    /**
-     * Flips an image horizontally for objects facing the other direction.
-     * @param {Object} obj - The object whose image should be flipped.
-     */
     flipImage(obj) {
         this.ctx.translate(obj.x + obj.width / 2, obj.y);
         this.ctx.scale(-1, 1);
         this.ctx.translate(-obj.x - obj.width / 2, -obj.y);
     }
 
-    /**
-     * Spawns collectible coins in the world.
-     */
     spawnCoins() {
         this.collectableCoins = [];
         let placed = 0;
@@ -366,9 +273,6 @@ class World {
         }
     }
 
-    /**
-     * Spawns collectible bottles in the world.
-     */
     spawnBottles() {
         const bottleCount = 5;
         this.collectableBottles = [];
@@ -382,35 +286,18 @@ class World {
         }
     }
 
-    /**
-     * Generates a random X position for a coin.
-     * @returns {number} - A random X position for a coin.
-     */
     randomX() {
         return this.COIN_MIN_X + Math.random() * (this.COIN_MAX_X - this.COIN_MIN_X);
     }
 
-    /**
-     * Checks if a given X position overlaps with existing coins.
-     * @param {number} x - The X position to check.
-     * @returns {boolean} - Whether the position overlaps with any coin.
-     */
     checkOverlap(x) {
         return this.collectableCoins.some(c => Math.abs(x - c.x) < this.COIN_SPACING);
     }
 
-    /**
-     * Checks if a given X position overlaps with existing bottles.
-     * @param {number} x - The X position to check.
-     * @returns {boolean} - Whether the position overlaps with any bottle.
-     */
     checkBottleOverlap(x) {
         return this.collectableBottles.some(b => Math.abs(x - b.x) < 120);
     }
 
-    /**
-     * Triggers the boss battle when the character reaches a certain point.
-     */
     checkBossTrigger() {
         if (!window.bossTriggered && this.character.x >= 2800) {
             window.bossTriggered = true;
@@ -422,26 +309,27 @@ class World {
         }
     }
 
-    /**
-     * Starts the boss music.
-     */
     startBossMusic() {
         this.bossMusic.play();
     }
 
-    /**
-     * Unfreezes the player and allows movement again.
-     */
     unfreezePlayer() {
         this.character.canMove = true;
     }
 
-    /**
-     * Updates the display for collected coins.
-     */
     updateCollectedCoinsDisplay() {
         const msg = `You have collected ${this.collectedCoinsCount} / ${this.COIN_COUNT} coins!`;
         document.getElementById('collectedCoinsGameOver').textContent = msg;
         document.getElementById('collectedCoinsWin').textContent = msg;
+    }
+
+    cleanUp() {
+        this.pauseGame();
+        this.setMute(true);
+        this.soundtrack_sound.pause();
+        this.soundtrack_sound.currentTime = 0;
+        this.bossMusic.pause();
+        this.bossMusic.currentTime = 0;
+        this.character?.stopAllSounds?.();
     }
 }
