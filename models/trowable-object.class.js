@@ -63,6 +63,7 @@ class ThrowableObject extends MovableObject {
         this.hitboxWidth = this.width - 10
         this.hitboxHeight = this.height - 10
         this.throw()
+        this.hasHit = false;
     }
 
     /**

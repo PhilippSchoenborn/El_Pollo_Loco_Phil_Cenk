@@ -266,20 +266,14 @@ function toggleFullscreen() {
  * Reloads the current game.
  */
 function reloadGame() {
-    // Clean up and stop the current world
     if (world) {
         world.cleanUp?.();
         world = null;
     }
-
-    // Clear canvas
+    window.bossTriggered = false;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Unbind key events
-    disableUserInput();
-
-    // Reset UI to start screen
+    unbindKeyEvents();
     document.getElementById('loadingImage').classList.remove('hidden');
     document.querySelector('.start-screen-icon').style.display = 'inline';
     document.querySelector('.start-screen-icon').onclick = startGame;
@@ -291,11 +285,9 @@ function reloadGame() {
     document.getElementById('winScreen').classList.add('hidden');
     document.getElementById('winAgainButton').classList.add('hidden');
     document.getElementById('touchControls').style.display = 'none';
-
     setupTouchControls();
     checkOrientation();
 }
-
 
 /**
  * Closes the legal notice overlay.
