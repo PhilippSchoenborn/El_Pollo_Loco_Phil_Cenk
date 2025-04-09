@@ -42,13 +42,10 @@ class StatusBar extends DrawableObject {
      * @param {number} percentage - The new health percentage (between 0 and 100).
      */
     setPercentage(percentage) {
-        this.percentage = Math.max(0, Math.min(100, Math.round(percentage))); // Clamp and round to avoid image mismatch
+        this.percentage = Math.max(0, Math.min(100, Math.round(percentage)));
         const index = this.resolveImageIndex();
         const path = this.IMAGES_LIFE[index];
         this.img = this.imageCache[path];
-
-        // 🔍 Debug log:
-        console.log(`StatusBar: Health set to ${this.percentage}%. Showing image: ${path} (Index: ${index})`);
     }
 
 
