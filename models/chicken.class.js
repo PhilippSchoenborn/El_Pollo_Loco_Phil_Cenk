@@ -49,4 +49,8 @@ class Chicken extends MovableObject {
         this.death_sound.play()
         this.death_sound.volume = 0.4
     }
+
+    setMute(muted) {
+        this.death_sound.muted = muted;
+    }    
 }

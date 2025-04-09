@@ -78,8 +78,12 @@ class World {
      */
     setMute(muted) {
         [this.soundtrack_sound, this.coin_sound, this.pickup_bottle_sound, this.bossMusic].forEach(s => s.muted = muted);
+        this.level.enemies.forEach(enemy => enemy.setMute?.(muted));
+        this.throwableObjects.forEach(obj => obj.setMute?.(muted));
         this.character.setMute(muted);
     }
+
+    
 
     /**
      * Begins the game loop for collisions and boss activation.
@@ -249,8 +253,11 @@ class World {
         const facingLeft = this.character.otherDirection;
         const x = this.character.x + (facingLeft ? -30 : 65);
         const y = this.character.y + 100;
-        this.throwableObjects.push(new ThrowableObject(x, y, facingLeft));
+        const bottle = new ThrowableObject(x, y, facingLeft);
+        bottle.setMute?.(this.soundtrack_sound.muted);
+        this.throwableObjects.push(bottle);
     }
+
 
     /**
      * Pauses the entire game.

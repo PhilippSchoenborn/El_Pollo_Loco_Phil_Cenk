@@ -99,4 +99,9 @@ class ThrowableObject extends MovableObject {
             }
         }, 600)
     }
+
+    setMute(muted) {
+        this.throw_sound.muted = muted;
+        this.smash_sound.muted = muted;
+    }
 }

@@ -353,6 +353,7 @@ class Character extends MovableObject {
         this.character_hurt_sound.muted = muted;
         this.snoring_sound.muted = muted;
         this.gameover_sound.muted = muted;
+        this.bounce_sound.muted = muted;
     }
 
     /**

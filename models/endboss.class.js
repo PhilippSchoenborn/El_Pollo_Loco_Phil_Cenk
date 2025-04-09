@@ -309,4 +309,10 @@ class Endboss extends MovableObject {
             }, 800);
         }, 2000);
     }
+
+    setMute(muted) {
+        this.hit_sound.muted = muted;
+        this.death_sound.muted = muted;
+        this.roosterCry.muted = muted;
+    }   
 }
