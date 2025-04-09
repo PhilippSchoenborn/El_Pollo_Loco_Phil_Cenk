@@ -281,7 +281,6 @@ function reloadGame() {
     document.querySelector('.game-instructions-section').style.display = 'block';
     document.querySelector('.reload-button').classList.add('hidden');
     document.getElementById('gameOverScreen').classList.add('hidden');
-    document.getElementById('tryAgainButton').classList.add('hidden');
     document.getElementById('winScreen').classList.add('hidden');
     document.getElementById('touchControls').style.display = 'none';
     setupTouchControls();
@@ -403,6 +402,7 @@ function retryGame() {
         world.cleanUp?.();
         world = null;
     }
+    window.bossTriggered = false;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     keyboard = new Keyboard();
@@ -418,3 +418,4 @@ function retryGame() {
     }
     checkOrientation();
 }
+

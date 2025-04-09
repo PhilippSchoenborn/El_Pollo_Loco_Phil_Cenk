@@ -320,7 +320,6 @@ class Character extends MovableObject {
     _onGameOverComplete() {
         setTimeout(() => {
             document.getElementById('gameOverScreen').classList.remove('hidden');
-            document.getElementById('tryAgainButton').classList.remove('hidden');
             this.world?.pauseGame?.();
         }, 500);
     }
