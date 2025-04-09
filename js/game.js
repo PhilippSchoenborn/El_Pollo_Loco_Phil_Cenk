@@ -125,6 +125,7 @@ function startGame() {
     document.querySelector('.legal-notice-section').style.display = 'none';
     document.querySelector('.game-instructions-section').style.display = 'none';
     document.querySelector('.reload-button').classList.remove('hidden');
+    document.querySelector('.retry-btn').classList.remove('hidden');
 
     // 🔥 IMPORTANT: Re-create fresh keyboard
     keyboard = new Keyboard();
@@ -395,3 +396,30 @@ window.addEventListener("resize", () => {
 window.addEventListener("orientationchange", () => {
     checkOrientation();
 });
+
+/**
+ * Restarts the game without going to the main menu.
+ */
+function retryGame() {
+    if (world) {
+        world.cleanUp?.();
+        world = null;
+    }
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    keyboard = new Keyboard();
+    setupTouchControls();
+    bindKeyEvents();
+    world = new World(canvas, keyboard);
+    world.setMute(isMuted);
+    world.init();
+    document.getElementById('gameOverScreen').classList.add('hidden');
+    document.getElementById('tryAgainButton').classList.add('hidden');
+    document.getElementById('winScreen').classList.add('hidden');
+    document.getElementById('winAgainButton').classList.add('hidden');
+
+    if (isTouchDevice()) {
+        handleTouchControlsVisibility();
+    }
+    checkOrientation();
+}
