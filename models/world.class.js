@@ -295,19 +295,18 @@ class World {
      */
     drawStatus() {
         const bars = [this.statusBar, this.statusBarCoins, this.statusBarBottles];
-
-        // Show the Endboss bar only if it's vulnerable and alive
+      
         if (
-            this.endboss &&
-            this.endboss.canTakeDamage &&
-            this.endboss.currentState === 'chase' &&
-            this.endboss.currentState !== 'dead'
+          this.endboss &&
+          this.endboss.canTakeDamage &&
+          this.endboss.currentState !== 'dead'
         ) {
-            bars.push(this.endboss.statusBar); // The same bar the Endboss updates in endboss.hit()
+          bars.push(this.endboss.statusBar);
         }
-
+      
         this.addObjects([bars]);
-    }
+      }
+      
 
     applyCamera(drawFn) {
         this.ctx.save();
