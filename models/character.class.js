@@ -364,4 +364,13 @@ class Character extends MovableObject {
     isAbove(other) {
         return this.y + this.hitboxHeight - 10 <= other.y;
     }
+
+    wakeUp() {
+        if (this.snoringSoundPlaying) {
+            this.stopSnoring();
+            this.lastMovementTime = Date.now();
+            this.longIdleFrameCounter = 0;
+            this.idleAnimationFrameCounter = 0;
+        }
+    }    
 }
