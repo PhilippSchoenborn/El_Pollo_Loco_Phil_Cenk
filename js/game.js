@@ -283,6 +283,7 @@ function reloadGame() {
     document.getElementById('gameOverScreen').classList.add('hidden');
     document.getElementById('winScreen').classList.add('hidden');
     document.getElementById('touchControls').style.display = 'none';
+    document.querySelector('.retry-btn').classList.add('hidden');
     setupTouchControls();
     checkOrientation();
 }
