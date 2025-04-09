@@ -1,4 +1,4 @@
-const DEBUG_MODE = true; // Set to true to display hitboxes, false to hide them.
+const DEBUG_MODE = false; // Set to true to display hitboxes, false to hide them.
 
 /**
  * Canvas element for rendering the game.
