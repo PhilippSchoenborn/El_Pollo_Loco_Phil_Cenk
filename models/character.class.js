@@ -1,38 +1,97 @@
+/************************************************
+ * character.class.js
+ ************************************************/
+
 /**
  * Represents the main character in the game with movement, animations, and sounds.
  */
 class Character extends MovableObject {
-    height = 220
-    width = 120
-    speed = 1.8
-    lastMovementTime = Date.now()
-    idleTimeThreshold = 5000
-    idleAnimationFrameCounter = 0
-    longIdleFrameCounter = 0
-    idleAnimationSpeed = 40
-    longIdleAnimationSpeed = 40
-    snoringSoundPlaying = false
-    health = 100
-    dead = false
-    statusBar = null
-    isInvulnerable = false
-    isAnimatingHurt = false
+    height = 220;
+    width = 120;
+    speed = 1.8;
+    lastMovementTime = Date.now();
+    idleTimeThreshold = 5000;
+    idleAnimationFrameCounter = 0;
+    longIdleFrameCounter = 0;
+    idleAnimationSpeed = 40;
+    longIdleAnimationSpeed = 40;
+    snoringSoundPlaying = false;
+    health = 100;
+    dead = false;
+    statusBar = null;
+    isInvulnerable = false;
+    isAnimatingHurt = false;
 
-    IMAGES_IDLE = ['./img/2_character_pepe/1_idle/idle/I-1.png', './img/2_character_pepe/1_idle/idle/I-2.png', './img/2_character_pepe/1_idle/idle/I-3.png', './img/2_character_pepe/1_idle/idle/I-4.png', './img/2_character_pepe/1_idle/idle/I-5.png', './img/2_character_pepe/1_idle/idle/I-6.png', './img/2_character_pepe/1_idle/idle/I-7.png', './img/2_character_pepe/1_idle/idle/I-8.png', './img/2_character_pepe/1_idle/idle/I-9.png', './img/2_character_pepe/1_idle/idle/I-10.png']
-    IMAGES_LONG_IDLE = ['./img/2_character_pepe/1_idle/long_idle/I-11.png', './img/2_character_pepe/1_idle/long_idle/I-12.png', './img/2_character_pepe/1_idle/long_idle/I-13.png', './img/2_character_pepe/1_idle/long_idle/I-14.png', './img/2_character_pepe/1_idle/long_idle/I-15.png', './img/2_character_pepe/1_idle/long_idle/I-16.png', './img/2_character_pepe/1_idle/long_idle/I-17.png', './img/2_character_pepe/1_idle/long_idle/I-18.png', './img/2_character_pepe/1_idle/long_idle/I-19.png', './img/2_character_pepe/1_idle/long_idle/I-20.png']
-    IMAGES_WALKING = ['./img/2_character_pepe/2_walk/W-21.png', './img/2_character_pepe/2_walk/W-22.png', './img/2_character_pepe/2_walk/W-23.png', './img/2_character_pepe/2_walk/W-24.png', './img/2_character_pepe/2_walk/W-25.png', './img/2_character_pepe/2_walk/W-26.png']
-    IMAGES_JUMPING = ['./img/2_character_pepe/3_jump/J-31.png', './img/2_character_pepe/3_jump/J-32.png', './img/2_character_pepe/3_jump/J-33.png', './img/2_character_pepe/3_jump/J-34.png', './img/2_character_pepe/3_jump/J-35.png', './img/2_character_pepe/3_jump/J-36.png', './img/2_character_pepe/3_jump/J-37.png', './img/2_character_pepe/3_jump/J-38.png', './img/2_character_pepe/3_jump/J-39.png']
-    IMAGES_DEAD = ['./img/2_character_pepe/5_dead/D-51.png', './img/2_character_pepe/5_dead/D-52.png', './img/2_character_pepe/5_dead/D-53.png', './img/2_character_pepe/5_dead/D-54.png', './img/2_character_pepe/5_dead/D-55.png', './img/2_character_pepe/5_dead/D-56.png', './img/2_character_pepe/5_dead/D-57.png']
-    IMAGES_HURT = ['./img/2_character_pepe/4_hurt/H-41.png', './img/2_character_pepe/4_hurt/H-42.png', './img/2_character_pepe/4_hurt/H-43.png']
+    IMAGES_IDLE = [
+        './img/2_character_pepe/1_idle/idle/I-1.png',
+        './img/2_character_pepe/1_idle/idle/I-2.png',
+        './img/2_character_pepe/1_idle/idle/I-3.png',
+        './img/2_character_pepe/1_idle/idle/I-4.png',
+        './img/2_character_pepe/1_idle/idle/I-5.png',
+        './img/2_character_pepe/1_idle/idle/I-6.png',
+        './img/2_character_pepe/1_idle/idle/I-7.png',
+        './img/2_character_pepe/1_idle/idle/I-8.png',
+        './img/2_character_pepe/1_idle/idle/I-9.png',
+        './img/2_character_pepe/1_idle/idle/I-10.png'
+    ];
+    IMAGES_LONG_IDLE = [
+        './img/2_character_pepe/1_idle/long_idle/I-11.png',
+        './img/2_character_pepe/1_idle/long_idle/I-12.png',
+        './img/2_character_pepe/1_idle/long_idle/I-13.png',
+        './img/2_character_pepe/1_idle/long_idle/I-14.png',
+        './img/2_character_pepe/1_idle/long_idle/I-15.png',
+        './img/2_character_pepe/1_idle/long_idle/I-16.png',
+        './img/2_character_pepe/1_idle/long_idle/I-17.png',
+        './img/2_character_pepe/1_idle/long_idle/I-18.png',
+        './img/2_character_pepe/1_idle/long_idle/I-19.png',
+        './img/2_character_pepe/1_idle/long_idle/I-20.png'
+    ];
+    IMAGES_WALKING = [
+        './img/2_character_pepe/2_walk/W-21.png',
+        './img/2_character_pepe/2_walk/W-22.png',
+        './img/2_character_pepe/2_walk/W-23.png',
+        './img/2_character_pepe/2_walk/W-24.png',
+        './img/2_character_pepe/2_walk/W-25.png',
+        './img/2_character_pepe/2_walk/W-26.png'
+    ];
+    IMAGES_JUMPING = [
+        './img/2_character_pepe/3_jump/J-31.png',
+        './img/2_character_pepe/3_jump/J-32.png',
+        './img/2_character_pepe/3_jump/J-33.png',
+        './img/2_character_pepe/3_jump/J-34.png',
+        './img/2_character_pepe/3_jump/J-35.png',
+        './img/2_character_pepe/3_jump/J-36.png',
+        './img/2_character_pepe/3_jump/J-37.png',
+        './img/2_character_pepe/3_jump/J-38.png',
+        './img/2_character_pepe/3_jump/J-39.png'
+    ];
+    IMAGES_DEAD = [
+        './img/2_character_pepe/5_dead/D-51.png',
+        './img/2_character_pepe/5_dead/D-52.png',
+        './img/2_character_pepe/5_dead/D-53.png',
+        './img/2_character_pepe/5_dead/D-54.png',
+        './img/2_character_pepe/5_dead/D-55.png',
+        './img/2_character_pepe/5_dead/D-56.png',
+        './img/2_character_pepe/5_dead/D-57.png'
+    ];
+    IMAGES_HURT = [
+        './img/2_character_pepe/4_hurt/H-41.png',
+        './img/2_character_pepe/4_hurt/H-42.png',
+        './img/2_character_pepe/4_hurt/H-43.png'
+    ];
 
-    world
-    walking_sound = new Audio('audio/walking.mp3')
-    jump_sound = new Audio('audio/jump.mp3')
-    character_jump_sound = new Audio('audio/character_jump.mp3')
-    character_hurt_sound = new Audio('audio/character_hurt.mp3')
-    snoring_sound = new Audio('audio/snoring.mp3')
+    world;
+
+    walking_sound = new Audio('audio/walking.mp3');
+    jump_sound = new Audio('audio/jump.mp3');
+    character_jump_sound = new Audio('audio/character_jump.mp3');
+    character_hurt_sound = new Audio('audio/character_hurt.mp3');
+    snoring_sound = new Audio('audio/snoring.mp3');
     gameover_sound = new Audio('audio/gameover3.mp3');
     bounce_sound = new Audio('./audio/jump.mp3');
+
+    // NEW: Sound for winning the game
+    win_sound = new Audio('audio/win.mp3');
 
     /**
      * Creates an instance of Character.
@@ -67,6 +126,10 @@ class Character extends MovableObject {
         this.snoring_sound.volume = 0.5;
         this.snoring_sound.loop = true;
         this.gameover_sound.volume = 0.6;
+        this.bounce_sound.volume = 0.3;
+
+        // NEW: Volume for the win sound
+        this.win_sound.volume = 0.6;
     }
 
     /** Defines the hitbox area for collision detection. */
@@ -88,9 +151,11 @@ class Character extends MovableObject {
      */
     update(timestamp) {
         if (this.dead) return;
+
         this.updatePosition();
         this.updateCamera();
         this.handleIdleState();
+
         this.updateAnimationFrame(timestamp);
         requestAnimationFrame(this.update.bind(this));
     }
@@ -99,13 +164,21 @@ class Character extends MovableObject {
     updatePosition() {
         const keys = this.world.keyboard;
         const now = Date.now();
+
+        // Move Right
         if (keys.RIGHT && this.x < this.world.level.level_end_x) {
             this.moveCharacter(true, now);
-        } else if (keys.LEFT && this.x > 0) {
+        }
+        // Move Left
+        else if (keys.LEFT && this.x > 0) {
             this.moveCharacter(false, now);
-        } else {
+        }
+        // No horizontal movement
+        else {
             this.stopWalkingSound();
         }
+
+        // Jump
         if ((keys.UP || keys.SPACE) && !this.isAboveGround()) {
             this.jumpCharacter(now);
         }
@@ -117,11 +190,20 @@ class Character extends MovableObject {
      * @param {number} time - Current time for idle tracking.
      */
     moveCharacter(toRight, time) {
-        toRight ? this.moveRight() : this.moveLeft();
-        this.otherDirection = !toRight;
-        this.walking_sound.play();
+        if (toRight) {
+            this.moveRight();
+            this.otherDirection = false;
+        } else {
+            this.moveLeft();
+            this.otherDirection = true;
+        }
         this.lastMovementTime = time;
         this.stopSnoring();
+        if (!this.isAboveGround()) {
+            this.walking_sound.play();
+        } else {
+            this.stopWalkingSound();
+        }
     }
 
     /**
@@ -156,7 +238,11 @@ class Character extends MovableObject {
     /** Determines and plays idle or long idle animations based on inactivity. */
     handleIdleState() {
         const now = Date.now();
-        if (!this.world.keyboard.LEFT && !this.world.keyboard.RIGHT && !this.isAboveGround()) {
+        if (
+            !this.world.keyboard.LEFT &&
+            !this.world.keyboard.RIGHT &&
+            !this.isAboveGround()
+        ) {
             this.playIdleAnimations(now);
         }
     }
@@ -243,7 +329,8 @@ class Character extends MovableObject {
         this.isInvulnerable = true;
         this.playHurtAnimation();
         this.character_hurt_sound.play();
-        setTimeout(() => this.isInvulnerable = false, 150 * this.IMAGES_HURT.length);
+
+        setTimeout(() => (this.isInvulnerable = false), 150 * this.IMAGES_HURT.length);
     }
 
     /** Starts the hurt animation sequence. */
@@ -264,6 +351,7 @@ class Character extends MovableObject {
     _startAnimation(frames, frameDuration, onComplete) {
         let frameIndex = 0;
         let lastTime = 0;
+
         const animate = (time) => {
             if (this._shouldAdvanceFrame(time, lastTime, frameDuration)) {
                 this._setFrame(frames, frameIndex++);
@@ -285,7 +373,7 @@ class Character extends MovableObject {
      * @private
      */
     _shouldAdvanceFrame(currentTime, lastTime, duration) {
-        return !lastTime || (currentTime - lastTime >= duration);
+        return !lastTime || currentTime - lastTime >= duration;
     }
 
     /**
@@ -305,7 +393,7 @@ class Character extends MovableObject {
         return this.health <= 0;
     }
 
-    /** Triggers the game over animation and screen display. */
+    /** Triggers the game over animation and screen display (i.e., losing). */
     gameOver() {
         this.stopAllSounds();
         this.gameover_sound.play();
@@ -319,9 +407,18 @@ class Character extends MovableObject {
      */
     _onGameOverComplete() {
         setTimeout(() => {
-            document.getElementById('gameOverScreen').classList.remove('hidden');
+            document.getElementById('gameOverScreen')?.classList.remove('hidden');
             this.world?.pauseGame?.();
         }, 500);
+    }
+
+    /**
+     * NEW: Call this if you want to trigger a "victory" scenario 
+     * (like if the player kills the Endboss).
+     */
+    playWinSound() {
+        this.stopAllSounds();
+        this.win_sound.play();
     }
 
     stopAllSounds() {
@@ -330,14 +427,15 @@ class Character extends MovableObject {
             this.jump_sound,
             this.character_jump_sound,
             this.character_hurt_sound,
-            this.snoring_sound
+            this.snoring_sound,
+            this.gameover_sound,
+            this.bounce_sound,
+            this.win_sound
         ];
-
         sounds.forEach(sound => {
             sound.pause();
             sound.currentTime = 0;
         });
-
         this.snoringSoundPlaying = false;
     }
 
@@ -353,6 +451,7 @@ class Character extends MovableObject {
         this.snoring_sound.muted = muted;
         this.gameover_sound.muted = muted;
         this.bounce_sound.muted = muted;
+        this.win_sound.muted = muted;
     }
 
     /**
@@ -364,6 +463,9 @@ class Character extends MovableObject {
         return this.y + this.hitboxHeight - 10 <= other.y;
     }
 
+    /**
+     * Wakes the character from an idle/snoring state, resetting idle counters.
+     */
     wakeUp() {
         if (this.snoringSoundPlaying) {
             this.stopSnoring();
@@ -371,5 +473,5 @@ class Character extends MovableObject {
             this.longIdleFrameCounter = 0;
             this.idleAnimationFrameCounter = 0;
         }
-    }    
+    }
 }
