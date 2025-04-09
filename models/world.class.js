@@ -83,7 +83,7 @@ class World {
         this.character.setMute(muted);
     }
 
-    
+
 
     /**
      * Begins the game loop for collisions and boss activation.
@@ -416,6 +416,7 @@ class World {
             this.soundtrack_sound.pause();
             this.soundtrack_sound.currentTime = 0;
             this.level.enemies.push(this.endboss);
+            this.endboss.setMute?.(this.soundtrack_sound.muted);
             this.endboss.doEntrance();
         }
     }
