@@ -4,7 +4,6 @@
  */
 function createLevel1() {
     return new Level(
-        // Enemies
         [
             new Chicken(400),
             new Chicken(900),
@@ -17,11 +16,9 @@ function createLevel1() {
             new Chick(1300),
             new Chick(2000),
         ],
-        // Clouds
         [
             new Cloud(2800),
         ],
-        // Background objects
         [
             new BackgroundObject('./img/5_background/layers/air.png', -719),
             new BackgroundObject('./img/5_background/layers/3_third_layer/2.png', -719),

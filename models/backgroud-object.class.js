@@ -21,8 +21,8 @@ class BackgroundObject extends MovableObject {
      * @param {number} x - The horizontal position of the object in the world.
      */
     constructor(imagePath, x) {
-        super().loadImage(imagePath); // Load the background image using inherited method
-        this.x = x; // Set horizontal position
-        this.y = 480 - this.height; // Position the object at the bottom of the canvas
+        super().loadImage(imagePath);
+        this.x = x;
+        this.y = 480 - this.height;
     }
 }

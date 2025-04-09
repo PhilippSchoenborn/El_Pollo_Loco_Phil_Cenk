@@ -1,4 +1,4 @@
-const DEBUG_MODE = true; // Set to true to display hitboxes, false to hide them.
+const DEBUG_MODE = false; // Set to true to display hitboxes, false to hide them.
 
 /**
  * Canvas element for rendering the game.
@@ -117,7 +117,7 @@ function updateVolumeIcon() {
  * Starts the game and displays the main game screen.
  */
 function startGame() {
-    canvas = document.getElementById('canvas'); // 🛠️ Re-assign canvas before using it
+    canvas = document.getElementById('canvas');
     document.getElementById('loadingImage').classList.add('hidden');
     document.querySelector('.start-screen-icon').style.display = 'none';
     document.querySelector('.start-screen-icon').onclick = null;
@@ -126,28 +126,18 @@ function startGame() {
     document.querySelector('.game-instructions-section').style.display = 'none';
     document.querySelector('.reload-button').classList.remove('hidden');
     document.querySelector('.retry-btn').classList.remove('hidden');
-
-    // 🔥 IMPORTANT: Re-create fresh keyboard
     keyboard = new Keyboard();
     setupTouchControls();
-
-    // ✅ Re-bind key listeners to new keyboard
     bindKeyEvents();
-
-    // 🎮 Create and init world with fresh keyboard
     world = new World(canvas, keyboard);
     world.setMute(isMuted);
     world.init();
-
-    // 🕹️ Just in case
     if (world.character) {
         world.character.canMove = true;
     }
-
     if (isTouchDevice()) {
         handleTouchControlsVisibility();
     }
-
     checkOrientation();
 }
 

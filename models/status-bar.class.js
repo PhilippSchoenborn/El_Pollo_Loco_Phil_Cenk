@@ -48,8 +48,6 @@ class StatusBar extends DrawableObject {
         this.img = this.imageCache[path];
     }
 
-
-
     /**
      * Determines the index of the image to display based on the current health percentage.
      * @returns {number} The index of the image corresponding to the current health percentage.

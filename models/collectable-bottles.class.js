@@ -6,7 +6,6 @@ class CollectableBottle extends MovableObject {
         this.width = 100;
         this.height = 100;
         this.initialY = y;
-        // Adjust hitbox to be smaller: 50x50 hitbox
         this.hitbox = {
             offsetX: 45,
             offsetY: 30,

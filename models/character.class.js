@@ -1,7 +1,3 @@
-/************************************************
- * character.class.js
- ************************************************/
-
 /**
  * Represents the main character in the game with movement, animations, and sounds.
  */
@@ -89,8 +85,6 @@ class Character extends MovableObject {
     snoring_sound = new Audio('audio/snoring.mp3');
     gameover_sound = new Audio('audio/gameover3.mp3');
     bounce_sound = new Audio('./audio/jump.mp3');
-
-    // NEW: Sound for winning the game
     win_sound = new Audio('audio/win.mp3');
 
     /**
@@ -127,8 +121,6 @@ class Character extends MovableObject {
         this.snoring_sound.loop = true;
         this.gameover_sound.volume = 0.6;
         this.bounce_sound.volume = 0.3;
-
-        // NEW: Volume for the win sound
         this.win_sound.volume = 0.6;
     }
 
@@ -151,11 +143,9 @@ class Character extends MovableObject {
      */
     update(timestamp) {
         if (this.dead) return;
-
         this.updatePosition();
         this.updateCamera();
         this.handleIdleState();
-
         this.updateAnimationFrame(timestamp);
         requestAnimationFrame(this.update.bind(this));
     }
@@ -164,21 +154,15 @@ class Character extends MovableObject {
     updatePosition() {
         const keys = this.world.keyboard;
         const now = Date.now();
-
-        // Move Right
         if (keys.RIGHT && this.x < this.world.level.level_end_x) {
             this.moveCharacter(true, now);
         }
-        // Move Left
         else if (keys.LEFT && this.x > 0) {
             this.moveCharacter(false, now);
         }
-        // No horizontal movement
         else {
             this.stopWalkingSound();
         }
-
-        // Jump
         if ((keys.UP || keys.SPACE) && !this.isAboveGround()) {
             this.jumpCharacter(now);
         }

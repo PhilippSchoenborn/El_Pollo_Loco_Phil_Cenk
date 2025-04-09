@@ -50,7 +50,7 @@ class ThrowableObject extends MovableObject {
      */
     constructor(x, y, facingLeft) {
         super().loadImage(this.IMAGES_ROTATION[0])
-        this.loadImages(this.IMAGES_ROTATION) 
+        this.loadImages(this.IMAGES_ROTATION)
         this.x = x
         this.y = y
         this.width = 60
@@ -100,8 +100,16 @@ class ThrowableObject extends MovableObject {
         }, 600)
     }
 
+    /**
+     * Mutes or unmutes the throwable object's sound effects.
+     * 
+     * This affects both the throw and smash sounds, depending on the given flag.
+     * 
+     * @param {boolean} muted - If true, both sounds will be muted; if false, they will be unmuted.
+     */
     setMute(muted) {
         this.throw_sound.muted = muted;
         this.smash_sound.muted = muted;
     }
+
 }

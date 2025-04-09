@@ -16,6 +16,12 @@ class StatusBarEndboss extends DrawableObject {
 
     percentage = 100;
 
+    /**
+     * Creates an instance of the status bar for the Endboss's life (health).
+     * 
+     * Initializes the image set for the health display, sets the initial percentage to 100%,
+     * and positions the status bar on the screen with a defined width and height.
+     */
     constructor() {
         super();
         this.loadImages(this.IMAGES_LIFE);
@@ -36,6 +42,14 @@ class StatusBarEndboss extends DrawableObject {
         this.img = this.imageCache[this.IMAGES_LIFE[index]];
     }
 
+    /**
+     * Determines the appropriate image index to represent the current health percentage.
+     * 
+     * The returned index corresponds to different health bar images based on the current
+     * percentage value. Higher percentages return higher indices, representing a fuller bar.
+     * 
+     * @returns {number} The image index ranging from 0 (empty) to 5 (full).
+     */
     resolveImageIndex() {
         if (this.percentage === 100) return 5;
         else if (this.percentage >= 80) return 4;
