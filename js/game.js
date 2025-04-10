@@ -323,7 +323,11 @@ function setupTouchControls() {
     addControlEvents("btnRight", "RIGHT");
     addControlEvents("btnJump", "UP");
     addControlEvents("btnThrow", "D");
+    document.querySelectorAll('.touch-button').forEach(button => {
+        button.addEventListener('contextmenu', e => e.preventDefault());
+    });
 }
+
 
 /**
  * Adds touch and mouse event listeners for a button.
