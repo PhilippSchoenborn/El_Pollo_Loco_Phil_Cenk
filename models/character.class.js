@@ -257,7 +257,7 @@ class Character extends MovableObject {
     }
 
     /**
-     * Updates the current animation frame based on time delta.
+     * Updates the current animation frame based on time delta for standard movement.
      * @param {DOMHighResTimeStamp} timestamp
      */
     updateAnimationFrame(timestamp) {
@@ -317,7 +317,7 @@ class Character extends MovableObject {
         setTimeout(() => (this.isInvulnerable = false), 150 * this.IMAGES_HURT.length);
     }
 
-    /** Starts the hurt animation sequence. */
+    /** Starts the hurt animation sequence via interval-based approach. */
     playHurtAnimation() {
         if (this.isAnimatingHurt) return;
         this.isAnimatingHurt = true;
@@ -327,49 +327,28 @@ class Character extends MovableObject {
     }
 
     /**
-     * Starts a frame-based animation using requestAnimationFrame.
-     * @param {string[]} frames - Array of image keys to animate through.
-     * @param {number} frameDuration - Time between frames in ms.
-     * @param {Function} onComplete - Callback when animation finishes.
+     * Replaces requestAnimationFrame-based logic with setInterval for frame-based animations
+     * (e.g., for hurt or dead animations).
+     *
+     * @param {string[]} frames - Array of image URLs
+     * @param {number} frameDuration - Time between frames in milliseconds
+     * @param {Function} onComplete - Callback invoked when animation finishes
      */
     _startAnimation(frames, frameDuration, onComplete) {
         let frameIndex = 0;
-        let lastTime = 0;
 
-        const animate = (time) => {
-            if (this._shouldAdvanceFrame(time, lastTime, frameDuration)) {
-                this._setFrame(frames, frameIndex++);
-                lastTime = time;
+        // Set up an interval to change frames
+        const intervalId = setInterval(() => {
+            // If we still have frames to show, display the next one
+            if (frameIndex < frames.length) {
+                this.img = this.imageCache[frames[frameIndex]];
+                frameIndex++;
+            } else {
+                // No more frames; clear the interval and invoke the completion callback if any
+                clearInterval(intervalId);
+                onComplete?.();
             }
-            frameIndex < frames.length
-                ? requestAnimationFrame(animate)
-                : onComplete?.();
-        };
-        requestAnimationFrame(animate);
-    }
-
-    /**
-     * Checks if enough time has passed to advance to the next frame.
-     * @param {number} currentTime
-     * @param {number} lastTime
-     * @param {number} duration
-     * @returns {boolean}
-     * @private
-     */
-    _shouldAdvanceFrame(currentTime, lastTime, duration) {
-        return !lastTime || currentTime - lastTime >= duration;
-    }
-
-    /**
-     * Sets the current image from the frame array and image cache.
-     * @param {string[]} frames
-     * @param {number} index
-     * @private
-     */
-    _setFrame(frames, index) {
-        if (this.imageCache && frames[index]) {
-            this.img = this.imageCache[frames[index]];
-        }
+        }, frameDuration);
     }
 
     /** @returns {boolean} True if the character is dead. */
@@ -381,6 +360,7 @@ class Character extends MovableObject {
     gameOver() {
         this.stopAllSounds();
         this.gameover_sound.play();
+        // The dead animation also uses the interval approach:
         this._startAnimation(this.IMAGES_DEAD, 200, () => this._onGameOverComplete());
     }
 
@@ -397,8 +377,7 @@ class Character extends MovableObject {
     }
 
     /**
-     * NEW: Call this if you want to trigger a "victory" scenario 
-     * (like if the player kills the Endboss).
+     * Use this if you want to trigger a "victory" scenario (e.g. defeating an Endboss).
      */
     playWinSound() {
         this.stopAllSounds();
@@ -407,12 +386,6 @@ class Character extends MovableObject {
 
     /**
      * Stops all sound effects associated with the character.
-     * 
-     * This method iterates through a predefined list of audio objects and, if they are defined
-     * and have a valid 'pause' function, it pauses the sound and resets its current playback time.
-     * Additionally, it resets the flag indicating if the snoring sound is playing.
-     *
-     * @returns {void}
      */
     stopAllSounds() {
         const sounds = [
