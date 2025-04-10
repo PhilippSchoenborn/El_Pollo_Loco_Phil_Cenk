@@ -358,29 +358,46 @@ window.addEventListener("orientationchange", () => {
 /**
  * Restarts the game without going to the main menu.
  */
+let isRetrying = false;
 function retryGame() {
-    if (world) {
-        world.cleanUp?.();
-        world = null;
+    if (isRetrying) return;
+    isRetrying = true;
+
+    const retryBtn = document.querySelector('.retry-btn');
+    retryBtn.classList.add('disabled');
+    retryBtn.style.pointerEvents = 'none';
+    try {
+        if (world) {
+            world.cleanUp?.();
+            world = null;
+        }
+        window.removeEventListener("resize", checkOrientation);
+        window.removeEventListener("orientationchange", checkOrientation);
+        window.addEventListener("resize", checkOrientation);
+        window.addEventListener("orientationchange", checkOrientation);
+        window.bossTriggered = false;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        keyboard = new Keyboard();
+        setupTouchControls();
+        bindKeyEvents();
+        world = new World(canvas, keyboard);
+        world.setMute(isMuted);
+        world.init();
+        document.getElementById('gameOverScreen').classList.add('hidden');
+        document.getElementById('winScreen').classList.add('hidden');
+        document.getElementById('canvas').style.display = 'block';
+        if (world.character) {
+            world.character.canMove = true;
+        }
+        handleTouchControlsVisibility();
+    } catch (error) {
+        console.error("Error during retry:", error);
+    } finally {
+        setTimeout(() => {
+            isRetrying = false;
+            retryBtn.classList.remove('disabled');
+            retryBtn.style.pointerEvents = 'auto';
+        }, 2000);
     }
-    window.removeEventListener("resize", checkOrientation);
-    window.removeEventListener("orientationchange", checkOrientation);
-    window.addEventListener("resize", checkOrientation);
-    window.addEventListener("orientationchange", checkOrientation);
-    window.bossTriggered = false;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    keyboard = new Keyboard();
-    setupTouchControls();
-    bindKeyEvents();
-    world = new World(canvas, keyboard);
-    world.setMute(isMuted);
-    world.init();
-    document.getElementById('gameOverScreen').classList.add('hidden');
-    document.getElementById('winScreen').classList.add('hidden');
-    document.getElementById('canvas').style.display = 'block';
-    if (world.character) {
-        world.character.canMove = true;
-    }
-    handleTouchControlsVisibility();
 }
