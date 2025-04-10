@@ -36,13 +36,15 @@ h1,
 h2,
 h3,
 .close {
-    margin-bottom: 0;
+    margin: 0;
     font-family: 'Stardos Stencil', serif;
     font-weight: bold;
     text-align: center;
     color: white;
     font-size: 40px;
 }
+
+
 
 /* Container for canvas and interface */
 .canvas-container {
@@ -92,7 +94,7 @@ h3,
     scale: 1.1;
 }
 
-/* Modal styles */
+/* Modal styles for game controls (used by legal notice and instructions) */
 .modal {
     padding: 10px;
     max-width: 700px;
@@ -120,10 +122,10 @@ h3,
     align-items: center;
     flex-direction: column;
     z-index: 999;
-    bottom: 250px
+    bottom: 250px;
 }
 
-.close-button-modal{
+.close-button-modal {
     width: 100%;
 }
 
@@ -153,6 +155,8 @@ h2 {
     display: flex;
     align-items: center;
 }
+
+
 
 /* Hide elements */
 .hidden {
@@ -207,7 +211,7 @@ h2 {
     height: 100%;
     display: flex;
     justify-content: center;
-} 
+}
 
 .win-screen-img {
     width: 100%;
@@ -248,9 +252,7 @@ h2 {
     position: absolute;
     bottom: 10px;
     left: 10px;
-    /* statt left: 0; kann hier ein kleiner Abstand sinnvoll sein */
     right: 10px;
-    /* so wird sichergestellt, dass der Container den gesamten unteren Bereich ausfüllt */
     display: flex;
     justify-content: space-between;
     z-index: 99;
@@ -266,7 +268,6 @@ h2 {
     animation: pulse 1.5s infinite;
     cursor: pointer;
 }
-
 
 .legal-notice-link {
     font-size: 16px;
@@ -356,7 +357,6 @@ h2 {
 
 .legal-notice-container::-webkit-scrollbar {
     display: none;
-    /* Chrome, Safari */
 }
 
 .colleted-coins-end-screen {
@@ -364,24 +364,29 @@ h2 {
     font-size: 28px;
 }
 
-.close-container{
+.close-container {
     width: 100%;
-
 }
 
+/* Common Modal Header Container */
+.modal-header {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 10px;
+}
+
+/* Close Button Style (applies to all close buttons) */
 .close-modal {
-    /* top: 10px;
-    right: 10px; */
     font-family: 'Stardos Stencil', serif;
     font-weight: bold;
     font-size: 40px;
     color: white;
-    text-align: end;
     cursor: pointer;
 }
 
 .close-modal:hover {
-    /* filter: drop-shadow(5px 5px 4px white); */
     transform: scale(1.1);
 }
 
@@ -417,15 +422,14 @@ h2 {
     background: transparent;
 }
 
-
-/* Styling der Button-Gruppen */
+/* Styling of Button Groups */
 .left-controls,
 .right-controls {
     display: flex;
     gap: 10px;
 }
 
-/* Styling der Buttons */
+/* Styling of Buttons */
 .touch-button {
     display: flex;
     align-items: center;
@@ -437,7 +441,7 @@ h2 {
     border: solid 1px white;
 }
 
-/* 📌 Top-left corner layout for end screen buttons */
+/* Top-left corner layout for end screen buttons */
 .end-buttons-top-left {
     position: absolute;
     top: 20px;
@@ -447,7 +451,7 @@ h2 {
     z-index: 1000;
 }
 
-/* 🔁 Pulse effect on retry + reload icons */
+/* Pulse effect on retry + reload icons */
 .pulse-icon {
     width: 60px !important;
     height: 60px !important;
@@ -459,8 +463,6 @@ h2 {
 .pulse-icon:hover {
     transform: scale(1.15);
 }
-
-
 
 @media (max-width: 1024px) {
     .canvas-container {
@@ -474,17 +476,6 @@ h2 {
         left: 0;
         z-index: 1;
     }
-
-    /* .modal {
-        bottom: 2px;
-        left: 150px;
-    }
-
-    .modal-content {
-        width: 315px;
-        height: 280px;
-        padding: 2.5px;
-    } */
 
     .game-instructions-container {
         height: 100% !important;
@@ -533,16 +524,6 @@ h2 {
         object-fit: fill !important;
     }
 
-    /* .modal {
-        top: 1px;
-    } */
-
-    /* .modal-content {
-        width: 315px;
-        height: 280px;
-        padding: 2.5px;
-    } */
-
     .controls-images {
         height: 225px;
     }
@@ -556,4 +537,49 @@ h2 {
     }
 }
 
+/* New CSS for Info Modal to match Legal Notice and Game Instructions modals */
 
+/* Fullscreen overlay for the info modal */
+.modal-game-info {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-game-info h1,
+h2,
+h3 {
+    margin: 0;
+}
+
+/* Hide the info modal when hidden */
+.modal-game-info.hidden {
+    display: none;
+}
+
+/* Inner container for the info modal content */
+.info-modal-container {
+    padding: 10px;
+    max-width: 700px;
+    height: auto;
+    max-height: 460px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 18px;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.info-modal-container::-webkit-scrollbar {
+    display: none;
+}

@@ -212,21 +212,19 @@ function disableUserInput() {
 }
 
 /**
- * Opens the modal window.
+ * Opens the info modal.
  */
 function openModal() {
-    modal.style.display = 'block';
-}
-
-/**
- * Closes the modal window.
- */
-function closeModal() {
-    modal.style.display = 'none';
-}
-
-
-
+    modal.classList.remove('hidden');
+  }
+  
+  /**
+   * Closes the info modal.
+   */
+  function closeModal() {
+    modal.classList.add('hidden');
+  }
+  
 /**
  * Checks whether the browser is currently in fullscreen mode.
  * @returns {boolean}
@@ -346,7 +344,6 @@ function addControlEvents(buttonId, key) {
     button.addEventListener("mouseup", deactivate);
 }
 
-// Event bindings when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     modal = document.getElementById('infoModal');
     bindKeyEvents();
@@ -354,35 +351,37 @@ document.addEventListener('DOMContentLoaded', () => {
     checkOrientation();
 });
 
-// Event listener for opening legal notice
+document.getElementById('infoModal').addEventListener('click', (e) => {
+    const container = document.querySelector('.info-modal-container');
+    if (!container.contains(e.target)) {
+      closeModal();
+    }
+  });  
+
 document.querySelector('.legal-notice-link').addEventListener('click', e => {
     e.preventDefault();
     document.getElementById('openLegalNotice').classList.remove('hidden');
     document.body.classList.add('no-scroll');
 });
 
-// Close legal notice on outside click
 document.getElementById('openLegalNotice').addEventListener('click', e => {
     if (!document.querySelector('.legal-notice-container').contains(e.target)) {
         closeLegalNotice();
     }
 });
 
-// Event listener for opening game instructions
 document.querySelector('.game-instructions-link').addEventListener('click', e => {
     e.preventDefault();
     document.getElementById('gameInstructions').classList.remove('hidden');
     document.body.classList.add('no-scroll');
 });
 
-// Close game instructions on outside click
 document.getElementById('gameInstructions').addEventListener('click', e => {
     if (!document.querySelector('.game-instructions-container').contains(e.target)) {
         closeGameInstructions();
     }
 });
 
-// Update UI on resize and orientation change
 window.addEventListener("resize", () => {
     checkOrientation();
 });
