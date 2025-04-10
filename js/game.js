@@ -212,6 +212,8 @@ function closeModal() {
     modal.style.display = 'none';
 }
 
+
+
 /**
  * Checks whether the browser is currently in fullscreen mode.
  * @returns {boolean}

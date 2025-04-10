@@ -72,6 +72,36 @@
                     <button class="touch-button" id="btnThrow">&#128293;</button>
                 </div>
             </div>
+
+            <div id="infoModal" class="modal">
+                <div class="modal-content">
+                    <div class="close-button-modal">
+                        <span class="close" onclick="closeModal()">&times;</span>
+                    </div>
+                    <h2>Game Controls</h2>
+                    <div class="controls-images">
+                        <div class="controls">
+                            <img src="./img/10_interface_icons/arrow_left.png" alt="Left Arrow">
+                            <h3>Left</h3>
+                        </div>
+                        <div class="controls">
+                            <img src="./img/10_interface_icons/arrow_right.png" alt="Right Arrow">
+                            <h3>Right</h3>
+                        </div>
+                        <div class="controls">
+                            <img src="./img/10_interface_icons/arrow_up.png" alt="Up Arrow">
+                            <h3>/</h3>
+                            <img src="./img/10_interface_icons/space.png" alt="Space Key">
+                            <h3>Jump</h3>
+                        </div>
+                        <div class="controls">
+                            <img src="./img/10_interface_icons/key_d.png" alt="D Key">
+                            <h3>Throw</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
         <div id="gameOverScreen" class="game-over hidden">
             <img class="game-over-img" src="./img/9_intro_outro_screens/game_over/game over.png" alt="Game Over">
@@ -95,39 +125,15 @@
         </div>
     </div>
 
-    <div id="infoModal" class="modal">
 
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Game Controls</h2>
-            <div class="controls-images">
-                <div class="controls">
-                    <img src="./img/10_interface_icons/arrow_left.png" alt="Left Arrow">
-                    <h3>Left</h3>
-                </div>
-                <div class="controls">
-                    <img src="./img/10_interface_icons/arrow_right.png" alt="Right Arrow">
-                    <h3>Right</h3>
-                </div>
-                <div class="controls">
-                    <img src="./img/10_interface_icons/arrow_up.png" alt="Up Arrow">
-                    <h3>/</h3>
-                    <img src="./img/10_interface_icons/space.png" alt="Space Key">
-                    <h3>Jump</h3>
-                </div>
-                <div class="controls">
-                    <img src="./img/10_interface_icons/key_d.png" alt="D Key">
-                    <h3>Throw</h3>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div id="openLegalNotice" class="modal-legal-notice hidden">
         <div class="legal-notice-container">
 
-            <h1>Legal Notice <div class="close-modal" onclick="closeLegalNotice()">&times;</div>
-            </h1>
+            <div class="close-container">
+                <div class="close-modal" onclick="closeLegalNotice()">&times;</div>
+            </div>
+            <h1>Legal Notice</h1>
 
             <h2>Information pursuant to § 5 TMG</h2>
             <p><strong>Game Name:</strong> El Pollo Loco</p>
@@ -242,8 +248,8 @@
 
     <div id="gameInstructions" class="modal-game-instructions hidden">
         <div class="game-instructions-container">
-            <h1>About El Pollo Loco<div class="close-modal" onclick="closeGameInstructions()">&times;</div>
-            </h1>
+            <div class="close-modal" onclick="closeGameInstructions()">&times;</div>
+            <h1>About El Pollo Loco</h1>
             <h3>Help Pepe win the Game. Jump on Chicken and Chicks or throw Salsa at them. But be carefull with your
                 Salsa you might need more than one for the Big one! How Many Coins can you collect?</h3>
         </div>

@@ -94,12 +94,17 @@ h3,
 
 /* Modal styles */
 .modal {
-    display: none;
-    position: absolute;
-    top: 42px;
-    left: 176px;
-    z-index: 100;
-    background-color: rgba(0, 0, 0, 0.4);
+    padding: 10px;
+    max-width: 700px;
+    height: 49.5%;
+    max-height: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    font-size: 16px;
+    overflow-y: auto;
+    scrollbar-width: none;
 }
 
 .modal-content {
@@ -107,8 +112,19 @@ h3,
     padding: 10px;
     border: solid 16px rgba(255, 255, 255, 0.5);
     border-radius: 4px;
-    width: 20em;
-    text-align: center;
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 999;
+    bottom: 250px
+}
+
+.close-button-modal{
+    width: 100%;
 }
 
 .modal-content h3,
@@ -128,9 +144,9 @@ h2 {
 }
 
 .controls-images img {
-    margin: 10px;
-    width: 50px;
-    height: 50px;
+    margin: 5px;
+    width: 40px;
+    height: 40px;
 }
 
 .controls {
@@ -212,7 +228,7 @@ h2 {
     margin-top: 35px;
     position: absolute;
     z-index: 99;
-    top: 406px;
+    bottom: 20px;
     left: 10px;
 }
 
@@ -224,7 +240,7 @@ h2 {
     margin-top: 35px;
     position: absolute;
     z-index: 99;
-    top: 406px;
+    bottom: 20px;
     left: 140px;
 }
 
@@ -300,12 +316,6 @@ h2 {
     display: none;
 }
 
-.game-instructions-container h1 {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-}
-
 .game-instructions-container {
     padding: 10px;
     max-width: 700px;
@@ -323,12 +333,6 @@ h2 {
 
 .game-instructions-container::-webkit-scrollbar {
     display: none;
-}
-
-.legal-notice-container h1 {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
 }
 
 .legal-notice-container {
@@ -360,19 +364,24 @@ h2 {
     font-size: 28px;
 }
 
+.close-container{
+    width: 100%;
+
+}
+
 .close-modal {
-    top: 10px;
-    right: 10px;
+    /* top: 10px;
+    right: 10px; */
     font-family: 'Stardos Stencil', serif;
     font-weight: bold;
     font-size: 40px;
     color: white;
-    text-align: center;
+    text-align: end;
     cursor: pointer;
-    z-index: 1000;
 }
 
 .close-modal:hover {
+    /* filter: drop-shadow(5px 5px 4px white); */
     transform: scale(1.1);
 }
 
@@ -466,18 +475,16 @@ h2 {
         z-index: 1;
     }
 
-    .legal-notice-section {
-        top: 685px;
+    /* .modal {
+        bottom: 2px;
+        left: 150px;
     }
 
-    .game-instructions-section {
-        top: 685px;
-    }
-
-    .modal {
-        top: 155px;
-        left: 315px;
-    }
+    .modal-content {
+        width: 315px;
+        height: 280px;
+        padding: 2.5px;
+    } */
 
     .game-instructions-container {
         height: 100% !important;
@@ -526,15 +533,15 @@ h2 {
         object-fit: fill !important;
     }
 
-    .modal {
+    /* .modal {
         top: 1px;
-    }
+    } */
 
-    .modal-content {
+    /* .modal-content {
         width: 315px;
         height: 280px;
         padding: 2.5px;
-    }
+    } */
 
     .controls-images {
         height: 225px;
@@ -547,160 +554,6 @@ h2 {
     .bottom-buttons-container {
         gap: 10px;
     }
-
-    .legal-notice-section {
-        top: 300px;
-    }
-
-    .game-instructions-section {
-        top: 300px;
-    }
 }
 
-@media (max-width: 932px) {
-    .legal-notice-section {
-        top: 355px;
-    }
 
-    .game-instructions-section {
-        top: 355px;
-    }
-
-    .modal {
-        top: 25px;
-        left: 270px;
-    }
-}
-
-@media (max-width: 915px) {
-    .legal-notice-section {
-        top: 340px;
-    }
-
-    .game-instructions-section {
-        top: 340px;
-    }
-
-    .modal {
-        top: 12px;
-        left: 270px;
-    }
-}
-
-@media (max-width: 896px) {
-    .modal {
-        top: 14px;
-        left: 255px;
-    }
-}
-
-@media (max-width: 882px) {
-    .legal-notice-section {
-        top: 270px;
-    }
-
-    .game-instructions-section {
-        top: 270px;
-    }
-
-    .controls {
-        height: 55px;
-    }
-}
-
-@media (max-width: 853px) {
-    .legal-notice-section {
-        top: 495px;
-    }
-
-    .game-instructions-section {
-        top: 495px;
-    }
-}
-
-@media (max-width: 844px) {
-    .legal-notice-section {
-        top: 315px;
-    }
-
-    .game-instructions-section {
-        top: 315px;
-    }
-
-    .modal {
-        top: 2px;
-        left: 255px;
-    }
-}
-
-@media (max-width: 820px) {
-    .legal-notice-section {
-        top: 470px;
-    }
-
-    .game-instructions-section {
-        top: 470px;
-    }
-}
-
-@media (max-width: 740px) {
-    .legal-notice-section {
-        top: 285px;
-    }
-
-    .game-instructions-section {
-        top: 285px;
-    }
-}
-
-@media (max-width: 720px) {
-    .legal-notice-section {
-        top: 465px;
-    }
-
-    .game-instructions-section {
-        top: 465px;
-    }
-
-    .modal {
-        top: 90px;
-        left: 190px;
-    }
-}
-
-@media (max-width: 667px) {
-    .legal-notice-section {
-        top: 300px;
-    }
-
-    .game-instructions-section {
-        top: 300px;
-    }
-
-    .modal {
-        top: 30px;
-        left: 155px;
-    }
-}
-
-@media (max-width: 658px) {
-    .legal-notice-section {
-        top: 250px;
-    }
-
-    .game-instructions-section {
-        top: 250px;
-    }
-
-    .modal {
-        top: 1px;
-        left: 170px;
-    }
-}
-
-@media (max-width: 480px) {
-    .modal {
-        top: 1px;
-        left: 75px;
-    }
-}
