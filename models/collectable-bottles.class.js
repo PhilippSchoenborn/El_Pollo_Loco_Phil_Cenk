@@ -1,11 +1,20 @@
+/**
+ * Represents a collectable salsa bottle with idle animation and image switching.
+ * Inherits from MovableObject.
+ */
 class CollectableBottle extends MovableObject {
+    /**
+     * Creates a new CollectableBottle.
+     * @param {number} x - The x position of the bottle.
+     * @param {number} y - The y position of the bottle.
+     */
     constructor(x, y) {
         super().loadImage('./img/6_salsa_bottle/1_salsa_bottle_on_ground.png');
         this.x = x;
         this.y = y;
+        this.initialY = y;
         this.width = 100;
         this.height = 100;
-        this.initialY = y;
         this.hitbox = {
             offsetX: 45,
             offsetY: 30,
@@ -15,6 +24,9 @@ class CollectableBottle extends MovableObject {
         this.switchImage();
     }
 
+    /**
+     * Animates the bottle with a gentle up-and-down floating effect.
+     */
     animate() {
         let direction = 1;
         setInterval(() => {
@@ -25,6 +37,9 @@ class CollectableBottle extends MovableObject {
         }, 1000 / 60);
     }
 
+    /**
+     * Switches the bottle's image periodically to create a subtle idle animation.
+     */
     switchImage() {
         let currentImageIndex = 0;
         const images = [
