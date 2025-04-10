@@ -1,6 +1,5 @@
 /**
- * Represents the entire game world including canvas rendering,
- * game logic, object handling, collisions, and sounds.
+ * Handles the entire game world: rendering, logic, objects, collisions, and audio.
  */
 class World {
     canvas;
@@ -33,14 +32,8 @@ class World {
     collectedCoinsCount = 0;
 
     /**
-     * Creates an instance of the game world.
-     * 
-     * Initializes the canvas context, input controls, game level, UI elements,
-     * and core characters including the player and the endboss.
-     * Links the character to the current world instance.
-     * 
-     * @param {HTMLCanvasElement} canvas - The canvas element used to render the game.
-     * @param {Object} keyboard - An object handling keyboard input for character control.
+     * @param {HTMLCanvasElement} canvas - Game canvas.
+     * @param {Object} keyboard - Keyboard input handler.
      */
     constructor(canvas, keyboard) {
         this.canvas = canvas;
@@ -53,12 +46,7 @@ class World {
         this.endboss = new Endboss(3400);
     }
 
-    /**
-     * Initializes the game world.
-     * 
-     * Starts enemy movement, sound settings, background music, and main game loops.
-     * Also spawns initial coins and bottles in the world.
-     */
+    /** Initializes enemies, sounds, coins, bottles, and starts game loops. */
     init() {
         this.level.enemies.forEach(e => e.initMovement?.());
         this.initSounds();
@@ -69,12 +57,7 @@ class World {
         this.spawnBottles();
     }
 
-    /**
-     * Configures the initial settings for all game-related sounds.
-     * 
-     * Sets loop behavior and volume levels for soundtrack, boss music,
-     * coin collection sound, and bottle pickup sound.
-     */
+    /** Configures volume and looping for all game sounds. */
     initSounds() {
         this.soundtrack_sound.loop = true;
         this.soundtrack_sound.volume = 0.05;
@@ -84,14 +67,7 @@ class World {
         this.pickup_bottle_sound.volume = 0.5;
     }
 
-    /**
-     * Mutes or unmutes all sound sources in the game world.
-     * 
-     * Affects background music, collectible sounds, character sounds,
-     * enemy sounds, and throwable object sounds.
-     * 
-     * @param {boolean} muted - Whether to mute (`true`) or unmute (`false`) all sounds.
-     */
+    /** Mutes or unmutes all sounds. */
     setMute(muted) {
         [this.soundtrack_sound, this.coin_sound, this.pickup_bottle_sound, this.bossMusic].forEach(
             s => (s.muted = muted)
@@ -101,12 +77,7 @@ class World {
         this.character.setMute(muted);
     }
 
-    /**
-     * Starts the main game logic loop.
-     * 
-     * Repeatedly checks for collisions and boss fight triggers at a fixed interval,
-     * unless the game is paused.
-     */
+    /** Main collision loop. */
     run() {
         setInterval(() => {
             if (!this.gamePaused) {
@@ -116,71 +87,37 @@ class World {
         }, this.COLLISION_CHECK_INTERVAL);
     }
 
-    /**
-     * Checks all collisions in the game world.
-     * 
-     * This includes collisions with enemies, coins, and bottles. Each type of collision
-     * is handled by a specific method.
-     */
+    /** Runs all collision checks. */
     checkCollisions() {
         this.handleEnemyCollisions();
         this.handleCoinCollisions();
         this.handleBottleCollisions();
     }
 
-    /**
-     * Handles collisions with enemies.
-     * 
-     * For each enemy, the collision is processed and based on the interaction, 
-     * either a jump-on or touch action is taken.
-     */
+    /** Checks character vs enemy collisions. */
     handleEnemyCollisions() {
         this.level.enemies.forEach(enemy => this.processEnemyCollision(enemy));
     }
 
-    /**
-     * Processes the collision with a specific enemy.
-     * 
-     * This checks whether the character is colliding with an enemy, and determines
-     * whether the character is stomping on the enemy or simply touching it.
-     * 
-     * @param {Object} enemy - The enemy object that the character might collide with.
-     */
+    /** Handles logic for touching or jumping on an enemy. */
     processEnemyCollision(enemy) {
         if (enemy.dead) return;
         if (this.character.isColliding(enemy)) {
-            if (this.character.isInvulnerable) {
-            } else if (this.isStompingOn(enemy)) {
-                this.handleJumpOnEnemy(enemy);
-            } else {
-                this.handleTouchEnemy(enemy);
-            }
+            if (this.character.isInvulnerable) return;
+            this.isStompingOn(enemy)
+                ? this.handleJumpOnEnemy(enemy)
+                : this.handleTouchEnemy(enemy);
         }
         this.handleThrowableCollision(enemy);
     }
 
-    /**
-     * Checks if the character is stomping on an enemy.
-     * 
-     * This is determined by the character's position relative to the enemy's top
-     * and if the character is moving downward.
-     * 
-     * @param {Object} enemy - The enemy to check for stomp collision.
-     * @returns {boolean} - Returns true if the character is stomping on the enemy.
-     */
+    /** Checks if character is jumping on the enemy. */
     isStompingOn(enemy) {
         const tolerance = 30;
         return this.character.bottom() <= enemy.top() + tolerance && this.character.speedY < 0;
     }
 
-    /**
-     * Handles the action when the character jumps on an enemy.
-     * 
-     * This will make the character invulnerable for a short time and "kills" the enemy,
-     * unless it's the endboss.
-     * 
-     * @param {Object} enemy - The enemy object that the character has jumped on.
-     */
+    /** Kills enemy if jumped on. */
     handleJumpOnEnemy(enemy) {
         if (enemy instanceof Endboss) return;
         this.character.isInvulnerable = true;
@@ -191,53 +128,26 @@ class World {
         setTimeout(() => (this.character.isInvulnerable = false), 300);
     }
 
-    /**
-     * Handles the action when the character touches an enemy.
-     * 
-     * The character gets damaged, and the endboss may perform an attack.
-     * 
-     * @param {Object} enemy - The enemy object that the character touched.
-     */
+    /** Damages character if touched by enemy. */
     handleTouchEnemy(enemy) {
-        if (enemy instanceof Endboss) {
-            enemy.doAttack();
-        }
+        if (enemy instanceof Endboss) enemy.doAttack();
         this.character.hit();
         this.statusBar.setPercentage(this.character.health);
     }
 
-    /**
-     * Handles collisions between throwable objects and enemies.
-     * 
-     * If a throwable object hits an enemy, it will cause damage to the enemy or kill it.
-     * 
-     * @param {Object} enemy - The enemy to check for collisions with throwable objects.
-     */
+    /** Handles throwable objects hitting enemies. */
     handleThrowableCollision(enemy) {
         this.throwableObjects.forEach((bottle, i) => {
             if (!bottle.hasHit && bottle.isColliding(enemy)) {
                 bottle.hasHit = true;
                 bottle.splash();
-                if (enemy instanceof Endboss) {
-                    enemy.hit();
-                } else {
-                    this.killEnemy(enemy);
-                }
-                setTimeout(() => {
-                    this.throwableObjects.splice(i, 1);
-                }, 300);
+                enemy instanceof Endboss ? enemy.hit() : this.killEnemy(enemy);
+                setTimeout(() => this.throwableObjects.splice(i, 1), 300);
             }
         });
     }
 
-    /**
-     * Kills an enemy by triggering its death process.
-     * 
-     * If the enemy has a `die` method, it will be called to handle its death animation
-     * and cleanup. After the death animation, the enemy is removed from the level.
-     * 
-     * @param {Object} enemy - The enemy object to be killed.
-     */
+    /** Removes enemy from game world. */
     killEnemy(enemy) {
         if (enemy.die) {
             enemy.die();
@@ -250,12 +160,7 @@ class World {
         }
     }
 
-    /**
-     * Handles collisions with collectable coins.
-     * 
-     * This will collect a coin if the character is colliding with it, increase the coin count,
-     * and play a sound effect.
-     */
+    /** Handles collecting coins. */
     handleCoinCollisions() {
         this.collectableCoins = this.collectableCoins.filter(coin => {
             if (this.character.isColliding(coin)) {
@@ -269,11 +174,7 @@ class World {
         });
     }
 
-    /**
-     * Handles collisions with collectable bottles.
-     * 
-     * This will collect a bottle if the character is colliding with it and increase the bottle count.
-     */
+    /** Handles collecting bottles. */
     handleBottleCollisions() {
         this.collectableBottles = this.collectableBottles.filter(bottle => {
             if (this.character.isColliding(bottle)) {
@@ -285,12 +186,7 @@ class World {
         });
     }
 
-    /**
-     * Checks if the boss fight should be triggered based on the character's position.
-     * 
-     * If the character reaches a specific X position, the boss fight will begin, 
-     * the soundtrack will pause, and the endboss will enter the fight.
-     */
+    /** Starts boss fight when reaching a trigger position. */
     checkBossTrigger() {
         if (!window.bossTriggered && this.character.x >= 2800) {
             window.bossTriggered = true;
@@ -303,26 +199,17 @@ class World {
         }
     }
 
-    /**
-     * Starts the boss music.
-     */
+    /** Plays boss music. */
     startBossMusic() {
         this.bossMusic.play();
     }
 
-    /**
-     * Unfreezes the player and allows movement.
-     */
+    /** Unfreezes the player after cutscenes. */
     unfreezePlayer() {
         this.character.canMove = true;
     }
 
-    /**
-     * Draws the game world and updates all objects.
-     * 
-     * This includes clearing the canvas, drawing background objects, enemies,
-     * collectable items, and other game elements.
-     */
+    /** Draw loop for rendering game objects. */
     draw() {
         if (this.gamePaused) return;
         this.clearCanvas();
@@ -330,12 +217,7 @@ class World {
         requestAnimationFrame(() => this.draw());
     }
 
-    /**
-     * Handles the drawing of all game objects on the canvas.
-     * 
-     * It first checks throwable objects, applies camera positioning, 
-     * and adds objects like background elements, coins, and enemies to the drawing process.
-     */
+    /** Handles drawing of all game objects. */
     handleObjectsDrawing() {
         this.checkThrowObjects();
         this.applyCamera(() => {
@@ -353,34 +235,21 @@ class World {
         });
     }
 
-    /**
-     * Clears the entire canvas.
-     */
+    /** Clears the canvas. */
     clearCanvas() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    /**
-     * Draws the status bars, including health, coin count, and bottle count.
-     */
+    /** Draws UI status bars. */
     drawStatus() {
         const bars = [this.statusBar, this.statusBarCoins, this.statusBarBottles];
-        if (
-            this.endboss &&
-            this.endboss.canTakeDamage &&
-            this.endboss.currentState !== 'dead'
-        ) {
+        if (this.endboss?.canTakeDamage && this.endboss.currentState !== 'dead') {
             bars.push(this.endboss.statusBar);
         }
         this.addObjects([bars]);
     }
 
-    /**
-     * Applies the camera transformation to the drawing context, 
-     * shifting the camera's X position before rendering objects.
-     * 
-     * @param {Function} drawFn - A function that handles the actual drawing of objects.
-     */
+    /** Offsets drawing for camera scrolling. */
     applyCamera(drawFn) {
         this.ctx.save();
         this.ctx.translate(this.camera_x, 0);
@@ -388,22 +257,12 @@ class World {
         this.ctx.restore();
     }
 
-    /**
-     * Adds a group of objects to the canvas for drawing.
-     * 
-     * @param {Array} groups - A list of object arrays to draw.
-     */
+    /** Draws arrays of objects. */
     addObjects(groups) {
         groups.flat().forEach(obj => this.drawObject(obj));
     }
 
-    /**
-     * Draws a single object on the canvas.
-     * 
-     * If the object is facing the opposite direction, it will be flipped before drawing.
-     * 
-     * @param {Object} obj - The object to be drawn.
-     */
+    /** Draws one object and optionally its hitbox. */
     drawObject(obj) {
         this.ctx.save();
         if (obj.otherDirection) this.flipImage(obj);
@@ -414,22 +273,14 @@ class World {
         this.ctx.restore();
     }
 
-    /**
-     * Flips an image horizontally on the canvas.
-     * 
-     * @param {Object} obj - The object whose image will be flipped.
-     */
+    /** Flips image horizontally for mirrored drawing. */
     flipImage(obj) {
         this.ctx.translate(obj.x + obj.width / 2, obj.y);
         this.ctx.scale(-1, 1);
         this.ctx.translate(-obj.x - obj.width / 2, -obj.y);
     }
 
-    /**
-     * Checks if the D key is held to trigger the throwing action for throwable objects.
-     * 
-     * Also handles cooldowns between throws and decreases the number of bottles in the status bar.
-     */
+    /** Handles object throwing logic. */
     checkThrowObjects() {
         const now = Date.now();
         if (this.keyboard.D && !this.dWasHeld) {
@@ -441,14 +292,10 @@ class World {
                 this.lastThrowTime = now;
             }
         }
-        if (!this.keyboard.D) {
-            this.dWasHeld = false;
-        }
+        if (!this.keyboard.D) this.dWasHeld = false;
     }
 
-    /**
-     * Throws an object from the character, either to the left or right.
-     */
+    /** Spawns a throwable object. */
     throwObject() {
         const facingLeft = this.character.otherDirection;
         const x = this.character.x + (facingLeft ? -30 : 65);
@@ -458,11 +305,7 @@ class World {
         this.throwableObjects.push(bottle);
     }
 
-    /**
-     * Spawns collectable coins in the game world.
-     * 
-     * It places coins at random X positions, ensuring no overlap between coins.
-     */
+    /** Spawns coins at random positions. */
     spawnCoins() {
         this.collectableCoins = [];
         let placed = 0;
@@ -475,11 +318,7 @@ class World {
         }
     }
 
-    /**
-     * Spawns collectable bottles in the game world.
-     * 
-     * It places bottles at random X positions, ensuring no overlap between bottles.
-     */
+    /** Spawns bottles at random positions. */
     spawnBottles() {
         this.collectableBottles = [];
         let placed = 0;
@@ -492,54 +331,32 @@ class World {
         }
     }
 
-    /**
-     * Returns a random X coordinate within the valid range for coins.
-     * 
-     * @returns {number} - A random X position for a coin.
-     */
+    /** Generates a random coin X position. */
     randomX() {
         return this.COIN_MIN_X + Math.random() * (this.COIN_MAX_X - this.COIN_MIN_X);
     }
 
-    /**
-     * Checks if a given X coordinate overlaps with any existing coins.
-     * 
-     * @param {number} x - The X position to check for overlap.
-     * @returns {boolean} - Returns true if there is an overlap, false otherwise.
-     */
     checkOverlap(x) {
         return this.collectableCoins.some(c => Math.abs(x - c.x) < this.COIN_SPACING);
     }
 
-    /**
-     * Checks if a given X coordinate overlaps with any existing bottles.
-     * 
-     * @param {number} x - The X position to check for overlap.
-     * @returns {boolean} - Returns true if there is an overlap, false otherwise.
-     */
     checkBottleOverlap(x) {
         return this.collectableBottles.some(b => Math.abs(x - b.x) < 120);
     }
 
-    /**
-     * Updates the display of collected coins on the game-over or win screen.
-     */
+    /** Updates UI coin counter text. */
     updateCollectedCoinsDisplay() {
         const msg = `You have collected ${this.collectedCoinsCount} / ${this.COIN_COUNT} coins!`;
         document.getElementById('collectedCoinsGameOver').textContent = msg;
         document.getElementById('collectedCoinsWin').textContent = msg;
     }
 
-    /**
-     * Pauses the game.
-     */
+    /** Pauses the game logic and rendering. */
     pauseGame() {
         this.gamePaused = true;
     }
 
-    /**
-     * Cleans up after the game, pausing the game and muting all sounds.
-     */
+    /** Stops game and all sounds. */
     cleanUp() {
         this.pauseGame();
         this.setMute(true);
@@ -549,5 +366,4 @@ class World {
         this.bossMusic.currentTime = 0;
         this.character?.stopAllSounds?.();
     }
-
 }

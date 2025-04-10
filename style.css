@@ -44,9 +44,6 @@ h3,
     font-size: 40px;
 }
 
-
-
-/* Container for canvas and interface */
 .canvas-container {
     position: relative;
     width: 720px;
@@ -62,7 +59,6 @@ h3,
     height: 100%;
 }
 
-/* Position the loading image over the canvas */
 #loadingImage {
     position: absolute;
     top: 0;
@@ -73,7 +69,6 @@ h3,
     z-index: 2;
 }
 
-/* Interface icons */
 .interface-icons {
     display: flex;
     gap: 10px;
@@ -94,7 +89,6 @@ h3,
     scale: 1.1;
 }
 
-/* Modal styles for game controls (used by legal notice and instructions) */
 .modal {
     padding: 10px;
     max-width: 700px;
@@ -156,9 +150,6 @@ h2 {
     align-items: center;
 }
 
-
-
-/* Hide elements */
 .hidden {
     display: none !important;
 }
@@ -191,7 +182,6 @@ h2 {
     }
 }
 
-/* Game Over Screen */
 .game-over {
     position: absolute;
     top: 0;
@@ -218,10 +208,6 @@ h2 {
     height: 80%;
     display: flex;
     justify-content: center;
-}
-
-.hidden {
-    display: none !important;
 }
 
 .legal-notice-section {
@@ -269,12 +255,7 @@ h2 {
     cursor: pointer;
 }
 
-.legal-notice-link {
-    font-size: 16px;
-    text-decoration: none;
-    color: white;
-}
-
+.legal-notice-link,
 .game-instructions-link {
     font-size: 16px;
     text-decoration: none;
@@ -295,7 +276,8 @@ h2 {
     z-index: 999;
 }
 
-#openLegalNotice.hidden {
+#openLegalNotice.hidden,
+#gameInstructions.hidden {
     display: none;
 }
 
@@ -313,29 +295,7 @@ h2 {
     z-index: 999;
 }
 
-#gameInstructions.hidden {
-    display: none;
-}
-
-.game-instructions-container {
-    padding: 10px;
-    max-width: 700px;
-    height: 49.5%;
-    max-height: 480px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    font-size: 18px;
-    overflow-y: auto;
-    scrollbar-width: none;
-}
-
-.game-instructions-container::-webkit-scrollbar {
-    display: none;
-}
-
+.game-instructions-container,
 .legal-notice-container {
     padding: 10px;
     max-width: 700px;
@@ -351,12 +311,13 @@ h2 {
     scrollbar-width: none;
 }
 
-.legal-notice-container p {
-    padding: 10px;
-}
-
+.game-instructions-container::-webkit-scrollbar,
 .legal-notice-container::-webkit-scrollbar {
     display: none;
+}
+
+.legal-notice-container p {
+    padding: 10px;
 }
 
 .colleted-coins-end-screen {
@@ -368,7 +329,6 @@ h2 {
     width: 100%;
 }
 
-/* Common Modal Header Container */
 .modal-header {
     width: 100%;
     display: flex;
@@ -377,7 +337,6 @@ h2 {
     padding: 0 10px;
 }
 
-/* Close Button Style (applies to all close buttons) */
 .close-modal {
     font-family: 'Stardos Stencil', serif;
     font-weight: bold;
@@ -406,7 +365,6 @@ h2 {
     z-index: 9999;
 }
 
-/* Touch Controls Container */
 .touch-controls {
     position: absolute;
     bottom: 0;
@@ -422,14 +380,12 @@ h2 {
     background: transparent;
 }
 
-/* Styling of Button Groups */
 .left-controls,
 .right-controls {
     display: flex;
     gap: 10px;
 }
 
-/* Styling of Buttons */
 .touch-button {
     display: flex;
     align-items: center;
@@ -441,7 +397,6 @@ h2 {
     border: solid 1px white;
 }
 
-/* Top-left corner layout for end screen buttons */
 .end-buttons-top-left {
     position: absolute;
     top: 20px;
@@ -451,7 +406,6 @@ h2 {
     z-index: 1000;
 }
 
-/* Pulse effect on retry + reload icons */
 .pulse-icon {
     width: 60px !important;
     height: 60px !important;
@@ -477,12 +431,7 @@ h2 {
         z-index: 1;
     }
 
-    .game-instructions-container {
-        height: 100% !important;
-        max-width: 100% !important;
-        max-height: 100% !important;
-    }
-
+    .game-instructions-container,
     .legal-notice-container {
         height: 100% !important;
         max-width: 100% !important;
@@ -541,9 +490,6 @@ h2 {
     }
 }
 
-/* New CSS for Info Modal to match Legal Notice and Game Instructions modals */
-
-/* Fullscreen overlay for the info modal */
 .modal-game-info {
     position: fixed;
     top: 0;
@@ -563,12 +509,10 @@ h3 {
     margin: 0;
 }
 
-/* Hide the info modal when hidden */
 .modal-game-info.hidden {
     display: none;
 }
 
-/* Inner container for the info modal content */
 .info-modal-container {
     padding: 10px;
     max-width: 700px;

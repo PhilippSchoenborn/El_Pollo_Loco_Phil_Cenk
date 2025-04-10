@@ -63,24 +63,18 @@ class Endboss extends MovableObject {
     this.hitboxOffsetY = 40;
     this.hitboxWidth = 140;
     this.hitboxHeight = 170;
-
     this.loadImages(this.walkImages);
     this.loadImages(this.alertImages);
     this.loadImages(this.attackImages);
     this.loadImages(this.hurtImages);
     this.loadImages(this.deadImages);
     this.loadImage(this.walkImages[0]);
-
     this.hit_sound.volume = 0.5;
     this.death_sound.volume = 0.5;
     this.roosterCry.volume = 0.8;
     this.otherDirection = false;
-
-    // Endboss has a status bar
     this.statusBar = new StatusBarEndboss();
     this.statusBar.setPercentage(100);
-
-    // Replace requestAnimationFrame with setInterval
     this.initBehaviorLoop();
   }
 
@@ -93,51 +87,24 @@ class Endboss extends MovableObject {
    */
   initBehaviorLoop() {
     let lastTime = Date.now();
-
-    // We'll keep separate timers for walking / alert frame intervals
-    let walkFrameAcc = 0;
-    let alertFrameAcc = 0;
-    const walkFrameInterval = 200;  // ms per frame in walk
-    const alertFrameInterval = 150; // ms per frame in alert
-
+    let walkFrameAcc = 0, alertFrameAcc = 0;
+    const walkFrameInterval = 200, alertFrameInterval = 150;
     this.behaviorInterval = setInterval(() => {
-      if (this.currentState === 'dead') {
-        // If dead, stop the interval so no further updates
-        clearInterval(this.behaviorInterval);
-        return;
-      }
-
-      // Compute delta time for this tick
-      const now = Date.now();
-      const delta = now - lastTime;
-      lastTime = now;
-
-      // Entrance or chase movement
-      if (this.currentState === 'chase') {
-        this.chasePlayer();
-      }
-
-      // Animate frames based on current state
-      if (this.currentState === 'entrance') {
-        walkFrameAcc += delta;
-        if (walkFrameAcc >= walkFrameInterval) {
-          walkFrameAcc = 0;
-          this.playAnimation(this.walkImages);
+      if (this.currentState === 'dead') return clearInterval(this.behaviorInterval);
+      const delta = Date.now() - lastTime;
+      lastTime = Date.now();
+      if (this.currentState === 'chase') this.chasePlayer();
+      const handleAnimation = (state, acc, interval, images) => {
+        acc += delta;
+        if (this.currentState === state && acc >= interval) {
+          this.playAnimation(images);
+          return 0;
         }
-      } else if (this.currentState === 'alert') {
-        alertFrameAcc += delta;
-        if (alertFrameAcc >= alertFrameInterval) {
-          alertFrameAcc = 0;
-          this.playAnimation(this.alertImages);
-        }
-      } else if (this.currentState === 'chase') {
-        walkFrameAcc += delta;
-        if (walkFrameAcc >= walkFrameInterval) {
-          walkFrameAcc = 0;
-          this.playAnimation(this.walkImages);
-        }
-      }
-      // If 'attack' or 'hurt' or 'dead', we handle frames in their own intervals or methods
+        return acc;
+      };
+      walkFrameAcc = handleAnimation('entrance', walkFrameAcc, walkFrameInterval, this.walkImages);
+      alertFrameAcc = handleAnimation('alert', alertFrameAcc, alertFrameInterval, this.alertImages);
+      walkFrameAcc = handleAnimation('chase', walkFrameAcc, walkFrameInterval, this.walkImages);
     }, 1000 / 60);
   }
 
@@ -181,11 +148,9 @@ class Endboss extends MovableObject {
     this.currentState = 'alert';
     this.roosterCry.currentTime = 0;
     this.roosterCry.play();
-
     setTimeout(() => {
       this.roosterCry.currentTime = 0;
       this.roosterCry.play();
-
       setTimeout(() => {
         this.currentState = 'chase';
         this.canTakeDamage = true;
@@ -219,11 +184,9 @@ class Endboss extends MovableObject {
     this.currentState = 'attack';
     let frameIndex = 0;
     const frameDelay = 150;
-
     const attackAnim = setInterval(() => {
       this.img = this.imageCache[this.attackImages[frameIndex]];
       frameIndex++;
-
       if (frameIndex >= this.attackImages.length) {
         clearInterval(attackAnim);
         if (this.currentState !== 'dead') {
@@ -243,7 +206,6 @@ class Endboss extends MovableObject {
     this.hit_sound.play();
     const pct = (this.hitPoints / 3) * 100;
     this.statusBar.setPercentage(pct);
-
     if (this.hitPoints <= 0) {
       this.die();
     } else {
@@ -261,7 +223,6 @@ class Endboss extends MovableObject {
   playHurtAnimation(onComplete) {
     let frameIndex = 0;
     const frameDelay = 100;
-
     const hurtAnim = setInterval(() => {
       if (frameIndex < this.hurtImages.length) {
         this.img = this.imageCache[this.hurtImages[frameIndex]];
@@ -296,16 +257,13 @@ class Endboss extends MovableObject {
   startDeathAnimation() {
     let frameIndex = 0;
     const frameDelay = 350;
-
     const deathAnim = setInterval(() => {
       this.img = this.imageCache[this.deadImages[frameIndex]];
       frameIndex++;
-
       if (frameIndex >= this.deadImages.length) {
         clearInterval(deathAnim);
         setTimeout(() => {
           this.removeFromGame();
-          // Possibly call your "win()" method if the boss is defeated
           win();
         }, 500);
       }
