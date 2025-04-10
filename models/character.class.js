@@ -1,6 +1,4 @@
-/**
- * Represents the main character in the game with movement, animations, and sounds.
- */
+/** Represents the main character in the game with movement, animations, and sounds. */
 class Character extends MovableObject {
     height = 220;
     width = 120;
@@ -75,9 +73,7 @@ class Character extends MovableObject {
         './img/2_character_pepe/4_hurt/H-42.png',
         './img/2_character_pepe/4_hurt/H-43.png'
     ];
-
     world;
-
     walking_sound = new Audio('audio/walking.mp3');
     jump_sound = new Audio('audio/jump.mp3');
     character_jump_sound = new Audio('audio/character_jump.mp3');
@@ -86,8 +82,6 @@ class Character extends MovableObject {
     gameover_sound = new Audio('audio/gameover3.mp3');
     bounce_sound = new Audio('./audio/jump.mp3');
     win_sound = new Audio('audio/win.mp3');
-
-    // We'll track how much time has passed since the last frame for animation pacing.
     lastFrameTimeAcc = 0;
 
     /**
@@ -101,10 +95,9 @@ class Character extends MovableObject {
         this.statusBar = statusBar;
         this.configureSounds();
         this.setHitbox();
-        this.animate(); // <--- No longer uses requestAnimationFrame
+        this.animate();
     }
 
-    /** Loads all character animations into memory. */
     loadAllImages() {
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_JUMPING);
@@ -114,7 +107,6 @@ class Character extends MovableObject {
         this.loadImages(this.IMAGES_LONG_IDLE);
     }
 
-    /** Configures audio volumes and looping. */
     configureSounds() {
         this.walking_sound.volume = 0.15;
         this.jump_sound.volume = 0.3;
@@ -127,7 +119,6 @@ class Character extends MovableObject {
         this.win_sound.volume = 0.6;
     }
 
-    /** Defines the hitbox area for collision detection. */
     setHitbox() {
         this.hitboxOffsetX = 20;
         this.hitboxOffsetY = 90;
@@ -135,27 +126,17 @@ class Character extends MovableObject {
         this.hitboxHeight = this.height - 100;
     }
 
-    /**
-     * Replaces requestAnimationFrame with a fixed setInterval loop (~60 updates/second).
-     */
+    /** Replaces requestAnimationFrame with a fixed setInterval loop (~60 updates/second). */
     animate() {
         let lastTime = Date.now();
-
-        // Update ~60 times per second
         setInterval(() => {
-            if (this.dead) return;  // If dead, ignore further updates
-
+            if (this.dead) return;
             const now = Date.now();
-            const delta = now - lastTime; // ms since last update
-
-            // Update all character logic
+            const delta = now - lastTime;
             this.updatePosition();
             this.updateCamera();
             this.handleIdleState();
-
-            // Decide which animation frame to use
             this.updateAnimationFrame(delta);
-
             lastTime = now;
         }, 1000 / 60);
     }
@@ -212,7 +193,6 @@ class Character extends MovableObject {
         this.stopSnoring();
     }
 
-    /** Stops the walking sound if it's currently playing. */
     stopWalkingSound() {
         if (!this.walking_sound.paused) {
             this.walking_sound.pause();
@@ -220,7 +200,6 @@ class Character extends MovableObject {
         }
     }
 
-    /** Stops the snoring sound if it's playing. */
     stopSnoring() {
         if (this.snoringSoundPlaying) {
             this.snoring_sound.pause();
@@ -229,7 +208,6 @@ class Character extends MovableObject {
         }
     }
 
-    /** Determines and plays idle or long idle animations based on inactivity. */
     handleIdleState() {
         const now = Date.now();
         if (!this.world.keyboard.LEFT &&
@@ -259,7 +237,6 @@ class Character extends MovableObject {
         }
     }
 
-    /** Adjusts the camera to follow the character. */
     updateCamera() {
         this.world.camera_x = -this.x + 100;
     }
@@ -267,20 +244,13 @@ class Character extends MovableObject {
     /**
      * Updates the current animation frame (for walking, jumping, etc.) based on how
      * much time has passed since the last update (delta).
-     *
      * @param {number} delta - Time elapsed in ms since the last update.
      */
     updateAnimationFrame(delta) {
-        // Accumulate time
         this.lastFrameTimeAcc += delta;
-
-        // The “frameDuration” depends on movement speed
         const requiredTime = this.calculateFrameDuration(this.speed);
-
-        // Only change the frame if enough time has passed
         if (this.lastFrameTimeAcc >= requiredTime) {
             this.decideCurrentAnimation();
-            // Reset or reduce the accumulator
             this.lastFrameTimeAcc = 0;
         }
     }
@@ -333,7 +303,6 @@ class Character extends MovableObject {
         setTimeout(() => (this.isInvulnerable = false), 150 * this.IMAGES_HURT.length);
     }
 
-    /** Starts the hurt animation sequence via interval-based approach. */
     playHurtAnimation() {
         if (this.isAnimatingHurt) return;
         this.isAnimatingHurt = true;
@@ -344,7 +313,6 @@ class Character extends MovableObject {
 
     /**
      * Uses setInterval for special one-off animations (hurt, dead, etc.).
-     *
      * @param {string[]} frames - Array of image URLs
      * @param {number} frameDuration - Time between frames in milliseconds
      * @param {Function} onComplete - Callback invoked when animation finishes
@@ -362,7 +330,6 @@ class Character extends MovableObject {
         }, frameDuration);
     }
 
-    /** @returns {boolean} True if the character is dead. */
     isDead() {
         return this.health <= 0;
     }
@@ -377,7 +344,6 @@ class Character extends MovableObject {
     /**
      * Called after the game over animation completes.
      * Displays the game over screen and pauses the game.
-     * @private
      */
     _onGameOverComplete() {
         setTimeout(() => {
@@ -386,17 +352,11 @@ class Character extends MovableObject {
         }, 500);
     }
 
-    /**
-     * Use this if you want to trigger a "victory" scenario (e.g. defeating an Endboss).
-     */
     playWinSound() {
         this.stopAllSounds();
         this.win_sound.play();
     }
 
-    /**
-     * Stops all sound effects associated with the character.
-     */
     stopAllSounds() {
         const sounds = [
             this.walking_sound,
@@ -432,18 +392,10 @@ class Character extends MovableObject {
         this.win_sound.muted = muted;
     }
 
-    /**
-     * Determines if this object is above another (for collision logic).
-     * @param {MovableObject} other
-     * @returns {boolean}
-     */
     isAbove(other) {
         return this.y + this.hitboxHeight - 10 <= other.y;
     }
 
-    /**
-     * Wakes the character from an idle/snoring state, resetting idle counters.
-     */
     wakeUp() {
         if (this.snoringSoundPlaying) {
             this.stopSnoring();

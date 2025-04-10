@@ -1,51 +1,12 @@
 const DEBUG_MODE = false; // Set to true to display hitboxes, false to hide them.
 
-/**
- * Canvas element for rendering the game.
- * @type {HTMLCanvasElement}
- */
 let canvas;
-
-/**
- * The main world object controlling the game state.
- * @type {World}
- */
 let world;
-
-/**
- * Object representing keyboard input state.
- * @type {Keyboard}
- */
 let keyboard = new Keyboard();
-
-/**
- * Indicates whether the game is muted.
- * @type {boolean}
- */
 let isMuted = false;
-
-/**
- * Modal element for showing information.
- * @type {HTMLElement}
- */
 let modal;
-
-/**
- * Event listener reference for keydown.
- * @type {Function}
- */
 let handleKeyDown;
-
-/**
- * Event listener reference for keyup.
- * @type {Function}
- */
 let handleKeyUp;
-
-/**
- * Maps key values to keyboard state keys.
- * @type {Object.<string, string>}
- */
 const keyMap = {
     ArrowRight: 'RIGHT',
     ArrowLeft: 'LEFT',
@@ -56,9 +17,7 @@ const keyMap = {
     D: 'D'
 };
 
-/**
- * Initializes the game world and canvas.
- */
+/** Initializes the game world and canvas. */
 function init() {
     canvas = document.getElementById('canvas');
     world = new World(canvas, keyboard);
@@ -76,9 +35,7 @@ function setKeyboardState(e, state) {
     }
 }
 
-/**
- * Binds keydown and keyup events to window.
- */
+/** Binds keydown and keyup events to window. */
 function bindKeyEvents() {
     handleKeyDown = e => setKeyboardState(e, true);
     handleKeyUp = e => setKeyboardState(e, false);
@@ -86,26 +43,20 @@ function bindKeyEvents() {
     window.addEventListener('keyup', handleKeyUp);
 }
 
-/**
- * Removes key event listeners from window.
- */
+/** Removes key event listeners from window. */
 function unbindKeyEvents() {
     if (handleKeyDown) window.removeEventListener('keydown', handleKeyDown);
     if (handleKeyUp) window.removeEventListener('keyup', handleKeyUp);
 }
 
-/**
- * Toggles game audio mute state and updates the icon.
- */
+/** Toggles game audio mute state and updates the icon. */
 function toggleMute() {
     isMuted = !isMuted;
     updateVolumeIcon();
     if (world) world.setMute(isMuted);
 }
 
-/**
- * Updates the mute/volume icon on the button.
- */
+/** Updates the mute/volume icon on the button. */
 function updateVolumeIcon() {
     const btn = document.getElementById('volume-button');
     btn.src = isMuted
@@ -113,9 +64,7 @@ function updateVolumeIcon() {
         : './img/10_interface_icons/volume.png';
 }
 
-/**
- * Starts the game and displays the main game screen.
- */
+/** Starts the game and displays the main game screen. */
 function startGame() {
     canvas = document.getElementById('canvas');
     document.getElementById('loadingImage').classList.add('hidden');
@@ -143,9 +92,6 @@ function startGame() {
     checkOrientation();
 }
 
-
-
-
 /**
  * Checks if the device supports touch input.
  * @returns {boolean}
@@ -154,9 +100,7 @@ function isTouchDevice() {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
 
-/**
- * Handles the visibility of touch controls based on orientation.
- */
+/** Handles the visibility of touch controls based on orientation. */
 function handleTouchControlsVisibility() {
     const touchControls = document.getElementById("touchControls");
     const warning = document.getElementById("landscapeWarning");
@@ -178,9 +122,7 @@ function handleTouchControlsVisibility() {
     }
 }
 
-/**
- * Displays the game over screen and disables input.
- */
+/** Displays the game over screen and disables input. */
 function gameOver() {
     document.getElementById('gameOverScreen').classList.remove('hidden');
     document.getElementById('tryAgainButton').classList.remove('hidden');
@@ -189,9 +131,7 @@ function gameOver() {
     world.updateCollectedCoinsDisplay();
 }
 
-/**
- * Displays the win screen and disables input.
- */
+/** Displays the win screen and disables input. */
 function win() {
     disableUserInput();
     if (world?.character) {
@@ -204,27 +144,23 @@ function win() {
     world.updateCollectedCoinsDisplay();
 }
 
-/**
- * Disables user input by unbinding key events.
- */
+/** Disables user input by unbinding key events. */
 function disableUserInput() {
     unbindKeyEvents();
 }
 
-/**
- * Opens the info modal.
- */
+/** Opens the info modal. */
 function openModal() {
     modal.classList.remove('hidden');
-  }
-  
-  /**
-   * Closes the info modal.
-   */
-  function closeModal() {
+}
+
+/**
+ * Closes the info modal.
+ */
+function closeModal() {
     modal.classList.add('hidden');
-  }
-  
+}
+
 /**
  * Checks whether the browser is currently in fullscreen mode.
  * @returns {boolean}
@@ -327,7 +263,6 @@ function setupTouchControls() {
     });
 }
 
-
 /**
  * Adds touch and mouse event listeners for a button.
  * @param {string} buttonId - ID of the button element.
@@ -344,6 +279,11 @@ function addControlEvents(buttonId, key) {
     button.addEventListener("mouseup", deactivate);
 }
 
+/**
+ * Runs after the DOM content has fully loaded.
+ * Initializes modal reference, binds keyboard events, sets up touch controls,
+ * and checks screen orientation.
+ */
 document.addEventListener('DOMContentLoaded', () => {
     modal = document.getElementById('infoModal');
     bindKeyEvents();
@@ -351,41 +291,66 @@ document.addEventListener('DOMContentLoaded', () => {
     checkOrientation();
 });
 
+/**
+ * Closes the info modal if the user clicks outside of its inner container.
+ */
 document.getElementById('infoModal').addEventListener('click', (e) => {
     const container = document.querySelector('.info-modal-container');
     if (!container.contains(e.target)) {
-      closeModal();
+        closeModal();
     }
-  });  
+});
 
+/**
+ * Opens the legal notice modal and disables page scroll when the link is clicked.
+ * @param {Event} e - The click event
+ */
 document.querySelector('.legal-notice-link').addEventListener('click', e => {
     e.preventDefault();
     document.getElementById('openLegalNotice').classList.remove('hidden');
     document.body.classList.add('no-scroll');
 });
 
+/**
+ * Closes the legal notice modal if the user clicks outside of its container.
+ * @param {Event} e - The click event
+ */
 document.getElementById('openLegalNotice').addEventListener('click', e => {
     if (!document.querySelector('.legal-notice-container').contains(e.target)) {
         closeLegalNotice();
     }
 });
 
+/**
+ * Opens the game instructions modal and disables page scroll when the link is clicked.
+ * @param {Event} e - The click event
+ */
 document.querySelector('.game-instructions-link').addEventListener('click', e => {
     e.preventDefault();
     document.getElementById('gameInstructions').classList.remove('hidden');
     document.body.classList.add('no-scroll');
 });
 
+/**
+ * Closes the game instructions modal if the user clicks outside of its container.
+ * @param {Event} e - The click event
+ */
 document.getElementById('gameInstructions').addEventListener('click', e => {
     if (!document.querySelector('.game-instructions-container').contains(e.target)) {
         closeGameInstructions();
     }
 });
 
+/**
+ * Re-checks screen orientation when the window is resized.
+ */
 window.addEventListener("resize", () => {
     checkOrientation();
 });
 
+/**
+ * Re-checks screen orientation when the device orientation changes.
+ */
 window.addEventListener("orientationchange", () => {
     checkOrientation();
 });
