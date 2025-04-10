@@ -3,30 +3,29 @@
  * @extends MovableObject
  */
 class Chicken extends MovableObject {
-
-    height = 70
-    width = 65
-    y = 360
-    death_sound = new Audio('./audio/chicken_dead.mp3')
+    height = 70;
+    width = 65;
+    y = 360;
+    death_sound = new Audio('./audio/chicken_dead.mp3');
 
     IMAGES_WALKING = [
         './img/3_enemies_chicken/chicken_normal/1_walk/1_w.png',
         './img/3_enemies_chicken/chicken_normal/1_walk/2_w.png',
         './img/3_enemies_chicken/chicken_normal/1_walk/3_w.png'
-    ]
+    ];
 
     /**
      * @param {number} [x=200 + Math.random() * 500]
      */
     constructor(x = 200 + Math.random() * 500) {
-        super().loadImage('./img/3_enemies_chicken/chicken_normal/1_walk/1_w.png')
-        this.loadImages(this.IMAGES_WALKING)
-        this.x = x
-        this.speed = 0.15 + Math.random() * 0.3
-        this.hitboxOffsetX = 5
-        this.hitboxOffsetY = 10
-        this.hitboxWidth = this.width - 10
-        this.hitboxHeight = this.height - 20
+        super().loadImage('./img/3_enemies_chicken/chicken_normal/1_walk/1_w.png');
+        this.loadImages(this.IMAGES_WALKING);
+        this.x = x;
+        this.speed = 0.15 + Math.random() * 0.3;
+        this.hitboxOffsetX = 5;
+        this.hitboxOffsetY = 10;
+        this.hitboxWidth = this.width - 10;
+        this.hitboxHeight = this.height - 20;
     }
 
     /**
@@ -38,6 +37,7 @@ class Chicken extends MovableObject {
         this.moveInterval = setInterval(() => {
             this.moveLeft();
         }, 1000 / 60);
+
         this.animationInterval = setInterval(() => {
             this.playAnimation(this.IMAGES_WALKING);
         }, 125);
@@ -55,17 +55,15 @@ class Chicken extends MovableObject {
         clearInterval(this.moveInterval);
         clearInterval(this.animationInterval);
         this.speed = 0;
-        this.death_sound.play();
         this.death_sound.volume = 0.4;
+        this.death_sound.play();
     }
 
     /**
      * Mutes or unmutes the death sound.
-     *
-     * @param {boolean} muted - If true, the death sound is muted; if false, it is unmuted.
+     * @param {boolean} muted
      */
     setMute(muted) {
         this.death_sound.muted = muted;
     }
-
 }
