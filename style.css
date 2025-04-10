@@ -479,10 +479,14 @@ h2 {
 
     .game-instructions-container {
         height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
     }
 
     .legal-notice-container {
         height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
     }
 }
 
