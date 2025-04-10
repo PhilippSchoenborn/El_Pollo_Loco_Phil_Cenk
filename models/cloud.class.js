@@ -9,6 +9,13 @@ class Cloud extends MovableObject {
         './img/5_background/layers/4_clouds/1.png',
         './img/5_background/layers/4_clouds/2.png',
         './img/5_background/layers/4_clouds/3.png',
+        './img/5_background/layers/4_clouds/4.png',
+        './img/5_background/layers/4_clouds/5.png',
+        './img/5_background/layers/4_clouds/6.png',
+        './img/5_background/layers/4_clouds/7.png',
+        './img/5_background/layers/4_clouds/8.png',
+        './img/5_background/layers/4_clouds/9.png',
+        './img/5_background/layers/4_clouds/10.png',
     ];
     speed = 0.2;
 
