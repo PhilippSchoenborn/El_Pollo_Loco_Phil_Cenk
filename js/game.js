@@ -126,6 +126,8 @@ function startGame() {
     document.querySelector('.game-instructions-section').style.display = 'none';
     document.querySelector('.reload-button').classList.remove('hidden');
     document.querySelector('.retry-btn').classList.remove('hidden');
+    window.addEventListener("resize", checkOrientation);
+    window.addEventListener("orientationchange", checkOrientation);
     keyboard = new Keyboard();
     setupTouchControls();
     bindKeyEvents();
@@ -143,6 +145,7 @@ function startGame() {
 
 
 
+
 /**
  * Checks if the device supports touch input.
  * @returns {boolean}
@@ -155,13 +158,24 @@ function isTouchDevice() {
  * Handles the visibility of touch controls based on orientation.
  */
 function handleTouchControlsVisibility() {
-    if (!isTouchDevice()) return;
-    if (window.innerWidth > window.innerHeight) {
-        document.getElementById("landscapeWarning").style.display = "none";
-        document.getElementById("touchControls").setAttribute("style", "display: flex !important");
+    const touchControls = document.getElementById("touchControls");
+    const warning = document.getElementById("landscapeWarning");
+    const isTouch = isTouchDevice();
+    const isLandscape = window.innerWidth > window.innerHeight;
+    const isGameRunning = world && world.character && world.character.canMove;
+    touchControls.style.display = "none";
+    warning.style.display = "none";
+    if (!isTouch) return;
+    if (!isGameRunning) {
+        if (!isLandscape) {
+            warning.style.display = "flex";
+        }
+        return;
+    }
+    if (isLandscape) {
+        touchControls.style.display = "flex";
     } else {
-        document.getElementById("landscapeWarning").style.display = "flex";
-        document.getElementById("touchControls").style.display = "none";
+        warning.style.display = "flex";
     }
 }
 
@@ -298,20 +312,7 @@ function closeGameInstructions() {
  * Checks screen orientation and adjusts UI accordingly.
  */
 function checkOrientation() {
-    const mobileThreshold = 768;
-    const isTouch = isTouchDevice();
-    if (window.innerWidth < mobileThreshold || isTouch) {
-        if (window.innerWidth < window.innerHeight) {
-            document.getElementById("landscapeWarning").style.display = "flex";
-            document.getElementById("touchControls").style.display = "none";
-        } else {
-            document.getElementById("landscapeWarning").style.display = "none";
-            document.getElementById("touchControls").style.display = "flex";
-        }
-    } else {
-        document.getElementById("landscapeWarning").style.display = "none";
-        document.getElementById("touchControls").style.display = "none";
-    }
+    handleTouchControlsVisibility();
 }
 
 /**
@@ -393,6 +394,10 @@ function retryGame() {
         world.cleanUp?.();
         world = null;
     }
+    window.removeEventListener("resize", checkOrientation);
+    window.removeEventListener("orientationchange", checkOrientation);
+    window.addEventListener("resize", checkOrientation);
+    window.addEventListener("orientationchange", checkOrientation);
     window.bossTriggered = false;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -404,9 +409,9 @@ function retryGame() {
     world.init();
     document.getElementById('gameOverScreen').classList.add('hidden');
     document.getElementById('winScreen').classList.add('hidden');
-    if (isTouchDevice()) {
-        handleTouchControlsVisibility();
+    document.getElementById('canvas').style.display = 'block';
+    if (world.character) {
+        world.character.canMove = true;
     }
-    checkOrientation();
+    handleTouchControlsVisibility();
 }
-
