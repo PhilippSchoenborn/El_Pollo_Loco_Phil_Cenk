@@ -4,7 +4,7 @@
 class Character extends MovableObject {
     height = 220;
     width = 120;
-    speed = 1.8;
+    speed = 3;
     lastMovementTime = Date.now();
     idleTimeThreshold = 5000;
     idleAnimationFrameCounter = 0;
@@ -87,6 +87,9 @@ class Character extends MovableObject {
     bounce_sound = new Audio('./audio/jump.mp3');
     win_sound = new Audio('audio/win.mp3');
 
+    // We'll track how much time has passed since the last frame for animation pacing.
+    lastFrameTimeAcc = 0;
+
     /**
      * Creates an instance of Character.
      * @param {StatusBar} statusBar - The UI element displaying health.
@@ -98,7 +101,7 @@ class Character extends MovableObject {
         this.statusBar = statusBar;
         this.configureSounds();
         this.setHitbox();
-        this.animate();
+        this.animate(); // <--- No longer uses requestAnimationFrame
     }
 
     /** Loads all character animations into memory. */
@@ -132,22 +135,29 @@ class Character extends MovableObject {
         this.hitboxHeight = this.height - 100;
     }
 
-    /** Starts the character animation loop using requestAnimationFrame. */
-    animate() {
-        requestAnimationFrame(this.update.bind(this));
-    }
-
     /**
-     * Main update loop called on every animation frame.
-     * @param {DOMHighResTimeStamp} timestamp - The current time.
+     * Replaces requestAnimationFrame with a fixed setInterval loop (~60 updates/second).
      */
-    update(timestamp) {
-        if (this.dead) return;
-        this.updatePosition();
-        this.updateCamera();
-        this.handleIdleState();
-        this.updateAnimationFrame(timestamp);
-        requestAnimationFrame(this.update.bind(this));
+    animate() {
+        let lastTime = Date.now();
+
+        // Update ~60 times per second
+        setInterval(() => {
+            if (this.dead) return;  // If dead, ignore further updates
+
+            const now = Date.now();
+            const delta = now - lastTime; // ms since last update
+
+            // Update all character logic
+            this.updatePosition();
+            this.updateCamera();
+            this.handleIdleState();
+
+            // Decide which animation frame to use
+            this.updateAnimationFrame(delta);
+
+            lastTime = now;
+        }, 1000 / 60);
     }
 
     /** Handles character movement based on keyboard input. */
@@ -222,11 +232,9 @@ class Character extends MovableObject {
     /** Determines and plays idle or long idle animations based on inactivity. */
     handleIdleState() {
         const now = Date.now();
-        if (
-            !this.world.keyboard.LEFT &&
+        if (!this.world.keyboard.LEFT &&
             !this.world.keyboard.RIGHT &&
-            !this.isAboveGround()
-        ) {
+            !this.isAboveGround()) {
             this.playIdleAnimations(now);
         }
     }
@@ -257,16 +265,23 @@ class Character extends MovableObject {
     }
 
     /**
-     * Updates the current animation frame based on time delta for standard movement.
-     * @param {DOMHighResTimeStamp} timestamp
+     * Updates the current animation frame (for walking, jumping, etc.) based on how
+     * much time has passed since the last update (delta).
+     *
+     * @param {number} delta - Time elapsed in ms since the last update.
      */
-    updateAnimationFrame(timestamp) {
-        if (!this.lastFrameTime) this.lastFrameTime = timestamp;
-        const delta = timestamp - this.lastFrameTime;
-        const duration = this.calculateFrameDuration(this.speed);
-        if (delta >= duration) {
+    updateAnimationFrame(delta) {
+        // Accumulate time
+        this.lastFrameTimeAcc += delta;
+
+        // The “frameDuration” depends on movement speed
+        const requiredTime = this.calculateFrameDuration(this.speed);
+
+        // Only change the frame if enough time has passed
+        if (this.lastFrameTimeAcc >= requiredTime) {
             this.decideCurrentAnimation();
-            this.lastFrameTime = timestamp;
+            // Reset or reduce the accumulator
+            this.lastFrameTimeAcc = 0;
         }
     }
 
@@ -290,7 +305,8 @@ class Character extends MovableObject {
             this.takeDamage(20);
         } else if (!this.isInvulnerable && this.isAboveGround()) {
             this.playAnimation(this.IMAGES_JUMPING);
-        } else if (!this.isInvulnerable && (this.world.keyboard.LEFT || this.world.keyboard.RIGHT)) {
+        } else if (!this.isInvulnerable &&
+            (this.world.keyboard.LEFT || this.world.keyboard.RIGHT)) {
             this.playAnimation(this.IMAGES_WALKING);
         }
     }
@@ -327,8 +343,7 @@ class Character extends MovableObject {
     }
 
     /**
-     * Replaces requestAnimationFrame-based logic with setInterval for frame-based animations
-     * (e.g., for hurt or dead animations).
+     * Uses setInterval for special one-off animations (hurt, dead, etc.).
      *
      * @param {string[]} frames - Array of image URLs
      * @param {number} frameDuration - Time between frames in milliseconds
@@ -336,15 +351,11 @@ class Character extends MovableObject {
      */
     _startAnimation(frames, frameDuration, onComplete) {
         let frameIndex = 0;
-
-        // Set up an interval to change frames
         const intervalId = setInterval(() => {
-            // If we still have frames to show, display the next one
             if (frameIndex < frames.length) {
                 this.img = this.imageCache[frames[frameIndex]];
                 frameIndex++;
             } else {
-                // No more frames; clear the interval and invoke the completion callback if any
                 clearInterval(intervalId);
                 onComplete?.();
             }
@@ -360,7 +371,6 @@ class Character extends MovableObject {
     gameOver() {
         this.stopAllSounds();
         this.gameover_sound.play();
-        // The dead animation also uses the interval approach:
         this._startAnimation(this.IMAGES_DEAD, 200, () => this._onGameOverComplete());
     }
 
