@@ -165,9 +165,8 @@ function handleTouchControlsVisibility() {
     const isGameRunning = world && world.character && world.character.canMove;
     touchControls.style.display = "none";
     warning.style.display = "none";
-    if (!isTouch) return;
-    if (!isGameRunning) {
-        if (!isLandscape) {
+    if (!isTouch || !isGameRunning) {
+        if (isTouch && !isLandscape) {
             warning.style.display = "flex";
         }
         return;
