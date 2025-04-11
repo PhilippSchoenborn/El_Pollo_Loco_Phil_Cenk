@@ -295,6 +295,10 @@ h2 {
     z-index: 999;
 }
 
+.modal-game-instructions h3 {
+    font-size: 24px;
+}
+
 .game-instructions-container,
 .legal-notice-container {
     padding: 10px;
