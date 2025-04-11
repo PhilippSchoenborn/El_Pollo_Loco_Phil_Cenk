@@ -266,6 +266,20 @@ function setupTouchControls() {
 }
 
 /**
+ * Disables context menu on all buttons to prevent long-press popups on mobile.
+ */
+/**
+ * Disables the context menu on all interactive UI elements to prevent long-press or right-click menus.
+ */
+function disableContextMenusOnAllButtons() {
+    document.querySelectorAll(
+        'button, img, a, .img-icon, .start-screen-icon, .pulse-icon, .legal-notice, .game-instructions'
+    ).forEach(el => {
+        el.addEventListener('contextmenu', e => e.preventDefault());
+    });
+}
+
+/**
  * Adds touch and mouse event listeners for a button.
  * @param {string} buttonId - ID of the button element.
  * @param {string} key - Key to toggle in the keyboard object.
@@ -291,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bindKeyEvents();
     setupTouchControls();
     checkOrientation();
-    updateFullscreenButtonVisibility()
+    updateFullscreenButtonVisibility();
     window.addEventListener("resize", () => {
         checkOrientation();
         updateFullscreenButtonVisibility();
@@ -300,6 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
         checkOrientation();
         updateFullscreenButtonVisibility();
     });
+    disableContextMenusOnAllButtons();
 });
 
 /**
