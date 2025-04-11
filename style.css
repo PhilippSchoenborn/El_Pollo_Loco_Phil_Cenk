@@ -391,8 +391,12 @@ h2 {
 }
 
 .touch-button {
+    color: white;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 10px 20px;
     font-size: 1em;
     border: none;
@@ -482,6 +486,7 @@ h2 {
     }
 
     .touch-controls {
+        height: auto;
         position: absolute;
         bottom: 0;
         width: 100%;
