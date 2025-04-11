@@ -187,6 +187,7 @@ class Character extends MovableObject {
      */
     jumpCharacter(time) {
         this.jump();
+        this.currentImage = 0;
         this.character_jump_sound.play();
         setTimeout(() => this.jump_sound.play(), 150);
         this.lastMovementTime = time;
