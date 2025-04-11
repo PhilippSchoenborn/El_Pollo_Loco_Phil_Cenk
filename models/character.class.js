@@ -7,8 +7,8 @@ class Character extends MovableObject {
     idleTimeThreshold = 5000;
     idleAnimationFrameCounter = 0;
     longIdleFrameCounter = 0;
-    idleAnimationSpeed = 40;
-    longIdleAnimationSpeed = 40;
+    idleAnimationSpeed = 20;
+    longIdleAnimationSpeed = 20;
     snoringSoundPlaying = false;
     health = 100;
     dead = false;
