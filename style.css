@@ -448,6 +448,12 @@ h2 {
     }
 }
 
+@media (max-width: 768px) and (pointer: coarse) {
+    #fullscreen-button {
+        display: none !important;
+    }
+}
+
 @media (max-width: 768px) {
 
     html,

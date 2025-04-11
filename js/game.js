@@ -78,6 +78,7 @@ function startGame() {
     window.addEventListener("resize", checkOrientation);
     window.addEventListener("orientationchange", checkOrientation);
     keyboard = new Keyboard();
+    updateFullscreenButtonVisibility()
     setupTouchControls();
     bindKeyEvents();
     world = new World(canvas, keyboard);
@@ -223,6 +224,7 @@ function reloadGame() {
     document.getElementById('winScreen').classList.add('hidden');
     document.getElementById('touchControls').style.display = 'none';
     document.querySelector('.retry-btn').classList.add('hidden');
+    updateFullscreenButtonVisibility()
     setupTouchControls();
     checkOrientation();
 }
@@ -289,6 +291,15 @@ document.addEventListener('DOMContentLoaded', () => {
     bindKeyEvents();
     setupTouchControls();
     checkOrientation();
+    updateFullscreenButtonVisibility()
+    window.addEventListener("resize", () => {
+        checkOrientation();
+        updateFullscreenButtonVisibility();
+    });
+    window.addEventListener("orientationchange", () => {
+        checkOrientation();
+        updateFullscreenButtonVisibility();
+    });
 });
 
 /**
@@ -379,6 +390,7 @@ function retryGame() {
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         keyboard = new Keyboard();
+        updateFullscreenButtonVisibility()
         setupTouchControls();
         bindKeyEvents();
         world = new World(canvas, keyboard);
@@ -401,3 +413,19 @@ function retryGame() {
         }, 2000);
     }
 }
+
+/**
+ * Hides the fullscreen button on mobile devices (phones only).
+ */
+/**
+ * Updates the fullscreen button visibility based on device type and screen width.
+ * Hides it on phones (<=768px and touch-enabled), shows it otherwise.
+ */
+function updateFullscreenButtonVisibility() {
+    const fullscreenButton = document.getElementById('fullscreen-button');
+    if (!fullscreenButton) return;
+
+    const isPhone = window.innerWidth <= 768 && isTouchDevice();
+    fullscreenButton.style.display = isPhone ? 'none' : 'inline';
+}
+
