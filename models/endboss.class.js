@@ -148,17 +148,27 @@ class Endboss extends MovableObject {
     this.currentState = 'alert';
     this.roosterCry.currentTime = 0;
     this.roosterCry.play();
-    setTimeout(() => {
-      this.roosterCry.currentTime = 0;
-      this.roosterCry.play();
-      setTimeout(() => {
+    let phaseStartTime = performance.now();
+    let phase = 1;
+    const alertLoop = (now) => {
+      const elapsed = now - phaseStartTime;
+      if (phase === 1 && elapsed >= 2000) {
+        this.roosterCry.currentTime = 0;
+        this.roosterCry.play();
+        phase = 2;
+        phaseStartTime = now;
+      }
+      if (phase === 2 && elapsed >= 800) {
         this.currentState = 'chase';
         this.canTakeDamage = true;
         this.statusBar.setPercentage(100);
         world.startBossMusic();
         world.unfreezePlayer();
-      }, 800);
-    }, 2000);
+        return;
+      }
+      requestAnimationFrame(alertLoop);
+    };
+    requestAnimationFrame(alertLoop);
   }
 
   /**
