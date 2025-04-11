@@ -3,95 +3,94 @@
  * This object can load and display an image, and optionally draw a border around itself.
  */
 class DrawableObject {
-    /**
-     * Creates an instance of a drawable object with default properties for position, size, and image handling.
-     */
     constructor() {
-        Object.assign(this, { x: 120, y: 210, height: 90, width: 175, img: null, imageCache: {}, currentImage: 0 });
+        this.x = 120;
+        this.y = 210;
+        this.height = 90;
+        this.width = 175;
+        this.img = null;
+        this.imageCache = {};
+        this.currentImage = 0;
     }
 
     /**
      * Loads an image from the specified path and assigns it to the object's `img` property.
-     * 
      * @param {string} path - The path to the image file.
      */
-    loadImage = (path) => (this.img = new Image(), this.img.src = path);
-
-    /**
-     * Loads multiple images and stores them in the `imageCache` object, with each path as a key.
-     * Each image is created and its source is set based on the paths provided in the array.
-     * 
-     * @param {string[]} arr - An array of image file paths to load.
-     */
-    loadImages = (arr) => arr.forEach(path => this.imageCache[path] = Object.assign(new Image(), { src: path }));
-
-    /**
-     * Draws the current image of the object onto the specified canvas context at the object's position and size.
-     * 
-     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context to draw on.
-     */
-    draw(ctx) {
-        this.img && ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+    loadImage(path) {
+        this.img = new Image();
+        this.img.src = path;
     }
 
     /**
-     * Draws a border around the object if it is an instance of certain classes (Character, Chicken, Chick, Endboss, CollectableCoins, CollectableBottle).
-     * The border is drawn using a green stroke with a line width of 2.
-     * 
-     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context to draw the frame on.
+     * Loads multiple images and stores them in the `imageCache` object.
+     * @param {string[]} arr - An array of image paths.
+     */
+    loadImages(arr) {
+        arr.forEach(path => {
+            const img = new Image();
+            img.src = path;
+            this.imageCache[path] = img;
+        });
+    }
+
+    /**
+     * Draws the object's current image to the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
+    draw(ctx) {
+        if (this.img) {
+            ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+        }
+    }
+
+    /**
+     * Draws a green border around the object's hitbox (for debugging).
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      */
     drawFrame(ctx) {
-        let x, y, width, height;
-        if (this.hitbox) {
-            x = this.x + this.hitbox.offsetX;
-            y = this.y + this.hitbox.offsetY;
-            width = this.hitbox.width;
-            height = this.hitbox.height;
-        } else if (this.hitboxOffsetX !== undefined) {
-            x = this.x + this.hitboxOffsetX;
-            y = this.y + this.hitboxOffsetY;
-            width = this.hitboxWidth || this.width;
-            height = this.hitboxHeight || this.height;
-        } else {
-            x = this.x;
-            y = this.y;
-            width = this.width;
-            height = this.height;
-        }
+        const { x, y, width, height } = this.getHitboxDimensions();
         ctx.strokeStyle = 'green';
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, width, height);
     }
 
     /**
-     * Draws the hitbox of the object onto the given canvas context.
-     * 
-     * This method checks if a custom hitbox is defined (either via a `hitbox` object
-     * or individual offset/size properties) and draws a red rectangle representing it.
-     * If no hitbox data is available, it falls back to the object's position and dimensions.
-     *
-     * @param {CanvasRenderingContext2D} ctx - The 2D drawing context of a canvas where the hitbox will be drawn.
+     * Draws a red hitbox outline around the object (for debugging).
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      */
     drawHitbox(ctx) {
-        let x, y, width, height;
-        if (this.hitbox) {
-            x = this.x + this.hitbox.offsetX;
-            y = this.y + this.hitbox.offsetY;
-            width = this.hitbox.width;
-            height = this.hitbox.height;
-        } else if (this.hitboxOffsetX !== undefined) {
-            x = this.x + this.hitboxOffsetX;
-            y = this.y + this.hitboxOffsetY;
-            width = this.hitboxWidth || this.width;
-            height = this.hitboxHeight || this.height;
-        } else {
-            x = this.x;
-            y = this.y;
-            width = this.width;
-            height = this.height;
-        }
+        const { x, y, width, height } = this.getHitboxDimensions();
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, width, height);
+    }
+
+    /**
+     * Returns the object's current hitbox dimensions, taking into account any offsets.
+     * @returns {{ x: number, y: number, width: number, height: number }}
+     */
+    getHitboxDimensions() {
+        if (this.hitbox) {
+            return {
+                x: this.x + this.hitbox.offsetX,
+                y: this.y + this.hitbox.offsetY,
+                width: this.hitbox.width,
+                height: this.hitbox.height,
+            };
+        } else if (this.hitboxOffsetX !== undefined) {
+            return {
+                x: this.x + this.hitboxOffsetX,
+                y: this.y + this.hitboxOffsetY,
+                width: this.hitboxWidth || this.width,
+                height: this.hitboxHeight || this.height,
+            };
+        }
+        return {
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height,
+        };
     }
 }
