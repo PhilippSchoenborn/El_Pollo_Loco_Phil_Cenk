@@ -49,21 +49,19 @@ class Cloud extends MovableObject {
     }
 
     /**
-     * Draws the cloud segments in a seamless loop.
-     * Uses modulo arithmetic to avoid visual snapping.
-     *
-     * @param {CanvasRenderingContext2D} ctx - The canvas 2D rendering context.
+    * Draws cloud segments continuously moving left without snapping or looping back.
+    * @param {CanvasRenderingContext2D} ctx - The canvas 2D rendering context.
      */
     draw(ctx) {
-        let offsetX = this.x % this.width;
-        if (offsetX > 0) {
-            offsetX -= this.width;
-        }
         for (let i = 0; i < this.segments; i++) {
             const imgIndex = i % this.images.length;
             const image = this.imageCache[this.images[imgIndex]];
-            const drawX = offsetX + i * this.width;
+            const drawX = this.x + i * this.width;
             ctx.drawImage(image, drawX, this.y, this.width, this.height);
+        }
+        const totalScrollWidth = this.width * this.segments;
+        if (this.x <= -totalScrollWidth) {
+            this.x = 0;
         }
     }
 }
