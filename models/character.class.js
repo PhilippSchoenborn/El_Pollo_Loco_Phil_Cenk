@@ -200,7 +200,8 @@ class Character extends MovableObject {
     /** Chooses appropriate animation based on state. */
     decideCurrentAnimation() {
         if (this.isDead()) return this.gameOver();
-        if (this.isAnimatingHurt) return; // blockiere alles andere
+        if (this.shouldTakeDamage()) return this.takeDamage(20);
+        if (this.isAnimatingHurt) return;
         if (this.shouldTakeDamage()) return this.takeDamage(20);
         if (this.shouldJump()) return this.playAnimation(this.IMAGES_JUMPING);
         if (this.shouldWalk()) return this.playAnimation(this.IMAGES_WALKING);
