@@ -374,3 +374,5 @@ function addControlEvents(buttonId, key) {
     button.addEventListener("mousedown", activate);
     button.addEventListener("mouseup", deactivate);
 }
+
+setupEventListeners();
