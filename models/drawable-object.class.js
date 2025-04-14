@@ -1,7 +1,7 @@
 /**
  * Represents a drawable object with properties for position, size, and image handling.
- * This object can load and display an image, and optionally draw a border around itself.
- */
+* This object can load and display an image, and optionally draw a border around itself.
+*/
 class DrawableObject {
     constructor() {
         this.x = 120;
@@ -66,40 +66,55 @@ class DrawableObject {
         ctx.strokeRect(x, y, width, height);
     }
 
-/**
- * Returns the object's current hitbox dimensions, taking into account any offsets.
- * @returns {{ x: number, y: number, width: number, height: number }}
- */
-getHitboxDimensions() {
-    if (this.hitbox) return getFromHitbox.call(this);
-    if (this.hitboxOffsetX !== undefined) return getFromOffsets.call(this);
-    return getDefaultHitbox.call(this);
-}
+    /**
+     * Returns the object's current hitbox dimensions, taking into account any offsets.
+     * @returns {{ x: number, y: number, width: number, height: number }}
+     */
+    getHitboxDimensions() {
+        if (this.hitbox) return getFromHitbox.call(this);
+        if (this.hitboxOffsetX !== undefined) return getFromOffsets.call(this);
+        return getDefaultHitbox.call(this);
+    }
 
-getFromHitbox() {
-    return {
-        x: this.x + this.hitbox.offsetX,
-        y: this.y + this.hitbox.offsetY,
-        width: this.hitbox.width,
-        height: this.hitbox.height,
-    };
-}
+    /**
+     * Returns the hitbox position and dimensions based on the internal `hitbox` object.
+    * @returns {{x: number, y: number, width: number, height: number}} The calculated hitbox rectangle.
+    */
+    getFromHitbox() {
+        return {
+            x: this.x + this.hitbox.offsetX,
+            y: this.y + this.hitbox.offsetY,
+            width: this.hitbox.width,
+            height: this.hitbox.height,
+        };
+    }
 
-getFromOffsets() {
-    return {
-        x: this.x + this.hitboxOffsetX,
-        y: this.y + this.hitboxOffsetY,
-        width: this.hitboxWidth || this.width,
-        height: this.hitboxHeight || this.height,
-    };
-}
+    /**
+     * Returns the hitbox position and dimensions using individual offset and dimension properties.
+     * Useful if hitbox data is stored directly on the object rather than in a `hitbox` object.
+     * 
+     * @returns {{x: number, y: number, width: number, height: number}} The calculated hitbox rectangle with optional fallbacks.
+     */
+    getFromOffsets() {
+        return {
+            x: this.x + this.hitboxOffsetX,
+            y: this.y + this.hitboxOffsetY,
+            width: this.hitboxWidth || this.width,
+            height: this.hitboxHeight || this.height,
+        };
+    }
 
-getDefaultHitbox() {
-    return {
-        x: this.x,
-        y: this.y,
-        width: this.width,
-        height: this.height,
-    };
-}
+    /**
+     * Returns the default hitbox using the object's position and dimensions.
+     * 
+     * @returns {{x: number, y: number, width: number, height: number}} A basic rectangle matching the object’s bounds.
+     */
+    getDefaultHitbox() {
+        return {
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height,
+        };
+    }
 }
