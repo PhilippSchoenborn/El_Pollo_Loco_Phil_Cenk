@@ -52,7 +52,6 @@ function setupLegalNoticeOverlay() {
         e.preventDefault();
         showOverlay('openLegalNotice');
     });
-
     document.getElementById('openLegalNotice').addEventListener('click', (e) => {
         const container = document.querySelector('.legal-notice-container');
         if (!container.contains(e.target)) closeLegalNotice();
@@ -65,7 +64,6 @@ function setupGameInstructionsOverlay() {
         e.preventDefault();
         showOverlay('gameInstructions');
     });
-
     document.getElementById('gameInstructions').addEventListener('click', (e) => {
         const container = document.querySelector('.game-instructions-container');
         if (!container.contains(e.target)) closeGameInstructions();

@@ -78,34 +78,62 @@ class Endboss extends MovableObject {
     this.initBehaviorLoop();
   }
 
+
   /**
-   * Replaces the old requestAnimationFrame logic.
-   * We run one setInterval (~60 fps) that:
-   *   1) Updates movement logic (chase, etc.)
-   *   2) Plays frames for walk or alert animations
-   *   3) Stops if the boss is dead
+   * Processes a single frame of the behavior loop.
+   * Updates time accumulators and plays animations when their intervals are reached.
+   * @param {Object} lastTimeHolder - An object that holds the last frame's timestamp.
+   * @param {number} lastTimeHolder.lastTime - The timestamp (in ms) of the last processed frame.
+   * @param {Object} accumulators - An object holding accumulators for each animation type.
+   * @param {number} accumulators.walk - Accumulator for walk-related animations.
+   * @param {number} accumulators.alert - Accumulator for alert-related animations.
+   * @param {Object} intervals - An object specifying the time intervals for animations.
+   * @param {number} intervals.walk - The time interval (in ms) for walk animations.
+   * @param {number} intervals.alert - The time interval (in ms) for alert animations.
+   */
+  processBehaviorFrame(lastTimeHolder, accumulators, intervals) {
+    if (this.currentState === 'dead') {
+      clearInterval(this.behaviorInterval);
+      return;
+    }
+    const now = Date.now();
+    const delta = now - lastTimeHolder.lastTime;
+    lastTimeHolder.lastTime = now;
+    if (this.currentState === 'chase') this.chasePlayer();
+    accumulators.walk = this.updateAnimation('entrance', accumulators.walk, intervals.walk, this.walkImages, delta);
+    accumulators.alert = this.updateAnimation('alert', accumulators.alert, intervals.alert, this.alertImages, delta);
+    accumulators.walk = this.updateAnimation('chase', accumulators.walk, intervals.walk, this.walkImages, delta);
+  }
+
+  /**
+   * Initializes and starts the behavior loop.
+   * Sets up time holders, accumulators, and animation intervals, then processes frames at ~60 FPS.
    */
   initBehaviorLoop() {
-    let lastTime = Date.now();
-    let walkFrameAcc = 0, alertFrameAcc = 0;
-    const walkFrameInterval = 200, alertFrameInterval = 150;
+    const lastTimeHolder = { lastTime: Date.now() };
+    const accumulators = { walk: 0, alert: 0 };
+    const intervals = { walk: 200, alert: 150 };
     this.behaviorInterval = setInterval(() => {
-      if (this.currentState === 'dead') return clearInterval(this.behaviorInterval);
-      const delta = Date.now() - lastTime;
-      lastTime = Date.now();
-      if (this.currentState === 'chase') this.chasePlayer();
-      const handleAnimation = (state, acc, interval, images) => {
-        acc += delta;
-        if (this.currentState === state && acc >= interval) {
-          this.playAnimation(images);
-          return 0;
-        }
-        return acc;
-      };
-      walkFrameAcc = handleAnimation('entrance', walkFrameAcc, walkFrameInterval, this.walkImages);
-      alertFrameAcc = handleAnimation('alert', alertFrameAcc, alertFrameInterval, this.alertImages);
-      walkFrameAcc = handleAnimation('chase', walkFrameAcc, walkFrameInterval, this.walkImages);
+      this.processBehaviorFrame(lastTimeHolder, accumulators, intervals);
     }, 1000 / 60);
+  }
+
+  /**
+   * Updates the animation accumulator and triggers the animation if the specified interval is exceeded.
+   * @param {string} state - The state for which the animation should be processed.
+   * @param {number} acc - The current accumulator value for the animation.
+   * @param {number} interval - The interval (in ms) after which the animation should play.
+   * @param {Array} images - An array of images for the animation.
+   * @param {number} delta - The time (in ms) since the last update.
+   * @returns {number} - The updated accumulator value, reset to zero if the animation was played.
+   */
+  updateAnimation(state, acc, interval, images, delta) {
+    acc += delta;
+    if (this.currentState === state && acc >= interval) {
+      this.playAnimation(images);
+      return 0;
+    }
+    return acc;
   }
 
   /**
@@ -142,33 +170,76 @@ class Endboss extends MovableObject {
   }
 
   /**
-   * Plays rooster cry sounds and transitions to the chase phase.
+   * Initiates the alert phase of the boss encounter.
+   * Plays a rooster sound and starts the alert timing loop.
    */
   doAlertPhase() {
     this.currentState = 'alert';
+    this.playRoosterCry();
+    this.startAlertLoop();
+  }
+
+  /**
+   * Resets and plays the rooster cry audio.
+   */
+  playRoosterCry() {
     this.roosterCry.currentTime = 0;
     this.roosterCry.play();
+  }
+
+  /**
+   * Starts the loop that handles transitions between alert phases.
+   * Phase 1 lasts 2000ms, then plays another cry.
+   * Phase 2 lasts 800ms, then initiates the chase phase.
+   */
+  startAlertLoop() {
     let phaseStartTime = performance.now();
     let phase = 1;
     const alertLoop = (now) => {
       const elapsed = now - phaseStartTime;
-      if (phase === 1 && elapsed >= 2000) {
-        this.roosterCry.currentTime = 0;
-        this.roosterCry.play();
+      if (this.shouldTransitionToPhase2(phase, elapsed)) {
+        this.playRoosterCry();
         phase = 2;
         phaseStartTime = now;
-      }
-      if (phase === 2 && elapsed >= 800) {
-        this.currentState = 'chase';
-        this.canTakeDamage = true;
-        this.statusBar.setPercentage(100);
-        world.startBossMusic();
-        world.unfreezePlayer();
+      } else if (this.shouldTransitionToChase(phase, elapsed)) {
+        this.startChasePhase();
         return;
       }
       requestAnimationFrame(alertLoop);
     };
     requestAnimationFrame(alertLoop);
+  }
+
+  /**
+   * Determines whether the logic should transition from phase 1 to phase 2.
+   * @param {number} phase - The current phase number.
+   * @param {number} elapsed - Time elapsed since the current phase began, in milliseconds.
+   * @returns {boolean} True if transition to phase 2 should occur.
+   */
+  shouldTransitionToPhase2(phase, elapsed) {
+    return phase === 1 && elapsed >= 2000;
+  }
+
+  /**
+   * Determines whether the logic should transition from phase 2 to the chase phase.
+   * @param {number} phase - The current phase number.
+   * @param {number} elapsed - Time elapsed since the current phase began, in milliseconds.
+   * @returns {boolean} True if transition to chase phase should occur.
+   */
+  shouldTransitionToChase(phase, elapsed) {
+    return phase === 2 && elapsed >= 800;
+  }
+
+  /**
+   * Begins the chase phase of the boss fight.
+   * Enables damage, fills the status bar, plays boss music, and unfreezes the player.
+   */
+  startChasePhase() {
+    this.currentState = 'chase';
+    this.canTakeDamage = true;
+    this.statusBar.setPercentage(100);
+    world.startBossMusic();
+    world.unfreezePlayer();
   }
 
   /**

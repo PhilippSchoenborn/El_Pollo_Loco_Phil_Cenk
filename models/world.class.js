@@ -103,16 +103,13 @@ class World {
      */
     processEnemyCollision(enemy) {
         if (enemy.dead) return;
-
         const collided = this.character.isColliding(enemy);
         const canHit = !this.character.isInvulnerable;
-
         if (collided && canHit) {
             this.isStompingOn(enemy)
                 ? this.handleJumpOnEnemy(enemy)
                 : this.handleTouchEnemy(enemy);
         }
-
         this.handleThrowableCollision(enemy);
     }
 

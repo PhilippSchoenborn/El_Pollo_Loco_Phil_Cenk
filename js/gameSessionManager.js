@@ -5,10 +5,8 @@ let isRetrying = false;
 function retryGame() {
     if (isRetrying) return;
     isRetrying = true;
-
     const retryBtn = document.querySelector('.retry-btn');
     disableRetryButton(retryBtn);
-
     try {
         resetGameState();
     } catch (error) {

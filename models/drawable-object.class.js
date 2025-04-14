@@ -66,31 +66,40 @@ class DrawableObject {
         ctx.strokeRect(x, y, width, height);
     }
 
-    /**
-     * Returns the object's current hitbox dimensions, taking into account any offsets.
-     * @returns {{ x: number, y: number, width: number, height: number }}
-     */
-    getHitboxDimensions() {
-        if (this.hitbox) {
-            return {
-                x: this.x + this.hitbox.offsetX,
-                y: this.y + this.hitbox.offsetY,
-                width: this.hitbox.width,
-                height: this.hitbox.height,
-            };
-        } else if (this.hitboxOffsetX !== undefined) {
-            return {
-                x: this.x + this.hitboxOffsetX,
-                y: this.y + this.hitboxOffsetY,
-                width: this.hitboxWidth || this.width,
-                height: this.hitboxHeight || this.height,
-            };
-        }
-        return {
-            x: this.x,
-            y: this.y,
-            width: this.width,
-            height: this.height,
-        };
-    }
+/**
+ * Returns the object's current hitbox dimensions, taking into account any offsets.
+ * @returns {{ x: number, y: number, width: number, height: number }}
+ */
+getHitboxDimensions() {
+    if (this.hitbox) return getFromHitbox.call(this);
+    if (this.hitboxOffsetX !== undefined) return getFromOffsets.call(this);
+    return getDefaultHitbox.call(this);
+}
+
+getFromHitbox() {
+    return {
+        x: this.x + this.hitbox.offsetX,
+        y: this.y + this.hitbox.offsetY,
+        width: this.hitbox.width,
+        height: this.hitbox.height,
+    };
+}
+
+getFromOffsets() {
+    return {
+        x: this.x + this.hitboxOffsetX,
+        y: this.y + this.hitboxOffsetY,
+        width: this.hitboxWidth || this.width,
+        height: this.hitboxHeight || this.height,
+    };
+}
+
+getDefaultHitbox() {
+    return {
+        x: this.x,
+        y: this.y,
+        width: this.width,
+        height: this.height,
+    };
+}
 }
