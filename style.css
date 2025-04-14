@@ -314,7 +314,7 @@ h2 {
 }
 
 .modal-inner-container {
-display: flex;
+    display: flex;
 }
 
 .game-instructions-container::-webkit-scrollbar,
@@ -439,6 +439,14 @@ display: flex;
 }
 
 @media (max-width: 1024px) {
+    #fullscreen-button {
+        display: none !important;
+    }
+
+    #loadingImage {
+        object-fit: fill !important;
+    }
+
     .canvas-container {
         width: 100vw !important;
         height: 100vh !important;

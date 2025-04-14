@@ -100,13 +100,20 @@ class World {
     }
 
     /** Handles logic for touching or jumping on an enemy. */
+    // Example pseudo-code modification
     processEnemyCollision(enemy) {
         if (enemy.dead) return;
         if (this.character.isColliding(enemy)) {
-            if (this.character.isInvulnerable) return;
-            this.isStompingOn(enemy)
-                ? this.handleJumpOnEnemy(enemy)
-                : this.handleTouchEnemy(enemy);
+            if (!enemy.hasHitPlayer) {
+                if (this.character.isInvulnerable) return;
+                enemy.hasHitPlayer = true;
+                if (this.isStompingOn(enemy))
+                    this.handleJumpOnEnemy(enemy);
+                else
+                    this.handleTouchEnemy(enemy);
+            }
+        } else {
+            enemy.hasHitPlayer = false;
         }
         this.handleThrowableCollision(enemy);
     }
