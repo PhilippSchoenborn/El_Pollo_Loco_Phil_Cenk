@@ -377,18 +377,17 @@ h2 {
 }
 
 .touch-controls {
-    position: absolute;
-    bottom: 15px;
-    left: 0;
-    width: 100%;
-    height: 45px;
-    display: none;
-    z-index: 5;
-    padding: 10px;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: space-between;
-    background: transparent;
+        display: none;
+        position: absolute;
+        bottom: 15px;
+        left: 0;
+        width: 100%;
+        height: 45px;
+        z-index: 5;
+        padding: 10px;
+        box-sizing: border-box;
+        justify-content: space-between;
+        background: transparent;
 }
 
 .left-controls,

@@ -1,4 +1,4 @@
-const DEBUG_MODE = false; // Set to true to display hitboxes, false to hide them.
+const DEBUG_MODE = false;
 
 let canvas;
 let world;
@@ -7,6 +7,7 @@ let isMuted = false;
 let modal;
 let handleKeyDown;
 let handleKeyUp;
+
 const keyMap = {
     ArrowRight: 'RIGHT',
     ArrowLeft: 'LEFT',
@@ -17,6 +18,9 @@ const keyMap = {
     D: 'D'
 };
 
+/**
+ * Initializes the game canvas and world.
+ */
 function init() {
     canvas = document.getElementById('canvas');
     world = new World(canvas, keyboard);
@@ -24,9 +28,9 @@ function init() {
 }
 
 /**
- * Updates the keyboard state based on event and state.
- * @param {KeyboardEvent} e - The key event.
- * @param {boolean} state - Whether the key is pressed or released.
+ * Updates the keyboard state based on key press/release.
+ * @param {KeyboardEvent} e 
+ * @param {boolean} state 
  */
 function setKeyboardState(e, state) {
     if (keyMap[e.key] !== undefined) {
@@ -34,7 +38,9 @@ function setKeyboardState(e, state) {
     }
 }
 
-/** Binds keydown and keyup events to window. */
+/**
+ * Binds keydown and keyup listeners for player input.
+ */
 function bindKeyEvents() {
     handleKeyDown = (e) => setKeyboardState(e, true);
     handleKeyUp = (e) => setKeyboardState(e, false);
@@ -42,18 +48,26 @@ function bindKeyEvents() {
     window.addEventListener('keyup', handleKeyUp);
 }
 
-/** Removes key event listeners from window. */
+/**
+ * Unbinds keydown and keyup listeners.
+ */
 function unbindKeyEvents() {
     if (handleKeyDown) window.removeEventListener('keydown', handleKeyDown);
     if (handleKeyUp) window.removeEventListener('keyup', handleKeyUp);
 }
 
+/**
+ * Toggles game audio mute state.
+ */
 function toggleMute() {
     isMuted = !isMuted;
     updateVolumeIcon();
     if (world) world.setMute(isMuted);
 }
 
+/**
+ * Updates volume icon based on mute state.
+ */
 function updateVolumeIcon() {
     const btn = document.getElementById('volume-button');
     btn.src = isMuted
@@ -61,7 +75,9 @@ function updateVolumeIcon() {
         : './img/10_interface_icons/volume.png';
 }
 
-/* Helper: Updates UI elements needed when starting the game */
+/**
+ * Updates UI for starting the game.
+ */
 function updateUIForGameStart() {
     document.getElementById('loadingImage').classList.add('hidden');
     const startIcon = document.querySelector('.start-screen-icon');
@@ -74,13 +90,17 @@ function updateUIForGameStart() {
     document.querySelector('.retry-btn').classList.remove('hidden');
 }
 
-/* Helper: Binds listeners for screen orientation changes */
+/**
+ * Adds screen orientation listeners.
+ */
 function initGameListeners() {
     window.addEventListener("resize", checkOrientation);
     window.addEventListener("orientationchange", checkOrientation);
 }
 
-/* Helper: Initializes and starts the world/game */
+/**
+ * Initializes game world and input handling.
+ */
 function initWorld() {
     keyboard = new Keyboard();
     updateFullscreenButtonVisibility();
@@ -94,19 +114,32 @@ function initWorld() {
     }
 }
 
-/** Starts the game and displays the main game screen. */
+/**
+ * Starts the game with UI setup, orientation check and world initialization.
+ */
 function startGame() {
     canvas = document.getElementById('canvas');
     updateUIForGameStart();
     initGameListeners();
     initWorld();
-    if (isTouchDevice()) {
-        handleTouchControlsVisibility();
-    }
+    if (isTouchDevice()) handleTouchControlsForGameStart();
     checkOrientation();
 }
 
-/* Helper: Gets the touch controls elements */
+/**
+ * Shows or hides touch controls and warnings on game start.
+ */
+function handleTouchControlsForGameStart() {
+    const { touchControls, warning } = getTouchElements();
+    const isLandscape = window.innerWidth > window.innerHeight;
+    touchControls.style.display = isLandscape ? "flex" : "none";
+    warning.style.display = !isLandscape ? "flex" : "none";
+}
+
+/**
+ * Gets DOM elements related to touch controls.
+ * @returns {{ touchControls: HTMLElement, warning: HTMLElement }}
+ */
 function getTouchElements() {
     return {
         touchControls: document.getElementById("touchControls"),
@@ -114,32 +147,45 @@ function getTouchElements() {
     };
 }
 
-/** Handles the visibility of touch controls based on orientation. */
+/**
+ * Checks screen orientation and updates touch control visibility.
+ */
 function handleTouchControlsVisibility() {
     const { touchControls, warning } = getTouchElements();
-    const isTouch = isTouchDevice();
+    const isTouch = isRealTouchDevice();
     const isLandscape = window.innerWidth > window.innerHeight;
     const isGameRunning = world && world.character && world.character.canMove;
-    touchControls.style.display = "none";
-    warning.style.display = "none";
+    touchControls.style.display = 'none';
+    warning.style.display = 'none';
+
     if (!isTouch || !isGameRunning) {
-        if (isTouch && !isLandscape) {
-            warning.style.display = "flex";
-        }
+        if (isTouch && !isLandscape) warning.style.display = 'flex';
         return;
     }
-    if (isLandscape) touchControls.style.display = "flex";
-    else warning.style.display = "flex";
+    touchControls.style.display = isLandscape ? 'flex' : 'none';
+    warning.style.display = !isLandscape ? 'flex' : 'none';
 }
 
 /**
- * Checks if the device supports touch input.
+ * helper functions for detecting touch Devices.
+ */
+function isRealTouchDevice() {
+    const ua = navigator.userAgent;
+    const isMobileUA = /Mobi|Android|iPhone|iPad|iPod|Tablet/i.test(ua);
+    return isMobileUA && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+}
+
+/**
+ * Detects if the current device is a touch device.
  * @returns {boolean}
  */
 function isTouchDevice() {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
 
+/**
+ * Clears and resets the game world state.
+ */
 function resetWorld() {
     if (world) {
         world.cleanUp?.();
@@ -150,6 +196,9 @@ function resetWorld() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+/**
+ * Resets all UI elements and interactions to pre-game state.
+ */
 function resetUIForReload() {
     unbindKeyEvents();
     document.getElementById('loadingImage').classList.remove('hidden');
@@ -165,6 +214,9 @@ function resetUIForReload() {
     document.querySelector('.retry-btn').classList.add('hidden');
 }
 
+/**
+ * Fully reloads the game environment and resets the UI.
+ */
 function reloadGame() {
     resetWorld();
     resetUIForReload();
@@ -173,6 +225,9 @@ function reloadGame() {
     checkOrientation();
 }
 
+/**
+ * Displays the Game Over screen and disables input.
+ */
 function gameOver() {
     document.getElementById('gameOverScreen').classList.remove('hidden');
     document.getElementById('tryAgainButton').classList.remove('hidden');
@@ -181,6 +236,9 @@ function gameOver() {
     world.updateCollectedCoinsDisplay();
 }
 
+/**
+ * Displays the win screen and stops character interaction.
+ */
 function win() {
     disableUserInput();
     if (world?.character) {
@@ -193,20 +251,29 @@ function win() {
     world.updateCollectedCoinsDisplay();
 }
 
+/**
+ * Disables all keyboard input.
+ */
 function disableUserInput() {
     unbindKeyEvents();
 }
 
+/**
+ * Shows the modal window.
+ */
 function openModal() {
     modal.classList.remove('hidden');
 }
 
+/**
+ * Hides the modal window.
+ */
 function closeModal() {
     modal.classList.add('hidden');
 }
 
 /**
- * Checks whether the browser is currently in fullscreen mode.
+ * Checks if the browser is currently in fullscreen mode.
  * @returns {boolean}
  */
 function isFullscreen() {
@@ -218,7 +285,7 @@ function isFullscreen() {
 
 /**
  * Requests fullscreen mode for a given element.
- * @param {HTMLElement} elem - The element to display in fullscreen.
+ * @param {HTMLElement} elem 
  */
 function requestFullscreen(elem) {
     (elem.requestFullscreen ||
@@ -227,6 +294,9 @@ function requestFullscreen(elem) {
         elem.msRequestFullscreen)?.call(elem);
 }
 
+/**
+ * Exits fullscreen mode.
+ */
 function exitFullscreen() {
     (document.exitFullscreen ||
         document.mozCancelFullScreen ||
@@ -235,7 +305,7 @@ function exitFullscreen() {
 }
 
 /**
- * Toggles fullscreen mode for the game container.
+ * Toggles fullscreen mode for the canvas container.
  */
 function toggleFullscreen() {
     const canvasContainer = document.querySelector('.canvas-container');
@@ -250,17 +320,23 @@ function closeLegalNotice() {
     document.body.classList.remove('no-scroll');
 }
 
+/**
+ * Closes the game instructions overlay.
+ */
 function closeGameInstructions() {
     document.getElementById('gameInstructions').classList.add('hidden');
     document.body.classList.remove('no-scroll');
 }
 
+/**
+ * Updates touch control visibility based on orientation.
+ */
 function checkOrientation() {
     handleTouchControlsVisibility();
 }
 
 /**
- * Sets up touch control event listeners.
+ * Sets up all control event listeners for touch buttons.
  */
 function setupTouchControls() {
     addControlEvents("btnLeft", "LEFT");
@@ -272,6 +348,9 @@ function setupTouchControls() {
     });
 }
 
+/**
+ * Prevents context menus on all interactive UI elements.
+ */
 function disableContextMenusOnAllButtons() {
     document.querySelectorAll(
         'button, img, a, .img-icon, .start-screen-icon, .pulse-icon, .legal-notice, .game-instructions'
@@ -281,9 +360,9 @@ function disableContextMenusOnAllButtons() {
 }
 
 /**
- * Adds touch and mouse event listeners for a button.
- * @param {string} buttonId - ID of the button element.
- * @param {string} key - Key to toggle in the keyboard object.
+ * Adds control logic to a touch or mouse button.
+ * @param {string} buttonId 
+ * @param {string} key 
  */
 function addControlEvents(buttonId, key) {
     const button = document.getElementById(buttonId);
@@ -294,134 +373,4 @@ function addControlEvents(buttonId, key) {
     button.addEventListener("touchend", deactivate);
     button.addEventListener("mousedown", activate);
     button.addEventListener("mouseup", deactivate);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    modal = document.getElementById('infoModal');
-    bindKeyEvents();
-    setupTouchControls();
-    checkOrientation();
-    updateFullscreenButtonVisibility();
-    window.addEventListener("resize", () => {
-        checkOrientation();
-        updateFullscreenButtonVisibility();
-    });
-    window.addEventListener("orientationchange", () => {
-        checkOrientation();
-        updateFullscreenButtonVisibility();
-    });
-    disableContextMenusOnAllButtons();
-});
-
-document.getElementById('infoModal').addEventListener('click', (e) => {
-    const container = document.querySelector('.info-modal-container');
-    if (!container.contains(e.target)) {
-        closeModal();
-    }
-});
-
-document.querySelector('.legal-notice-link').addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('openLegalNotice').classList.remove('hidden');
-    document.body.classList.add('no-scroll');
-});
-
-document.getElementById('openLegalNotice').addEventListener('click', (e) => {
-    if (!document.querySelector('.legal-notice-container').contains(e.target)) {
-        closeLegalNotice();
-    }
-});
-
-document.querySelector('.game-instructions-link').addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('gameInstructions').classList.remove('hidden');
-    document.body.classList.add('no-scroll');
-});
-
-document.getElementById('gameInstructions').addEventListener('click', (e) => {
-    if (!document.querySelector('.game-instructions-container').contains(e.target)) {
-        closeGameInstructions();
-    }
-});
-
-window.addEventListener("resize", () => {
-    checkOrientation();
-});
-
-window.addEventListener("orientationchange", () => {
-    checkOrientation();
-});
-
-function resetWorldForRetry() {
-    if (world) {
-        world.cleanUp?.();
-        world = null;
-    }
-    window.bossTriggered = false;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-function updateGameListenersForRetry() {
-    window.removeEventListener("resize", checkOrientation);
-    window.removeEventListener("orientationchange", checkOrientation);
-    window.addEventListener("resize", checkOrientation);
-    window.addEventListener("orientationchange", checkOrientation);
-}
-
-function restartWorld() {
-    keyboard = new Keyboard();
-    updateFullscreenButtonVisibility();
-    setupTouchControls();
-    bindKeyEvents();
-    world = new World(canvas, keyboard);
-    world.setMute(isMuted);
-    world.init();
-    if (world.character) {
-        world.character.canMove = true;
-    }
-}
-
-function updateUIAfterRetry() {
-    document.getElementById('gameOverScreen').classList.add('hidden');
-    document.getElementById('winScreen').classList.add('hidden');
-    document.getElementById('canvas').style.display = 'block';
-    handleTouchControlsVisibility();
-}
-
-/**
- * Restarts the game without going to the main menu.
- */
-let isRetrying = false;
-function retryGame() {
-    if (isRetrying) return;
-    isRetrying = true;
-    const retryBtn = document.querySelector('.retry-btn');
-    retryBtn.classList.add('disabled');
-    retryBtn.style.pointerEvents = 'none';
-    try {
-        resetWorldForRetry();
-        updateGameListenersForRetry();
-        restartWorld();
-        updateUIAfterRetry();
-    } catch (error) {
-        console.error("Error during retry:", error);
-    } finally {
-        setTimeout(() => {
-            isRetrying = false;
-            retryBtn.classList.remove('disabled');
-            retryBtn.style.pointerEvents = 'auto';
-        }, 2000);
-    }
-}
-
-/**
- * Updates the fullscreen button visibility based on device type and screen width.
- * Hides it on phones (<=768px and touch-enabled), shows it otherwise.
- */
-function updateFullscreenButtonVisibility() {
-    const fullscreenButton = document.getElementById('fullscreen-button');
-    if (!fullscreenButton) return;
-    const isPhone = window.innerWidth <= 768 && isTouchDevice();
-    fullscreenButton.style.display = isPhone ? 'none' : 'inline';
 }

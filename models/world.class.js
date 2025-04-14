@@ -104,17 +104,15 @@ class World {
     processEnemyCollision(enemy) {
         if (enemy.dead) return;
         if (this.character.isColliding(enemy)) {
-            if (!enemy.hasHitPlayer) {
-                if (this.character.isInvulnerable) return;
-                enemy.hasHitPlayer = true;
-                if (this.isStompingOn(enemy))
-                    this.handleJumpOnEnemy(enemy);
-                else
-                    this.handleTouchEnemy(enemy);
+            if (this.character.isInvulnerable) return;
+
+            if (this.isStompingOn(enemy)) {
+                this.handleJumpOnEnemy(enemy);
+            } else {
+                this.handleTouchEnemy(enemy);
             }
-        } else {
-            enemy.hasHitPlayer = false;
         }
+
         this.handleThrowableCollision(enemy);
     }
 
