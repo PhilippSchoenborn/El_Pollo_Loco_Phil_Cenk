@@ -39,8 +39,8 @@ class Character extends MovableObject {
     /** @type {HTMLAudioElement} */ win_sound = new Audio('audio/win.mp3');
 
     /**
-     * Creates the character and initializes sounds, images, and gravity.
-     * @param {StatusBar} statusBar - The status bar showing character health.
+     * Initializes the character.
+     * @param {StatusBar} statusBar
      */
     constructor(statusBar) {
         super().loadImage(this.IMAGES_WALKING[0]);
@@ -52,7 +52,7 @@ class Character extends MovableObject {
         this.animate();
     }
 
-    /** Loads all character images into cache. */
+    /** Loads character images into cache. */
     loadAllImages() {
         [
             this.IMAGES_WALKING,
@@ -64,7 +64,7 @@ class Character extends MovableObject {
         ].forEach(set => this.loadImages(set));
     }
 
-    /** Configures volume and settings for all sounds. */
+    /** Sets volume and loop settings for character sounds. */
     configureSounds() {
         this.walking_sound.volume = 0.15;
         this.jump_sound.volume = 0.3;
@@ -77,7 +77,7 @@ class Character extends MovableObject {
         this.win_sound.volume = 0.6;
     }
 
-    /** Sets the hitbox for collision detection. */
+    /** Sets the character hitbox. */
     setHitbox() {
         this.hitboxOffsetX = 20;
         this.hitboxOffsetY = 90;
@@ -85,7 +85,7 @@ class Character extends MovableObject {
         this.hitboxHeight = this.height - 100;
     }
 
-    /** Starts the character animation loop. */
+    /** Starts character animation loop. */
     animate() {
         let lastTime = Date.now();
         setInterval(() => {
@@ -100,7 +100,7 @@ class Character extends MovableObject {
         }, 1000 / 60);
     }
 
-    /** Handles movement and jumping based on keyboard input. */
+    /** Updates character movement and jump input. */
     updatePosition() {
         const keys = this.world.keyboard;
         const now = Date.now();
@@ -112,9 +112,9 @@ class Character extends MovableObject {
     }
 
     /**
-     * Moves the character left or right.
-     * @param {boolean} toRight - Direction to move.
-     * @param {number} time - Timestamp of movement.
+     * Moves the character.
+     * @param {boolean} toRight
+     * @param {number} time
      */
     moveCharacter(toRight, time) {
         toRight ? this.moveRight() : this.moveLeft();
@@ -124,7 +124,10 @@ class Character extends MovableObject {
         !this.isAboveGround() ? this.walking_sound.play() : this.stopWalkingSound();
     }
 
-    /** Makes the character jump and plays jump sounds. */
+    /**
+     * Handles character jump.
+     * @param {number} time
+     */
     jumpCharacter(time) {
         this.jump();
         this.currentImage = 0;
@@ -134,7 +137,7 @@ class Character extends MovableObject {
         this.stopSnoring();
     }
 
-    /** Stops the walking sound. */
+    /** Stops walking sound. */
     stopWalkingSound() {
         if (!this.walking_sound.paused) {
             this.walking_sound.pause();
@@ -142,7 +145,7 @@ class Character extends MovableObject {
         }
     }
 
-    /** Stops the snoring sound if playing. */
+    /** Stops snoring sound. */
     stopSnoring() {
         if (this.snoringSoundPlaying) {
             this.snoring_sound.pause();
@@ -151,7 +154,7 @@ class Character extends MovableObject {
         }
     }
 
-    /** Checks and plays idle or long idle animations. */
+    /** Checks idle time and plays appropriate animations. */
     handleIdleState() {
         const now = Date.now();
         if (!this.world.keyboard.LEFT && !this.world.keyboard.RIGHT && !this.isAboveGround()) {
@@ -161,7 +164,7 @@ class Character extends MovableObject {
 
     /**
      * Plays idle or long idle animations.
-     * @param {number} currentTime - The current timestamp.
+     * @param {number} currentTime
      */
     playIdleAnimations(currentTime) {
         const idleTooLong = currentTime - this.lastMovementTime >= this.idleTimeThreshold;
@@ -176,14 +179,14 @@ class Character extends MovableObject {
         }
     }
 
-    /** Updates the camera position based on character position. */
+    /** Updates camera to follow character. */
     updateCamera() {
         this.world.camera_x = -this.x + 100;
     }
 
     /**
-     * Updates the animation frame.
-     * @param {number} delta - Time elapsed since last update.
+     * Updates animation frames based on time delta.
+     * @param {number} delta
      */
     updateAnimationFrame(delta) {
         this.lastFrameTimeAcc += delta;
@@ -194,47 +197,55 @@ class Character extends MovableObject {
         }
     }
 
-    /** Decides which animation to play based on current state. */
+    /** Chooses appropriate animation based on state. */
     decideCurrentAnimation() {
         if (this.isDead()) return this.gameOver();
+        if (this.isAnimatingHurt) return; // blockiere alles andere
         if (this.shouldTakeDamage()) return this.takeDamage(20);
-        if (this.isAnimatingHurt) return this.playAnimation(this.IMAGES_HURT);
         if (this.shouldJump()) return this.playAnimation(this.IMAGES_JUMPING);
         if (this.shouldWalk()) return this.playAnimation(this.IMAGES_WALKING);
     }
 
-    /** @returns {boolean} Whether the character should take damage. */
+    /** @returns {boolean} Whether character should take damage */
     shouldTakeDamage() {
         return !this.isInvulnerable && this.isHurt();
     }
 
-    /** @returns {boolean} Whether the character should play jumping animation. */
+    /** @returns {boolean} Whether jump animation should play */
     shouldJump() {
         return !this.isInvulnerable && this.isAboveGround();
     }
 
-    /** @returns {boolean} Whether the character should play walking animation. */
+    /** @returns {boolean} Whether walking animation should play */
     shouldWalk() {
         return !this.isInvulnerable && (this.world.keyboard.LEFT || this.world.keyboard.RIGHT);
     }
 
     /**
-     * Applies damage to the character.
-     * @param {number} amount - The amount of damage to take.
+     * Applies damage to character.
+     * @param {number} amount
      */
     takeDamage(amount) {
-        if (this.isInvulnerable || this.dead || this.isAnimatingHurt) return;
+        if (this.isInvulnerable || this.dead) return;
         this.health = Math.max(this.health - amount, 0);
         this.statusBar?.setPercentage(this.health);
         if (this.health === 0 && !this.dead) return this.gameOver();
-        this.isInvulnerable = true;
-        setTimeout(() => this.isInvulnerable = false, 1000);
+        this.setTemporaryInvulnerability(1000);
         this.playHurtAnimation();
         this.character_hurt_sound.play();
-        this.wakeUp();
+        this.wakeUp(true);
     }
 
-    /** Plays hurt animation once and prevents overlap. */
+    /**
+     * Enables temporary invulnerability.
+     * @param {number} duration
+     */
+    setTemporaryInvulnerability(duration) {
+        this.isInvulnerable = true;
+        setTimeout(() => this.isInvulnerable = false, duration);
+    }
+
+    /** Plays hurt animation and sets hurt state. */
     playHurtAnimation() {
         if (this.isAnimatingHurt) return;
         this.isAnimatingHurt = true;
@@ -242,10 +253,10 @@ class Character extends MovableObject {
     }
 
     /**
-     * Starts a temporary animation from a set of frames.
-     * @param {string[]} frames - Array of image paths.
-     * @param {number} frameDuration - Duration per frame in ms.
-     * @param {Function} [onComplete] - Callback after animation finishes.
+     * Plays animation from frame set with optional callback.
+     * @param {string[]} frames
+     * @param {number} frameDuration
+     * @param {Function} [onComplete]
      */
     _startAnimation(frames, frameDuration, onComplete) {
         let frameIndex = 0;
@@ -259,14 +270,16 @@ class Character extends MovableObject {
         }, frameDuration);
     }
 
-    /** @returns {boolean} Whether the character is dead. */
+    /** @returns {boolean} Whether character is dead */
     isDead() {
         return this.health <= 0;
     }
 
-    /** Handles character death and triggers game over sequence. */
+    /** Triggers game over logic. */
     gameOver() {
         this.dead = true;
+        this.isInvulnerable = false;
+        this.isAnimatingHurt = false;
         this.stopAllSounds();
         this.gameover_sound.play();
         this._startAnimation(this.IMAGES_DEAD, 200, () => {
@@ -277,17 +290,21 @@ class Character extends MovableObject {
         });
     }
 
-    /** Wakes the character up from idle. */
-    wakeUp() {
+    /**
+     * Wakes up character from idle/sleep state.
+     * @param {boolean} fromDamage
+     */
+    wakeUp(fromDamage = false) {
         if (this.snoringSoundPlaying) {
             this.stopSnoring();
             this.lastMovementTime = Date.now();
             this.longIdleFrameCounter = 0;
             this.idleAnimationFrameCounter = 0;
         }
+        if (fromDamage) return;
     }
 
-    /** Stops all character-related sounds. */
+    /** Stops all active sounds. */
     stopAllSounds() {
         [
             this.walking_sound,
@@ -308,8 +325,8 @@ class Character extends MovableObject {
     }
 
     /**
-     * Mutes or unmutes all character sounds.
-     * @param {boolean} muted - True to mute, false to unmute.
+     * Toggles mute for all character sounds.
+     * @param {boolean} muted
      */
     setMute(muted) {
         [
@@ -325,8 +342,8 @@ class Character extends MovableObject {
     }
 
     /**
-     * Checks whether the character is above another object.
-     * @param {MovableObject} other - The object to compare.
+     * Checks if character is above another object.
+     * @param {MovableObject} other
      * @returns {boolean}
      */
     isAbove(other) {

@@ -1,54 +1,69 @@
-/**
- * Tracks whether the game is currently retrying.
- * Prevents double-initialization on rapid button presses.
- * @type {boolean}
- */
+/** Tracks if the game is currently retrying to prevent double-starts. */
 let isRetrying = false;
 
-/**
- * Fully restarts the game from a Game Over or Win state.
- * Resets world, listeners, UI, and re-initializes the game.
- */
+/** Retry the game after Game Over or Win. */
 function retryGame() {
     if (isRetrying) return;
     isRetrying = true;
 
     const retryBtn = document.querySelector('.retry-btn');
-    retryBtn.classList.add('disabled');
-    retryBtn.style.pointerEvents = 'none';
+    disableRetryButton(retryBtn);
 
     try {
-        resetWorldForRetry();
-        updateGameListenersForRetry();
-        restartWorld();
-        updateUIAfterRetry();
+        resetGameState();
     } catch (error) {
         console.error("Error during retry:", error);
     } finally {
-        setTimeout(() => {
-            isRetrying = false;
-            retryBtn.classList.remove('disabled');
-            retryBtn.style.pointerEvents = 'auto';
-        }, 2000);
+        reenableRetryButton(retryBtn);
     }
 }
 
 /**
- * Clears the current world, resets canvas, and removes boss state.
+ * Disables the retry button to avoid spamming.
+ * @param {HTMLElement} btn
  */
+function disableRetryButton(btn) {
+    btn.classList.add('disabled');
+    btn.style.pointerEvents = 'none';
+}
+
+/**
+ * Re-enables retry button after a delay.
+ * @param {HTMLElement} btn
+ */
+function reenableRetryButton(btn) {
+    setTimeout(() => {
+        isRetrying = false;
+        btn.classList.remove('disabled');
+        btn.style.pointerEvents = 'auto';
+    }, 2000);
+}
+
+/** Resets game objects, world state, UI, and listeners. */
+function resetGameState() {
+    resetWorldForRetry();
+    resetBossFlagAndCanvas();
+    updateGameListenersForRetry();
+    restartWorld();
+    updateUIAfterRetry();
+}
+
+/** Clean up current world instance. */
 function resetWorldForRetry() {
     if (world) {
         world.cleanUp?.();
         world = null;
     }
+}
+
+/** Reset canvas and global boss trigger. */
+function resetBossFlagAndCanvas() {
     window.bossTriggered = false;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-/**
- * Removes and re-adds orientation listeners during retry to ensure proper layout.
- */
+/** Reset orientation listeners for layout consistency. */
 function updateGameListenersForRetry() {
     window.removeEventListener("resize", checkOrientation);
     window.removeEventListener("orientationchange", checkOrientation);
@@ -56,28 +71,40 @@ function updateGameListenersForRetry() {
     window.addEventListener("orientationchange", checkOrientation);
 }
 
-/**
- * Reinitializes keyboard, UI, and game world during a retry.
- */
+/** Reinitialize input, UI, and world. */
 function restartWorld() {
     keyboard = new Keyboard();
     updateFullscreenButtonVisibility();
     setupTouchControls();
     bindKeyEvents();
+    createAndInitWorld();
+}
+
+/** Create a new World instance and initialize it. */
+function createAndInitWorld() {
     world = new World(canvas, keyboard);
     world.setMute(isMuted);
     world.init();
-    if (world.character) {
-        world.character.canMove = true;
-    }
+    world.character && (world.character.canMove = true);
+}
+
+/** Show game canvas and hide end screens. */
+function updateUIAfterRetry() {
+    hideElement('gameOverScreen');
+    hideElement('winScreen');
+    showCanvas();
+    handleTouchControlsVisibility();
 }
 
 /**
- * Resets and displays the main game UI after retrying.
+ * Hide a screen by ID.
+ * @param {string} id
  */
-function updateUIAfterRetry() {
-    document.getElementById('gameOverScreen').classList.add('hidden');
-    document.getElementById('winScreen').classList.add('hidden');
+function hideElement(id) {
+    document.getElementById(id).classList.add('hidden');
+}
+
+/** Show the main canvas again. */
+function showCanvas() {
     document.getElementById('canvas').style.display = 'block';
-    handleTouchControlsVisibility();
 }
