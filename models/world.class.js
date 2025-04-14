@@ -1,6 +1,4 @@
-/**
- * Handles the entire game world: rendering, logic, objects, collisions, and audio.
- */
+/** Manages the game world: rendering, updates, collisions, sound. */
 class World {
     canvas;
     ctx;
@@ -31,10 +29,7 @@ class World {
     throwCooldown = 1000;
     collectedCoinsCount = 0;
 
-    /**
-     * @param {HTMLCanvasElement} canvas - Game canvas.
-     * @param {Object} keyboard - Keyboard input handler.
-     */
+    /** Init game world. */
     constructor(canvas, keyboard) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
@@ -46,7 +41,7 @@ class World {
         this.endboss = new Endboss(3400);
     }
 
-    /** Initializes enemies, sounds, coins, bottles, and starts game loops. */
+    /** Setup and start game elements. */
     init() {
         this.level.enemies.forEach(e => e.initMovement?.());
         this.initSounds();
@@ -57,7 +52,7 @@ class World {
         this.spawnBottles();
     }
 
-    /** Configures volume and looping for all game sounds. */
+    /** Configure game audio. */
     initSounds() {
         this.soundtrack_sound.loop = true;
         this.soundtrack_sound.volume = 0.05;
@@ -67,7 +62,10 @@ class World {
         this.pickup_bottle_sound.volume = 0.5;
     }
 
-    /** Mutes or unmutes all sounds. */
+    /**
+     * Mute/unmute all game sounds.
+     * @param {boolean} muted
+     */
     setMute(muted) {
         [this.soundtrack_sound, this.coin_sound, this.pickup_bottle_sound, this.bossMusic].forEach(
             s => (s.muted = muted)
@@ -77,7 +75,7 @@ class World {
         this.character.setMute(muted);
     }
 
-    /** Main collision loop. */
+    /** Start main collision loop. */
     run() {
         setInterval(() => {
             if (!this.gamePaused) {
@@ -87,42 +85,50 @@ class World {
         }, this.COLLISION_CHECK_INTERVAL);
     }
 
-    /** Runs all collision checks. */
+    /** Check all game collisions. */
     checkCollisions() {
         this.handleEnemyCollisions();
         this.handleCoinCollisions();
         this.handleBottleCollisions();
     }
 
-    /** Checks character vs enemy collisions. */
+    /** Handle collisions between player and enemies. */
     handleEnemyCollisions() {
         this.level.enemies.forEach(enemy => this.processEnemyCollision(enemy));
     }
 
-    /** Handles logic for touching or jumping on an enemy. */
-    // Example pseudo-code modification
+    /**
+     * Manage logic when colliding with enemy.
+     * @param {Enemy} enemy
+     */
     processEnemyCollision(enemy) {
         if (enemy.dead) return;
-        if (this.character.isColliding(enemy)) {
-            if (this.character.isInvulnerable) return;
 
-            if (this.isStompingOn(enemy)) {
-                this.handleJumpOnEnemy(enemy);
-            } else {
-                this.handleTouchEnemy(enemy);
-            }
+        const collided = this.character.isColliding(enemy);
+        const canHit = !this.character.isInvulnerable;
+
+        if (collided && canHit) {
+            this.isStompingOn(enemy)
+                ? this.handleJumpOnEnemy(enemy)
+                : this.handleTouchEnemy(enemy);
         }
 
         this.handleThrowableCollision(enemy);
     }
 
-    /** Checks if character is jumping on the enemy. */
+    /**
+     * Is player stomping this enemy?
+     * @param {Enemy} enemy
+     */
     isStompingOn(enemy) {
         const tolerance = 30;
         return this.character.bottom() <= enemy.top() + tolerance && this.character.speedY < 0;
     }
 
-    /** Kills enemy if jumped on. */
+    /**
+     * Jumped on enemy = defeat it.
+     * @param {Enemy} enemy
+     */
     handleJumpOnEnemy(enemy) {
         if (enemy instanceof Endboss) return;
         this.character.isInvulnerable = true;
@@ -133,14 +139,20 @@ class World {
         setTimeout(() => (this.character.isInvulnerable = false), 300);
     }
 
-    /** Damages character if touched by enemy. */
+    /**
+     * Touched enemy = take damage.
+     * @param {Enemy} enemy
+     */
     handleTouchEnemy(enemy) {
         if (enemy instanceof Endboss) enemy.doAttack();
         this.character.hit();
         this.statusBar.setPercentage(this.character.health);
     }
 
-    /** Handles throwable objects hitting enemies. */
+    /**
+     * Bottle hit enemy = damage/kill.
+     * @param {Enemy} enemy
+     */
     handleThrowableCollision(enemy) {
         this.throwableObjects.forEach((bottle, i) => {
             if (!bottle.hasHit && bottle.isColliding(enemy)) {
@@ -152,7 +164,10 @@ class World {
         });
     }
 
-    /** Removes enemy from game world. */
+    /**
+     * Remove enemy from game.
+     * @param {Enemy} enemy
+     */
     killEnemy(enemy) {
         if (enemy.die) {
             enemy.die();
@@ -165,7 +180,7 @@ class World {
         }
     }
 
-    /** Handles collecting coins. */
+    /** Player picks up coins. */
     handleCoinCollisions() {
         this.collectableCoins = this.collectableCoins.filter(coin => {
             if (this.character.isColliding(coin)) {
@@ -179,7 +194,7 @@ class World {
         });
     }
 
-    /** Handles collecting bottles. */
+    /** Player picks up bottles. */
     handleBottleCollisions() {
         this.collectableBottles = this.collectableBottles.filter(bottle => {
             if (this.character.isColliding(bottle)) {
@@ -191,7 +206,7 @@ class World {
         });
     }
 
-    /** Starts boss fight when reaching a trigger position. */
+    /** Trigger boss fight at position. */
     checkBossTrigger() {
         if (!window.bossTriggered && this.character.x >= 2800) {
             window.bossTriggered = true;
@@ -204,17 +219,17 @@ class World {
         }
     }
 
-    /** Plays boss music. */
+    /** Start boss music. */
     startBossMusic() {
         this.bossMusic.play();
     }
 
-    /** Unfreezes the player after cutscenes. */
+    /** Allow player to move again. */
     unfreezePlayer() {
         this.character.canMove = true;
     }
 
-    /** Draw loop for rendering game objects. */
+    /** Main draw loop. */
     draw() {
         if (this.gamePaused) return;
         this.clearCanvas();
@@ -222,7 +237,7 @@ class World {
         requestAnimationFrame(() => this.draw());
     }
 
-    /** Handles drawing of all game objects. */
+    /** Draw game world objects. */
     handleObjectsDrawing() {
         this.checkThrowObjects();
         this.applyCamera(() => {
@@ -240,12 +255,12 @@ class World {
         });
     }
 
-    /** Clears the canvas. */
+    /** Clear the canvas. */
     clearCanvas() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    /** Draws UI status bars. */
+    /** Draw UI status bars. */
     drawStatus() {
         const bars = [this.statusBar, this.statusBarCoins, this.statusBarBottles];
         if (this.endboss?.canTakeDamage && this.endboss.currentState !== 'dead') {
@@ -254,7 +269,10 @@ class World {
         this.addObjects([bars]);
     }
 
-    /** Offsets drawing for camera scrolling. */
+    /**
+     * Offset camera to follow player.
+     * @param {Function} drawFn
+     */
     applyCamera(drawFn) {
         this.ctx.save();
         this.ctx.translate(this.camera_x, 0);
@@ -262,12 +280,18 @@ class World {
         this.ctx.restore();
     }
 
-    /** Draws arrays of objects. */
+    /**
+     * Draw all objects from groups.
+     * @param {Array[]} groups
+     */
     addObjects(groups) {
         groups.flat().forEach(obj => this.drawObject(obj));
     }
 
-    /** Draws one object and optionally its hitbox. */
+    /**
+     * Draw one object (with flip if needed).
+     * @param {Object} obj
+     */
     drawObject(obj) {
         this.ctx.save();
         if (obj.otherDirection) this.flipImage(obj);
@@ -278,14 +302,14 @@ class World {
         this.ctx.restore();
     }
 
-    /** Flips image horizontally for mirrored drawing. */
+    /** Flip image for left-facing objects. */
     flipImage(obj) {
         this.ctx.translate(obj.x + obj.width / 2, obj.y);
         this.ctx.scale(-1, 1);
         this.ctx.translate(-obj.x - obj.width / 2, -obj.y);
     }
 
-    /** Handles object throwing logic. */
+    /** Handle input to throw bottle. */
     checkThrowObjects() {
         const now = Date.now();
         if (this.keyboard.D && !this.dWasHeld) {
@@ -300,7 +324,7 @@ class World {
         if (!this.keyboard.D) this.dWasHeld = false;
     }
 
-    /** Spawns a throwable object. */
+    /** Create and throw bottle. */
     throwObject() {
         const facingLeft = this.character.otherDirection;
         const x = this.character.x + (facingLeft ? -30 : 65);
@@ -310,7 +334,7 @@ class World {
         this.throwableObjects.push(bottle);
     }
 
-    /** Spawns coins at random positions. */
+    /** Place coins randomly. */
     spawnCoins() {
         this.collectableCoins = [];
         let placed = 0;
@@ -323,7 +347,7 @@ class World {
         }
     }
 
-    /** Spawns bottles at random positions. */
+    /** Place bottles randomly. */
     spawnBottles() {
         this.collectableBottles = [];
         let placed = 0;
@@ -336,32 +360,40 @@ class World {
         }
     }
 
-    /** Generates a random coin X position. */
+    /** Get random coin x-position. */
     randomX() {
         return this.COIN_MIN_X + Math.random() * (this.COIN_MAX_X - this.COIN_MIN_X);
     }
 
+    /**
+     * Coin overlap check.
+     * @param {number} x
+     */
     checkOverlap(x) {
         return this.collectableCoins.some(c => Math.abs(x - c.x) < this.COIN_SPACING);
     }
 
+    /**
+     * Bottle overlap check.
+     * @param {number} x
+     */
     checkBottleOverlap(x) {
         return this.collectableBottles.some(b => Math.abs(x - b.x) < 120);
     }
 
-    /** Updates UI coin counter text. */
+    /** Update coin count text on win/game over. */
     updateCollectedCoinsDisplay() {
         const msg = `You have collected ${this.collectedCoinsCount} / ${this.COIN_COUNT} coins!`;
         document.getElementById('collectedCoinsGameOver').textContent = msg;
         document.getElementById('collectedCoinsWin').textContent = msg;
     }
 
-    /** Pauses the game logic and rendering. */
+    /** Pause game logic/drawing. */
     pauseGame() {
         this.gamePaused = true;
     }
 
-    /** Stops game and all sounds. */
+    /** Clean up all sounds and pause game. */
     cleanUp() {
         this.pauseGame();
         this.setMute(true);
